@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+<main class="post-page">
+  <article class="post-shell">
+    <header class="post-hero">
+      <a class="back-link" href="{{ '/#writing' | relative_url }}">Back to writing</a>
+      <p class="eyebrow">{{ page.topic }}</p>
+      <h1>{{ page.title }}</h1>
+      <p class="post-excerpt">{{ page.excerpt | strip_html }}</p>
+      <a class="source-link" href="{{ page.source_url }}" target="_blank" rel="noreferrer">Original note on GitHub</a>
+    </header>
+
+    <div class="post-content">
+      {{ content }}
+    </div>
+  </article>
+</main>

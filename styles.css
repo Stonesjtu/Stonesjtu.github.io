@@ -312,6 +312,111 @@ dd {
   color: var(--muted);
 }
 
+.post-page {
+  padding: clamp(44px, 7vw, 92px) clamp(20px, 5vw, 72px);
+}
+
+.post-shell {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.post-hero {
+  padding-bottom: clamp(28px, 5vw, 48px);
+  border-bottom: 1px solid var(--line);
+}
+
+.post-hero h1 {
+  max-width: 860px;
+  margin-bottom: 22px;
+  font-size: clamp(2.6rem, 7vw, 5.8rem);
+  line-height: 0.96;
+}
+
+.post-excerpt {
+  max-width: 760px;
+  color: #2d3732;
+  font-size: clamp(1.06rem, 2vw, 1.24rem);
+}
+
+.back-link,
+.source-link {
+  display: inline-flex;
+  margin-bottom: 24px;
+  color: var(--accent-dark);
+  font-weight: 850;
+  text-decoration: underline;
+  text-decoration-color: rgba(17, 102, 86, 0.26);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.source-link {
+  margin: 8px 0 0;
+}
+
+.post-content {
+  padding-top: clamp(28px, 5vw, 54px);
+  color: #25302b;
+  font-size: 1.02rem;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  margin-top: 2.1em;
+  margin-bottom: 0.7em;
+}
+
+.post-content h2 {
+  font-size: clamp(1.65rem, 3vw, 2.4rem);
+}
+
+.post-content h3 {
+  font-size: clamp(1.28rem, 2.2vw, 1.8rem);
+}
+
+.post-content p,
+.post-content ul,
+.post-content ol,
+.post-content blockquote,
+.post-content pre {
+  margin-bottom: 1.1rem;
+}
+
+.post-content a {
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.post-content blockquote {
+  margin-left: 0;
+  padding-left: 18px;
+  border-left: 3px solid var(--gold);
+  color: var(--muted);
+}
+
+.post-content pre {
+  overflow-x: auto;
+  padding: 18px;
+  border-radius: 8px;
+  background: #17201b;
+  color: #f8f4e9;
+}
+
+.post-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.92em;
+}
+
+.post-content :not(pre) > code {
+  padding: 0.1em 0.32em;
+  border-radius: 5px;
+  background: rgba(17, 102, 86, 0.09);
+  color: var(--accent-dark);
+}
+
 .timeline {
   display: grid;
   gap: 18px;
