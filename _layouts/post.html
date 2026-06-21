@@ -9,7 +9,7 @@ layout: default
       <p class="eyebrow">{{ page.topic }}</p>
       <h1>{{ page.title }}</h1>
       <p class="post-excerpt">{{ page.excerpt | strip_html }}</p>
-      <a class="source-link" href="{{ page.source_url }}" target="_blank" rel="noreferrer">Original note on GitHub</a>
+      <a class="source-link" href="{{ page.source_url }}" target="_blank" rel="noreferrer">{{ page.source_label | default: "Original note on GitHub" }}</a>
     </header>
 
     <div class="post-content">
