@@ -1,0 +1,15 @@
+{% if site.analytics.enabled and site.analytics.provider == "goatcounter" and site.analytics.goatcounter_code %}
+<script
+  data-goatcounter="https://{{ site.analytics.goatcounter_code }}.goatcounter.com/count"
+  async
+  src="https://gc.zgo.at/count.js">
+</script>
+<noscript>
+  <img
+    src="https://{{ site.analytics.goatcounter_code }}.goatcounter.com/count?p={{ page.url | relative_url | uri_escape }}"
+    alt=""
+    aria-hidden="true"
+    width="1"
+    height="1" />
+</noscript>
+{% endif %}

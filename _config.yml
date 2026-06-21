@@ -14,6 +14,15 @@ comments:
   category: "General"
   category_id: "DIC_kwDOS_7EwM4C_hcJ"
 
+analytics:
+  enabled: true
+  provider: goatcounter
+  goatcounter_code: "stonesjtu-homepage"
+
+visitor_counter:
+  enabled: true
+  url: "stonesjtu.github.io/homepage"
+
 markdown: kramdown
 permalink: pretty
 

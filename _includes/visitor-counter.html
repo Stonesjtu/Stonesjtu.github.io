@@ -1,0 +1,12 @@
+{% if site.visitor_counter.enabled and site.visitor_counter.url %}
+<a
+  class="visitor-counter"
+  href="https://hits.sh/{{ site.visitor_counter.url }}/"
+  target="_blank"
+  rel="noreferrer"
+  aria-label="Visitor statistics">
+  <img
+    src="https://hits.sh/{{ site.visitor_counter.url }}.svg?label=visits&view=today-total&style=flat-square&color=116656"
+    alt="Visitor count" />
+</a>
+{% endif %}
