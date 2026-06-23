@@ -1,7 +1,13 @@
 - PyTorch
+- LLM/VLM Serving
+- Inference Optimization
+- Training Infrastructure
+- Mobile AI
 - Python
 - C/C++
 - CUDA
+- Ascend 910B
+- Heterogeneous Computing
 - Linux
 - Docker
 - Git

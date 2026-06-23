@@ -1,5 +1,14 @@
+- scope: ByteDance, Doubao Mobile Assistant Team
+  tags: AI Infrastructure Engineer · Oct 2024-Present
+  title: Build large-model training, serving, and inference infrastructure across mobile and cloud
+  points:
+    - Work on AI infrastructure for Doubao mobile assistant, covering serving, inference, and training systems on both mobile-side and cloud-side paths.
+    - Own cloud LLM/VLM inference deployment and optimization for Doubao mobile assistant, improving latency, throughput, and inference cost.
+    - Drive GUI Agent model deployment, service launch, and performance and cost optimization for production assistant workloads.
+    - Build and integrate large-model training stacks, including VeOmni and verl on Ascend 910B.
+    - Coordinate across algorithm, inference, infrastructure, and heterogeneous-compute teams to turn model validation into reliable online services.
 - scope: NIO, Shanghai
-  tags: AI Compiler System - Staff Engineer · Apr 2023-Present
+  tags: AI Compiler System - Staff Engineer · Apr 2023-Oct 2024
   title: Lead AI compiler and NPU operator work for in-house DSA hardware
   points:
     - Analyze product neural networks and translate model requirements into operator and compiler-stack development plans.

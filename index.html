@@ -6,12 +6,12 @@ title: Home
 <main id="top">
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <p class="eyebrow">Intelligent speech · AI compilers · NPU systems</p>
+      <p class="eyebrow">AI infra · Mobile AI · Inference systems</p>
       <h1 id="hero-title">Kaiyu Shi</h1>
       <p class="hero-lede">
-        {{ site.description }} My recent work spans NIO's AI compiler system,
-        AISpeech edge speech chips, PyTorch distributed training, and memory-efficient
-        model-parallel DNN training.
+        {{ site.description }} My recent work spans Doubao mobile assistant AI infrastructure,
+        cloud LLM/VLM inference, GUI Agent serving, Ascend 910B training stacks, NIO's AI compiler
+        system, and AISpeech edge speech chips.
       </p>
       <div class="hero-actions" aria-label="Page shortcuts">
         <a class="button primary" href="#writing">Read blog posts</a>
@@ -22,7 +22,7 @@ title: Home
       <img src="{{ site.avatar_url }}" width="240" height="240" alt="GitHub avatar for {{ site.github_username }}" />
       <div>
         <p class="profile-name">石开宇 · Kaiyu Shi</p>
-        <p class="profile-role">AI Compiler System Staff Engineer at NIO. Previously speech chip algorithm engineer at AISpeech and intern at Microsoft Research.</p>
+        <p class="profile-role">AI Infrastructure Engineer on ByteDance's Doubao mobile assistant team. Previously AI compiler system engineer at NIO, speech chip algorithm engineer at AISpeech, and intern at Microsoft Research.</p>
         <a class="profile-link" href="mailto:{{ site.email }}">{{ site.email }}</a>
         <a class="profile-link" href="https://github.com/{{ site.github_username }}" target="_blank" rel="noreferrer">GitHub @{{ site.github_username }}</a>
       </div>
@@ -36,22 +36,23 @@ title: Home
     </div>
     <div class="intro-grid">
       <p>
-        I work where neural network models, compiler behavior, chip architecture, and production deployment meet.
-        The throughline is practical performance: lower latency, smaller memory footprints, better training
-        throughput, and reliable edge deployment.
+        I work where large-model serving, inference optimization, training infrastructure, compiler behavior,
+        chip architecture, and production deployment meet. The throughline is practical performance:
+        lower latency, lower serving cost, smaller memory footprints, better training throughput, and reliable
+        mobile and cloud deployment.
       </p>
       <dl class="metric-list">
         <div>
-          <dt>2x</dt>
-          <dd>Training acceleration in a PyTorch-based distributed training upgrade.</dd>
+          <dt>LLM/VLM</dt>
+          <dd>Cloud inference deployment and optimization for Doubao mobile assistant.</dd>
         </div>
         <div>
-          <dt>5x</dt>
-          <dd>Memory reduction and NNLM latency improvement in separate system efforts.</dd>
+          <dt>910B</dt>
+          <dd>Training-stack integration work with VeOmni and verl on Ascend 910B.</dd>
         </div>
         <div>
           <dt>25x</dt>
-          <dd>RTF improvement for end-to-end ASR acceleration.</dd>
+          <dd>RTF improvement from earlier end-to-end ASR acceleration work.</dd>
         </div>
       </dl>
     </div>
@@ -91,8 +92,8 @@ title: Home
     <p>
       Reach me at <a href="mailto:{{ site.email }}">{{ site.email }}</a> or on
       <a href="https://github.com/{{ site.github_username }}" target="_blank" rel="noreferrer">GitHub</a>
-      for conversations around AI infrastructure, compiler stacks, hardware-aware optimization,
-      and production model performance.
+      for conversations around AI infrastructure, model serving, inference optimization,
+      compiler stacks, hardware-aware optimization, and production model performance.
     </p>
   </section>
 </main>

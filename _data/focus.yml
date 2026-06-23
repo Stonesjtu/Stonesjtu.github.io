@@ -1,8 +1,12 @@
+- title: Large-Model AI Infrastructure
+  text: LLM/VLM serving, inference deployment, training-stack integration, GUI Agent model rollout, and production performance and cost optimization.
+- title: Mobile and Cloud AI Systems
+  text: End-to-end assistant infrastructure across mobile-side and cloud-side execution paths, with attention to latency, reliability, and heterogeneous resources.
 - title: AI Compiler Systems
   text: NPU operator development, graph optimization, fusion, code generation, memory planning, and hardware consistency validation.
 - title: Speech Chip Algorithms
   text: Edge inference runtime, acoustic model miniaturization, quantization-aware training, speech enhancement, and streaming beamforming.
 - title: Distributed Training
-  text: PyTorch training infrastructure, model parallelism, speech criteria, large-vocabulary language models, and throughput tuning.
+  text: PyTorch training infrastructure, VeOmni and verl stack integration, model parallelism, speech criteria, large-vocabulary language models, and throughput tuning.
 - title: Hardware-Aware Performance
   text: Kernel tuning, data layout, tiling search, polyhedral scheduling, cost modeling, and CPU-GPU heterogeneous acceleration.
