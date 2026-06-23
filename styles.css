@@ -363,8 +363,7 @@ dd {
   font-size: clamp(1.06rem, 2vw, 1.24rem);
 }
 
-.back-link,
-.source-link {
+.back-link {
   display: inline-flex;
   margin-bottom: 24px;
   color: var(--accent-dark);
@@ -373,10 +372,6 @@ dd {
   text-decoration-color: rgba(17, 102, 86, 0.26);
   text-decoration-thickness: 2px;
   text-underline-offset: 5px;
-}
-
-.source-link {
-  margin: 8px 0 0;
 }
 
 .post-content {
