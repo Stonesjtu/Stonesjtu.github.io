@@ -2,6 +2,7 @@ title: Kaiyu Shi
 description: AI infrastructure and compiler systems engineer building open, practical AI systems so everyone can enjoy AI.
 career_objective: "Everyone should enjoy AI."
 critical_action: "AI should be open, and infra is the key."
+brief_intro: "I build AI infrastructure for serving, inference, training, mobile AI, and compiler systems, with recent work across Doubao mobile assistant, cloud LLM/VLM inference, Ascend 910B training stacks, NPU compilers, and edge speech chips."
 url: "https://stonesjtu.github.io"
 baseurl: ""
 github_username: Stonesjtu

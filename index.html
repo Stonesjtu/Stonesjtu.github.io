@@ -9,25 +9,11 @@ title: Home
       <h1 id="hero-title">Kaiyu Shi</h1>
       <p class="career-objective">{{ site.career_objective }}</p>
       <p class="hero-lede">
-        I build AI infrastructure for serving, inference, training, mobile AI, and compiler systems.
-        {{ site.critical_action }}
+        {{ site.brief_intro }} {{ site.critical_action }}
       </p>
       <div class="hero-actions" aria-label="Page shortcuts">
         <a class="button primary" href="#writing">Read blog posts</a>
         <a class="button secondary" href="{{ '/about/' | relative_url }}">About</a>
-      </div>
-    </section>
-
-    <section class="summary-card" aria-labelledby="intro-title">
-      <p class="eyebrow">Brief intro</p>
-      <h2 id="intro-title">Open AI Needs Strong Infra</h2>
-      <p>
-        I work on the systems layer that makes useful AI cheaper, faster, and easier to ship:
-        LLM/VLM inference, training stacks, mobile assistant infrastructure, and hardware-aware optimization.
-      </p>
-      <div class="intro-actions">
-        <a class="repo-link" href="{{ '/about/' | relative_url }}">More about me</a>
-        <a class="repo-link" href="{{ '/about/#experience' | relative_url }}">Experience</a>
       </div>
     </section>
 
