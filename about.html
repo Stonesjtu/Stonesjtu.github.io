@@ -70,6 +70,70 @@ permalink: /about/
     </div>
   </section>
 
+  <section class="content-card" id="experience" aria-label="Experience timeline">
+    <div class="section-heading">
+      <p class="eyebrow">Selected work</p>
+      <h2>Experience</h2>
+    </div>
+    <div class="timeline">
+      {% for item in site.data.experience %}
+      <article class="experience-card">
+        <div class="experience-meta">
+          <span>{{ item.scope }}</span>
+          <span>{{ item.tags }}</span>
+        </div>
+        <h3>{{ item.title }}</h3>
+        <ul>
+          {% for point in item.points %}
+          <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="content-card credentials" id="background" aria-labelledby="background-title">
+    <div class="section-heading">
+      <p class="eyebrow">Education</p>
+      <h2 id="background-title">Shanghai Jiao Tong University</h2>
+    </div>
+    <div class="compact-list">
+      {% for item in site.data.education %}
+      <article>
+        <h3>{{ item.school }}</h3>
+        <p>{{ item.degree }}, {{ item.year }} - {{ item.field }}{% if item.extra %}. {{ item.extra }}{% endif %}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="content-card credentials" aria-labelledby="skills-title">
+    <div class="section-heading">
+      <p class="eyebrow">Toolbox</p>
+      <h2 id="skills-title">Skills</h2>
+    </div>
+    <div class="skill-cloud">
+      {% for skill in site.data.skills %}
+      <span>{{ skill }}</span>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="content-card credentials" aria-labelledby="publications-title">
+    <div class="section-heading">
+      <p class="eyebrow">Research</p>
+      <h2 id="publications-title">Publications</h2>
+    </div>
+    <div class="publications no-top-rule">
+      <ol>
+        {% for item in site.data.publications %}
+        <li>{{ item.text }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
   <section class="content-card contact" id="contact" aria-labelledby="contact-title">
     <div>
       <p class="eyebrow">Contact</p>
