@@ -121,6 +121,15 @@ h3 {
   font-size: clamp(1.08rem, 2vw, 1.34rem);
 }
 
+.career-objective {
+  max-width: 720px;
+  margin: -10px 0 18px;
+  color: var(--accent-dark);
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
+  font-weight: 850;
+  line-height: 1.12;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
