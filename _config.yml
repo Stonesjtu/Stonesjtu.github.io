@@ -1,5 +1,6 @@
 title: Kaiyu Shi
 description: AI infrastructure and compiler systems engineer building open, practical AI systems so everyone can enjoy AI.
+tagline: AI infrastructure, inference systems, training stacks, and open AI.
 career_objective: "Everyone should enjoy AI."
 critical_action: "AI should be open, and infra is the key."
 brief_intro: "I build AI infrastructure for serving, inference, training, mobile AI, and compiler systems, with recent work across Doubao mobile assistant, cloud LLM/VLM inference, Ascend 910B training stacks, NPU compilers, and edge speech chips."
@@ -8,6 +9,24 @@ baseurl: ""
 github_username: Stonesjtu
 avatar_url: "https://avatars.githubusercontent.com/u/4556044?v=4"
 email: "skyisno.1@gmail.com"
+lang: en
+timezone: Asia/Shanghai
+keywords:
+  - AI infrastructure
+  - LLM inference
+  - VLM inference
+  - mobile AI
+  - AI compiler
+  - NPU compiler
+  - Ascend 910B
+  - GPU kernels
+  - PyTorch
+author:
+  name: Kaiyu Shi
+  alternate_name: 石开宇
+  email: "skyisno.1@gmail.com"
+  url: "https://stonesjtu.github.io"
+  github: Stonesjtu
 
 comments:
   enabled: true

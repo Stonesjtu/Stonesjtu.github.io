@@ -1,0 +1,107 @@
+{% assign seo_site_title = site.title | default: site.github_username %}
+{% assign seo_page_title = page.title | default: seo_site_title %}
+{% if page.title and page.title != 'Home' %}
+  {% assign seo_title = seo_page_title | append: ' | ' | append: seo_site_title %}
+{% else %}
+  {% assign seo_title = seo_site_title | append: ' | ' | append: site.tagline %}
+{% endif %}
+{% assign seo_description = page.description | default: page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 %}
+{% assign seo_url = page.url | absolute_url %}
+{% assign seo_image = page.image | default: site.avatar_url %}
+{% assign seo_type = 'website' %}
+{% if page.layout == 'post' %}
+  {% assign seo_type = 'article' %}
+{% endif %}
+<title>{{ seo_title | escape }}</title>
+<meta name="description" content="{{ seo_description | escape }}" />
+<meta name="author" content="{{ site.author.name | default: site.title | escape }}" />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#242a31" />
+{% if site.keywords %}
+<meta name="keywords" content="{{ site.keywords | join: ', ' | escape }}" />
+{% endif %}
+<link rel="canonical" href="{{ seo_url }}" />
+<meta property="og:site_name" content="{{ seo_site_title | escape }}" />
+<meta property="og:type" content="{{ seo_type }}" />
+<meta property="og:title" content="{{ seo_title | escape }}" />
+<meta property="og:description" content="{{ seo_description | escape }}" />
+<meta property="og:url" content="{{ seo_url }}" />
+<meta property="og:image" content="{{ seo_image }}" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="{{ seo_title | escape }}" />
+<meta name="twitter:description" content="{{ seo_description | escape }}" />
+<meta name="twitter:image" content="{{ seo_image }}" />
+<link rel="alternate" type="application/atom+xml" title="{{ seo_site_title | escape }}" href="{{ '/feed.xml' | absolute_url }}" />
+{% if page.layout == 'post' %}
+<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}" />
+{% if page.topic %}
+<meta property="article:section" content="{{ page.topic | escape }}" />
+{% endif %}
+{% if site.author.name %}
+<meta property="article:author" content="{{ site.author.name | escape }}" />
+{% endif %}
+{% endif %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "{{ site.url }}/#person",
+      "name": {{ site.author.name | default: site.title | jsonify }},
+      "alternateName": {{ site.author.alternate_name | jsonify }},
+      "url": "{{ site.url }}",
+      "email": "mailto:{{ site.email }}",
+      "sameAs": [
+        "https://github.com/{{ site.github_username }}"
+      ],
+      "jobTitle": "AI Infrastructure Engineer",
+      "description": {{ site.description | jsonify }}
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{ site.url }}/#website",
+      "url": "{{ site.url }}",
+      "name": {{ seo_site_title | jsonify }},
+      "description": {{ site.description | jsonify }},
+      "publisher": {
+        "@id": "{{ site.url }}/#person"
+      }
+    }{% if page.layout == 'post' %},
+    {
+      "@type": "BlogPosting",
+      "@id": "{{ seo_url }}#article",
+      "headline": {{ page.title | jsonify }},
+      "description": {{ seo_description | jsonify }},
+      "url": "{{ seo_url }}",
+      "datePublished": "{{ page.date | date_to_xmlschema }}",
+      "dateModified": "{{ page.last_modified_at | default: page.date | date_to_xmlschema }}",
+      "author": {
+        "@id": "{{ site.url }}/#person"
+      },
+      "publisher": {
+        "@id": "{{ site.url }}/#person"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ seo_url }}"
+      }{% if page.topic %},
+      "articleSection": {{ page.topic | jsonify }}{% endif %}
+    }{% else %},
+    {
+      "@type": "WebPage",
+      "@id": "{{ seo_url }}#webpage",
+      "url": "{{ seo_url }}",
+      "name": {{ seo_title | jsonify }},
+      "description": {{ seo_description | jsonify }},
+      "isPartOf": {
+        "@id": "{{ site.url }}/#website"
+      },
+      "about": {
+        "@id": "{{ site.url }}/#person"
+      }
+    }{% endif %}
+  ]
+}
+</script>
