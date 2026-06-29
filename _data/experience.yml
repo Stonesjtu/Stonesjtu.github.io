@@ -9,13 +9,13 @@
     - Coordinate across algorithm, inference, infrastructure, and heterogeneous-compute teams to turn model validation into reliable online services.
 - scope: NIO, Shanghai
   tags: AI Compiler System - Staff Engineer · Apr 2023-Oct 2024
-  title: Lead AI compiler and NPU operator work for in-house DSA hardware
+  title: Worked on AI compiler and NPU operator optimization for in-house DSA hardware
   points:
-    - Analyze product neural networks and translate model requirements into operator and compiler-stack development plans.
+    - Analyzed product neural networks and translated model requirements into operator and compiler-stack development plans.
     - Identify performance hotspots and define optimization opportunities across operators, code generation, and compiler behavior.
-    - Develop and tune high-performance NPU operators including element-wise, NMS, and attention kernels.
-    - Build acceleration-library primitives comparable to CUB, including scan, reduce, and sort.
-    - Work on operator fusion, automatic compilation, code generation, and chip bring-up validation.
+    - Developed and tuned high-performance NPU operators including element-wise, NMS, and attention kernels.
+    - Built acceleration-library primitives comparable to CUB, including scan, reduce, and sort.
+    - Contributed to operator fusion, automatic compilation, code generation, and chip bring-up validation.
 - scope: AISpeech, Shanghai
   tags: Speech Chip Algorithm Engineer · 2020-Apr 2023
   title: Built edge speech-chip inference, compiler, quantization, and signal-processing systems
