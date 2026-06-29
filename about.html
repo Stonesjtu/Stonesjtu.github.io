@@ -25,46 +25,20 @@ description: "About Kaiyu Shi, an AI infrastructure engineer working on Doubao m
     </aside>
   </section>
 
-  <section class="content-card intro" aria-labelledby="impact-title">
+  <section class="content-card" aria-labelledby="work-title">
     <div class="section-heading">
-      <p class="eyebrow">Selected impact</p>
-      <h2 id="impact-title">Infrastructure That Makes AI Easier to Ship</h2>
+      <p class="eyebrow">What I work on</p>
+      <h2 id="work-title">Open AI Needs Strong Infra</h2>
     </div>
-    <div class="intro-grid">
-      <p>
-        I care about the infrastructure layer because it decides whether capable models can
-        become reliable, affordable, and widely usable products.
-      </p>
-      <dl class="metric-list">
-        <div>
-          <dt>LLM/VLM</dt>
-          <dd>Cloud inference deployment and optimization for Doubao mobile assistant.</dd>
-        </div>
-        <div>
-          <dt>910B</dt>
-          <dd>Training-stack integration work with VeOmni and verl on Ascend 910B.</dd>
-        </div>
-        <div>
-          <dt>25x</dt>
-          <dd>RTF improvement from earlier end-to-end ASR acceleration work.</dd>
-        </div>
-      </dl>
-    </div>
-  </section>
-
-  <section class="content-card systems" aria-labelledby="focus-title">
-    <div class="section-heading">
-      <p class="eyebrow">Focus areas</p>
-      <h2 id="focus-title">Systems I Like to Make Better</h2>
-    </div>
-    <div class="focus-grid">
-      {% for focus in site.data.focus %}
-      <article>
-        <h3>{{ focus.title }}</h3>
-        <p>{{ focus.text }}</p>
-      </article>
-      {% endfor %}
-    </div>
+    <p class="lead-copy">
+      I care about the infrastructure layer because it decides whether capable models can
+      become reliable, affordable, and widely usable products.
+    </p>
+    <ul class="about-list">
+      <li>Deploy and optimize LLM/VLM inference for Doubao mobile assistant.</li>
+      <li>Build training infrastructure, including VeOmni and verl stack integration on Ascend 910B.</li>
+      <li>Work close to hardware: AI compilers, NPU operators, GPU kernels, and edge speech chips.</li>
+    </ul>
   </section>
 
   <section class="content-card" id="experience" aria-label="Experience timeline">
@@ -72,7 +46,7 @@ description: "About Kaiyu Shi, an AI infrastructure engineer working on Doubao m
       <p class="eyebrow">Selected work</p>
       <h2>Experience</h2>
     </div>
-    <div class="timeline">
+    <div class="simple-timeline">
       {% for item in site.data.experience %}
       <article class="experience-card">
         <div class="experience-meta">
@@ -81,7 +55,7 @@ description: "About Kaiyu Shi, an AI infrastructure engineer working on Doubao m
         </div>
         <h3>{{ item.title }}</h3>
         <ul>
-          {% for point in item.points %}
+          {% for point in item.points limit:2 %}
           <li>{{ point }}</li>
           {% endfor %}
         </ul>
@@ -90,30 +64,31 @@ description: "About Kaiyu Shi, an AI infrastructure engineer working on Doubao m
     </div>
   </section>
 
-  <section class="content-card credentials" id="background" aria-labelledby="background-title">
+  <section class="content-card credentials about-background" id="background" aria-labelledby="background-title">
     <div class="section-heading">
-      <p class="eyebrow">Education</p>
-      <h2 id="background-title">Shanghai Jiao Tong University</h2>
+      <p class="eyebrow">Background</p>
+      <h2 id="background-title">Education and Toolbox</h2>
     </div>
-    <div class="compact-list">
-      {% for item in site.data.education %}
-      <article>
-        <h3>{{ item.school }}</h3>
-        <p>{{ item.degree }}, {{ item.year }} - {{ item.field }}{% if item.extra %}. {{ item.extra }}{% endif %}</p>
-      </article>
-      {% endfor %}
-    </div>
-  </section>
-
-  <section class="content-card credentials" aria-labelledby="skills-title">
-    <div class="section-heading">
-      <p class="eyebrow">Toolbox</p>
-      <h2 id="skills-title">Skills</h2>
-    </div>
-    <div class="skill-cloud">
-      {% for skill in site.data.skills %}
-      <span>{{ skill }}</span>
-      {% endfor %}
+    <div class="about-columns">
+      <div>
+        <h3>Education</h3>
+        <div class="compact-list">
+          {% for item in site.data.education %}
+          <article>
+            <h4>{{ item.school }}</h4>
+            <p>{{ item.degree }}, {{ item.year }} - {{ item.field }}{% if item.extra %}. {{ item.extra }}{% endif %}</p>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <h3>Skills</h3>
+        <div class="skill-cloud">
+          {% for skill in site.data.skills %}
+          <span>{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
     </div>
   </section>
 
