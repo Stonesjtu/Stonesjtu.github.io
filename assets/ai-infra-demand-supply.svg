@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">AI demand is rising faster than hardware supply</title>
+  <desc id="desc">A conceptual chart showing model demand rising steeply while chip and memory supply improves more slowly, with infrastructure co-design bridging the gap.</desc>
+  <rect width="960" height="520" fill="#f8fafc"/>
+  <rect x="70" y="64" width="820" height="360" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="70" y="38" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">The infra gap: demand compounds faster than supply</text>
+  <text x="70" y="468" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="15">time</text>
+  <text x="18" y="260" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="15" transform="rotate(-90 18 260)">effective compute and memory demand</text>
+  <line x1="118" y1="386" x2="842" y2="386" stroke="#7b8798" stroke-width="2"/>
+  <line x1="118" y1="386" x2="118" y2="98" stroke="#7b8798" stroke-width="2"/>
+  <path d="M118 386 C250 335 342 285 455 205 C574 122 684 92 842 80" fill="none" stroke="#d1495b" stroke-width="6" stroke-linecap="round"/>
+  <path d="M118 386 C274 348 407 320 545 286 C658 258 755 232 842 202" fill="none" stroke="#2f80ed" stroke-width="6" stroke-linecap="round"/>
+  <path d="M118 386 C266 363 412 349 554 333 C670 320 760 305 842 286" fill="none" stroke="#8a6f3d" stroke-width="6" stroke-linecap="round"/>
+  <path d="M502 223 C573 211 633 200 704 182" fill="none" stroke="#172033" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M555 329 C620 304 664 266 704 182" fill="none" stroke="#172033" stroke-width="2" stroke-dasharray="6 6"/>
+  <rect x="600" y="230" width="220" height="72" rx="8" fill="#ecfdf3" stroke="#63b97a"/>
+  <text x="620" y="257" fill="#1f5d35" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">co-design work</text>
+  <text x="620" y="280" fill="#2e6842" font-family="Inter, Arial, sans-serif" font-size="13">models, kernels, compilers,</text>
+  <text x="620" y="299" fill="#2e6842" font-family="Inter, Arial, sans-serif" font-size="13">serving, memory, chips</text>
+  <circle cx="842" cy="80" r="6" fill="#d1495b"/>
+  <text x="606" y="112" fill="#a92c3f" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">model + token demand</text>
+  <text x="606" y="133" fill="#a92c3f" font-family="Inter, Arial, sans-serif" font-size="13">parameters, data, context, test-time compute</text>
+  <circle cx="842" cy="202" r="6" fill="#2f80ed"/>
+  <text x="612" y="168" fill="#1f65bd" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">accelerator compute</text>
+  <text x="612" y="189" fill="#1f65bd" font-family="Inter, Arial, sans-serif" font-size="13">better chips, parallelism, lower precision</text>
+  <circle cx="842" cy="286" r="6" fill="#8a6f3d"/>
+  <text x="618" y="338" fill="#665126" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">memory and power budget</text>
+  <text x="618" y="359" fill="#665126" font-family="Inter, Arial, sans-serif" font-size="13">bandwidth, capacity, thermal envelope</text>
+  <rect x="146" y="112" width="240" height="78" rx="8" fill="#fff7ed" stroke="#e6a85c"/>
+  <text x="166" y="140" fill="#8a4b12" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">Infrastructure becomes leverage</text>
+  <text x="166" y="164" fill="#8a4b12" font-family="Inter, Arial, sans-serif" font-size="13">Scheduling, locality, precision,</text>
+  <text x="166" y="183" fill="#8a4b12" font-family="Inter, Arial, sans-serif" font-size="13">routing, and caching close the gap.</text>
+</svg>
