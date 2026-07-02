@@ -100,6 +100,10 @@ That is the central tension in AI infra. The model side wants elasticity: bigger
 
 The H100 is a good example of both progress and constraint. NVIDIA's Hopper material highlights HBM3 bandwidth around 3 TB/s, a 50 MB L2 cache, Transformer Engine support, NVLink/NVSwitch scale-out, and low-precision tensor paths.[^h100] Those are enormous engineering gains, but they also show the shape of the problem: the accelerator has to spend more area and system design on memory hierarchy, interconnect, and datatype specialization because raw compute alone is not enough.
 
+The last twenty years of GPU evolution make the same point from another angle. The first CUDA-era Tesla C870 was advertised at 518 GFLOP/s peak single precision in 2007.[^tesla-c870] The C1060 reached 933 GFLOP/s in 2008.[^tesla-c1060] Kepler's K20X reached 3.95 TFLOP/s single precision and 1.31 TFLOP/s double precision in 2012.[^tesla-k20x] Then the center of gravity shifted from general FP32 throughput toward lower-precision tensor math for AI: P100 delivered 21.2 TFLOP/s FP16 in 2016, V100 delivered about 125-130 Tensor TFLOP/s, A100 reached 312 TFLOP/s dense FP16/BF16 Tensor Core performance, and H100 lists 1,979 TFLOP/s FP16/BF16 Tensor Core and 3,958 TFLOP/s FP8 Tensor Core performance.[^p100][^v100][^a100][^h100-spec]
+
+Those numbers should not be read as one clean apples-to-apples curve, because the datatype, sparsity mode, memory system, and programming model changed. But that is exactly the infrastructure lesson. GPU progress has come not only from more scalar FLOP/s, but from changing the numerical contract: CUDA, SIMT execution, HBM, NVLink, tensor cores, TF32, BF16, FP8, sparsity, and compiler/runtime support all turned model structure into hardware efficiency. The resource trend is still impressive: Epoch AI estimated that GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and roughly every 2.07 years for GPUs commonly used in ML research.[^gpu-price-performance] Their newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^epoch-ai-trends] Our World in Data publishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
+
 The token is the economic unit
 ---
 
@@ -125,3 +129,13 @@ References
 [^dark-silicon]: Hadi Esmaeilzadeh et al., [Dark Silicon and the End of Multicore Scaling](https://research.cs.wisc.edu/vertical/papers/2011/isca11-darksilicon.pdf), 2011.
 [^horowitz]: Mark Horowitz, [Computing's Energy Problem](https://gwern.net/doc/cs/hardware/2014-horowitz-2.pdf), ISSCC 2014.
 [^h100]: NVIDIA, [Hopper Architecture In-Depth](https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/), 2022.
+[^tesla-c870]: NVIDIA, [NVIDIA Tesla: GPU Compute Technical Brief](https://www.nvidia.com/docs/io/43395/tesla_technical_brief.pdf), 2007.
+[^tesla-c1060]: NVIDIA, [Tesla C1060 Computing Processor Board](https://www.nvidia.com/docs/io/43395/bd-04111-001_v06.pdf), 2008.
+[^tesla-k20x]: NVIDIA Newsroom, [NVIDIA Unveils World's Fastest, Most Efficient Accelerators](https://nvidianews.nvidia.com/news/nvidia-unveils-world-s-fastest-most-efficient-accelerators-powers-world-s-no-1-supercomputer-6622729), 2012.
+[^p100]: NVIDIA, [Pascal Architecture Whitepaper](https://images.nvidia.com/content/pdf/tesla/whitepaper/pascal-architecture-whitepaper.pdf), 2016.
+[^v100]: NVIDIA, [Tesla V100 GPU Architecture](https://images.nvidia.com/content/volta-architecture/pdf/volta-architecture-whitepaper.pdf), 2017.
+[^a100]: NVIDIA, [A100 Tensor Core GPU Architecture](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf), 2020.
+[^h100-spec]: NVIDIA, [H100 Tensor Core GPU](https://www.nvidia.com/en-us/data-center/h100/), accessed 2026-07-02.
+[^gpu-price-performance]: Jaime Sevilla and Pablo Villalobos, [Trends in GPU Price-Performance](https://epoch.ai/publications/trends-in-gpu-price-performance), Epoch AI, 2022.
+[^epoch-ai-trends]: Epoch AI, [Trends in Artificial Intelligence: AI Hardware](https://epoch.ai/trends), accessed 2026-07-02.
+[^owid-gpu-price-performance]: Our World in Data, [GPU computational performance per dollar](https://ourworldindata.org/grapher/gpu-price-performance), accessed 2026-07-02.
