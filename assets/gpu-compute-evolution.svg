@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+  <title id="title">GPU peak compute and compute per dollar evolution</title>
+  <desc id="desc">A log-scale chart comparing representative NVIDIA GPU peak AI compute against an Epoch AI GPU compute-per-dollar trend from 2007 to 2026, both normalized to 2007.</desc>
+  <rect width="960" height="560" fill="#f8fafc"/>
+  <text x="70" y="44" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">GPU compute rose faster than compute per dollar</text>
+  <text x="70" y="74" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="14">Log scale, normalized to Tesla C870-era 2007 = 1. Peak compute uses the headline AI/HPC datatype of each generation.</text>
+
+  <rect x="70" y="96" width="820" height="372" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <line x1="110" y1="410" x2="850" y2="410" stroke="#7b8798" stroke-width="2"/>
+  <line x1="110" y1="410" x2="110" y2="80" stroke="#7b8798" stroke-width="2"/>
+
+  <g stroke="#e5ebf3" stroke-width="1">
+    <line x1="110" y1="410" x2="850" y2="410"/>
+    <line x1="110" y1="344" x2="850" y2="344"/>
+    <line x1="110" y1="278" x2="850" y2="278"/>
+    <line x1="110" y1="212" x2="850" y2="212"/>
+    <line x1="110" y1="146" x2="850" y2="146"/>
+    <line x1="110" y1="80" x2="850" y2="80"/>
+  </g>
+
+  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">
+    <text x="72" y="414">1x</text>
+    <text x="68" y="348">10x</text>
+    <text x="60" y="282">100x</text>
+    <text x="52" y="216">1,000x</text>
+    <text x="44" y="150">10,000x</text>
+    <text x="36" y="84">100,000x</text>
+  </g>
+
+  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">
+    <text x="98" y="438">2007</text>
+    <text x="292" y="438">2012</text>
+    <text x="448" y="438">2016</text>
+    <text x="604" y="438">2020</text>
+    <text x="760" y="438">2024</text>
+    <text x="836" y="438">2026</text>
+  </g>
+
+  <polyline points="110.0,410.0 148.9,393.1 304.7,351.8 460.5,303.6 499.5,252.7 616.3,226.5 694.2,153.7 772.1,110.3 850.0,81.0" fill="none" stroke="#d1495b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <polyline points="110.0,410.0 304.7,369.6 460.5,337.3 616.3,305.0 772.1,272.7 850.0,256.5" fill="none" stroke="#2f80ed" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 7"/>
+
+  <g fill="#d1495b" stroke="#ffffff" stroke-width="2">
+    <circle cx="110.0" cy="410.0" r="5"/>
+    <circle cx="148.9" cy="393.1" r="5"/>
+    <circle cx="304.7" cy="351.8" r="5"/>
+    <circle cx="460.5" cy="303.6" r="5"/>
+    <circle cx="499.5" cy="252.7" r="5"/>
+    <circle cx="616.3" cy="226.5" r="5"/>
+    <circle cx="694.2" cy="153.7" r="5"/>
+    <circle cx="772.1" cy="110.3" r="5"/>
+    <circle cx="850.0" cy="81.0" r="5"/>
+  </g>
+
+  <g fill="#172033" font-family="Inter, Arial, sans-serif" font-size="11">
+    <text x="118" y="399">C870</text>
+    <text x="156" y="386">C1060</text>
+    <text x="278" y="343">K20X</text>
+    <text x="435" y="295">P100</text>
+    <text x="506" y="248">V100</text>
+    <text x="590" y="218">A100</text>
+    <text x="664" y="143">H100</text>
+    <text x="738" y="101">B200</text>
+    <text x="812" y="72">Rubin</text>
+  </g>
+
+  <rect x="144" y="112" width="292" height="72" rx="8" fill="#fff4f2" stroke="#dd7a74"/>
+  <line x1="166" y1="136" x2="216" y2="136" stroke="#d1495b" stroke-width="4" stroke-linecap="round"/>
+  <text x="228" y="140" fill="#8d302a" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">representative peak GPU compute</text>
+  <text x="166" y="162" fill="#8d302a" font-family="Inter, Arial, sans-serif" font-size="12">SP -> FP16/BF16/FP8/FP4 tensor peaks</text>
+
+  <rect x="144" y="198" width="292" height="72" rx="8" fill="#f0f7ff" stroke="#6ba9e8"/>
+  <line x1="166" y1="222" x2="216" y2="222" stroke="#2f80ed" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 7"/>
+  <text x="228" y="226" fill="#235f99" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">GPU compute/$ trend</text>
+  <text x="166" y="248" fill="#235f99" font-family="Inter, Arial, sans-serif" font-size="12">Epoch all-GPU trend: about 2.46 yr doubling</text>
+
+  <text x="70" y="508" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">Note: This compares headline peak math rates across changing datatypes. It is useful for infrastructure intuition, not for exact workload speedup prediction.</text>
+</svg>
