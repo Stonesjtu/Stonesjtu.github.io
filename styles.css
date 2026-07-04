@@ -695,8 +695,31 @@ li::marker {
 .post-content ul,
 .post-content ol,
 .post-content blockquote,
-.post-content pre {
+.post-content pre,
+.post-content table {
   margin-bottom: 1.1rem;
+}
+
+.post-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.94rem;
+}
+
+.post-content th,
+.post-content td {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.post-content th {
+  background: #f4f7fb;
+  color: #1f2933;
+  font-weight: 760;
 }
 
 .post-content a {
