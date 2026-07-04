@@ -402,6 +402,30 @@ Interconnect bandwidth is improving aggressively because this tax is now first-o
 | Blackwell | 1.8 TB/s NVLink per GPU; 130 TB/s NVL72 aggregate | larger rack-scale GPU domains for model parallelism |
 | Rubin | 3.6 TB/s NVLink per GPU; 260 TB/s NVL72 aggregate | communication bandwidth has to scale with MoE, long context, and agentic inference |
 
+There are two different network curves hiding behind the same word "interconnect":
+
+- **Scale-up** is the tightly coupled GPU domain inside a box or rack. NVLink / NVSwitch bandwidth is not sold like a generic switch port; it is bundled into GPU systems, board design, power delivery, and thermal design. The useful public metric is bandwidth per GPU or per rack-scale domain.
+- **Scale-out** is the cluster fabric across nodes and racks. Ethernet and InfiniBand have visible port speeds, switch radix, optics, cables, NICs, and sometimes observable street prices. This is where a rough dollar-per-Gb/s proxy is possible.
+
+The speed curve is steep. InfiniBand moved from 4x QDR at 32 Gb/s in the late 2000s, to EDR 100 Gb/s, HDR 200 Gb/s, NDR 400 Gb/s, and XDR 800 Gb/s. Ethernet followed the same broad shape: 40/100GbE was standardized in 2010, 200/400GbE in 2017, and 800GbE in 2024.[^infiniband-rates][^ethernet-100g][^ethernet-400g][^ethernet-800g] NVIDIA's current Quantum-X800 documentation lists 72-port and 144-port XDR systems at 800 Gb/s per port, up to 115.2 Tb/s of maximum throughput for the 4U system.[^quantum-x800]
+
+For a dollar-per-speed proxy, use switch chassis price divided by front-panel bandwidth. This is not total cluster networking cost. It excludes optics, cables, NICs, support contracts, power, rack layout, and topology oversubscription. It is still useful because it shows the direction of the switching layer itself. The anchors below combine a legacy Cisco 10GbE price-list snapshot, public Mellanox / NVIDIA InfiniBand switch listings, and current SN5610 800GbE listing/spec data.[^nexus-price][^mellanox-switch-prices][^sn5610-price][^sn5610-specs]
+
+| scale-out switch proxy | approximate era | ports x port speed | public price anchor | switch dollars per Gb/s |
+| --- | ---: | ---: | ---: | ---: |
+| Cisco Nexus 5020 10GbE | 2008 | 40 x 10 Gb/s | USD 28,770 list-price snapshot | USD 72/Gb/s |
+| Mellanox SB7800 EDR | 2015 | 36 x 100 Gb/s | USD 10,259 channel listing | USD 2.85/Gb/s |
+| Mellanox QM8700 HDR | 2018 | 40 x 200 Gb/s | USD 18,740 channel listing | USD 2.34/Gb/s |
+| NVIDIA QM9700 NDR | 2022 | 64 x 400 Gb/s | USD 32,870 channel listing | USD 1.28/Gb/s |
+| NVIDIA SN5610 800GbE | 2026 | 64 x 800 Gb/s | USD 51,999 channel listing | USD 1.02/Gb/s |
+
+<figure class="post-figure">
+  <img src="{{ '/assets/interconnect-speed-cost-trend.svg' | relative_url }}" alt="Dual-axis chart showing scale-out switch port speed rising from 10G to 800G while switch dollar per gigabit falls from about 72 dollars per gigabit to about one dollar per gigabit.">
+  <figcaption>Scale-out switch bandwidth improved dramatically over the last two decades, but the system-level network bill does not fall as fast as raw switch dollars per Gb/s because optics, NICs, cables, power, and topology complexity become first-order costs.</figcaption>
+</figure>
+
+The punchline is subtle: network silicon has delivered a large cost-per-bit improvement, but AI clusters keep spending the savings. Higher port speed enables larger all-reduce domains, more tensor-parallel shards, more MoE all-to-all traffic, and more disaggregated serving. The value of better AI infrastructure is therefore not just "buy faster switches." It is reducing bytes moved, placing bytes closer to compute, overlapping collectives with kernels, and choosing parallelism plans that turn expensive network bandwidth into useful tokens.
+
 This is why "chips are slowing down" is not only a FLOP story. It is a locality and communication story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, interconnect bandwidth, synchronization time, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory and network bandwidth do useful work more often.
 
 The token is the economic unit
@@ -473,3 +497,12 @@ References
 [^n2-wafer-price]: Astute Group, [TSMC's 2nm Wafer Price Hits USD 30,000 Amid Monopoly Concerns](https://www.astutegroup.com/news/industrial/tsmcs-2nm-wafer-price-hits-30000-amid-monopoly-concerns/), 2025.
 [^nvlink]: NVIDIA, [NVLink and NVLink Switch](https://www.nvidia.com/en-us/data-center/nvlink/), accessed 2026-07-04.
 [^hgx-rubin]: NVIDIA, [HGX Platform](https://www.nvidia.com/en-us/data-center/hgx/), accessed 2026-07-04.
+[^infiniband-rates]: Wikipedia, [InfiniBand performance table](https://en.wikipedia.org/wiki/InfiniBand#Performance), accessed 2026-07-04.
+[^ethernet-100g]: Wikipedia, [100 Gigabit Ethernet](https://en.wikipedia.org/wiki/100_Gigabit_Ethernet), accessed 2026-07-04.
+[^ethernet-400g]: Ethernet Alliance, [IEEE 802.3 Standards Activities](https://ethernetalliance.org/wp-content/uploads/2018/02/OFC_400G_18_0314_Final.pdf), 2018.
+[^ethernet-800g]: IEEE Standards Association, [Ethernet's Next Bar is Now - 800 Gb/s!](https://standards.ieee.org/beyond-standards/ethernets-next-bar/), 2024.
+[^quantum-x800]: NVIDIA Networking Docs, [NVIDIA Q32xx and Q34xx XDR 800Gb/s InfiniBand Switch Systems](https://networking-docs.nvidia.com/xdrswitcheshw/introduction), accessed 2026-07-04.
+[^nexus-price]: Finnegan Software, [Cisco price list snapshot](https://www.finnsoft.com/priclist/cisco.htm), accessed 2026-07-04.
+[^mellanox-switch-prices]: Router-Switch.com, [NVIDIA Mellanox switches price list](https://www.router-switch.com/mellanox-switches-price.html), accessed 2026-07-04.
+[^sn5610-price]: NADDOD, [NVIDIA SN5610 Spectrum-4 800GbE switch listing](https://www.naddod.com/products/102969.html), accessed 2026-07-04.
+[^sn5610-specs]: NVIDIA Networking Docs, [NVIDIA Spectrum-4 SN5000 specifications](https://docs.nvidia.com/networking/display/sn5000/specifications), accessed 2026-07-04.
