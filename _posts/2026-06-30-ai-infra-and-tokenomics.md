@@ -236,7 +236,7 @@ One TFLOP/s sustained for one hour produces 3.6 PFLOP-s. For historical cards wi
 This is still a rough engineering estimate, not a purchasing benchmark. The datatype changes across generations, the utilization assumption is optimistic for owned hardware, and cloud prices include more than the GPU chip. The shape is still useful: peak AI math has moved from sub-TFLOP FP32 to multi-PFLOP low-precision tensor paths, while compute per dollar improved in uneven steps rather than as a smooth free lunch. Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
 
 <figure class="post-figure">
-  <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Two-panel log-scale chart comparing representative NVIDIA GPU peak compute and estimated compute per dollar.">
+  <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Two-panel log-scale chart titled GPU compute rose faster than compute per dollar, comparing representative NVIDIA GPU peak compute with real estimated GPU compute-per-dollar points.">
   <figcaption>Concrete price-performance estimates make the slowdown point sharper: raw peak math still jumps, but delivered compute per dollar depends on price, utilization, datatype, and cloud economics.</figcaption>
 </figure>
 

@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" role="img" aria-labelledby="title desc">
-  <title id="title">GPU peak compute and estimated compute per dollar</title>
-  <desc id="desc">Two log-scale charts showing representative NVIDIA GPU peak compute and estimated PFLOP-seconds per US dollar using public list prices or cloud GPU-hour prices.</desc>
+  <title id="title">GPU compute rose faster than compute per dollar</title>
+  <desc id="desc">Two log-scale charts showing representative NVIDIA GPU peak compute and real estimated GPU compute-per-dollar points using public list prices or cloud GPU-hour prices.</desc>
   <rect width="960" height="580" fill="#f8fafc"/>
 
-  <text x="64" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">GPU compute power and compute per dollar</text>
+  <text x="64" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">GPU compute rose faster than compute per dollar</text>
   <text x="64" y="70" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="13">
     Concrete estimate: older GPUs use launch/list price amortized over 3 years at 100% utilization; current GPUs use Lambda on-demand GPU-hour prices.
   </text>
@@ -12,7 +12,7 @@
   <rect x="496" y="98" width="412" height="382" rx="8" fill="#ffffff" stroke="#d7dee8"/>
 
   <text x="80" y="126" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">Peak compute used</text>
-  <text x="520" y="126" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">Estimated compute per dollar</text>
+  <text x="520" y="126" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">Real estimated compute-per-dollar points</text>
   <text x="80" y="146" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">TFLOP/s, log scale</text>
   <text x="520" y="146" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">PFLOP-s per USD, log scale</text>
 
@@ -91,12 +91,18 @@
     <text x="296" y="245">A100</text>
     <text x="372" y="191">H100</text>
     <text x="404" y="158">B200</text>
-    <text x="528" y="368">33</text>
-    <text x="660" y="294">213</text>
-    <text x="717" y="228">1,109</text>
-    <text x="736" y="269">403</text>
-    <text x="812" y="182">3,571</text>
-    <text x="838" y="142">9,686</text>
+    <text x="528" y="366">C870</text>
+    <text x="528" y="380">33</text>
+    <text x="650" y="294">P100</text>
+    <text x="660" y="308">213</text>
+    <text x="717" y="224">V100</text>
+    <text x="717" y="238">1,109</text>
+    <text x="738" y="270">A100</text>
+    <text x="742" y="284">403</text>
+    <text x="810" y="182">H100</text>
+    <text x="810" y="196">3,571</text>
+    <text x="834" y="140">B200</text>
+    <text x="834" y="154">9,686</text>
   </g>
 
   <g font-family="Inter, Arial, sans-serif" font-size="11">
