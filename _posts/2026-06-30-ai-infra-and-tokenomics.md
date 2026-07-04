@@ -60,13 +60,54 @@ Two scaling modes show why the infra problem does not stay fixed.
 
 In strong scaling, the workload is fixed and more hardware is added to finish sooner. The limiting terms are communication, synchronization, stragglers, and idle time. Adding more devices eventually exposes imperfect overlap and coordination overhead.
 
-In weak scaling, the hardware grows and the workload grows with it. This is the common AI pattern. More compute is used to train larger models, consume more data, extend context length, add modalities, and spend more compute at inference time. The bottleneck moves instead of disappearing:
+Pre-LLM consumer infrastructure mostly fits this pattern. A video stream, social-network feed, or game session can be expensive at global scale, but the compute per user is usually bounded by the product workload:
+
+```text
+pre-LLM app:
+  per_user_compute ~= O(1)
+  total_compute(N users) ~= N * O(1)
+
+strong scaling goal:
+  fixed workload W
+  add hardware P
+  reduce latency: time ~= W / P + communication_overhead(P)
+```
+
+In other words, once the product behavior is fixed, infra optimization mostly reduces the constant factor for serving the same request, stream, feed, or frame. The user count grows, but the compute size of each user's unit of work does not keep expanding because the model got larger or the context got longer.
+
+LLM infrastructure is different. The unit workload itself scales with model size and token length:
+
+```text
+LLM request, rough dense-transformer intuition:
+  P = model parameters
+  T = input_tokens + output_tokens
+
+  per_request_compute ~= O(P * T) + attention/cache terms
+
+post-LLM trend:
+  P increases
+  T increases
+  inference-time steps increase
+  therefore per_request_compute is not O(1)
+```
+
+This is why LLMs fit weak scaling better. In weak scaling, the hardware grows and the workload grows with it. More compute is used to train larger models, consume more data, extend context length, add modalities, and spend more compute at inference time. The bottleneck moves instead of disappearing:
 
 - More GPUs make interconnect topology and collective overlap important.
 - Longer context turns KV cache capacity and bandwidth into serving constraints.
 - Larger batches improve throughput but change latency and memory pressure.
 - MoE and routing improve parameter efficiency but add load-balancing problems.
 - Test-time compute improves quality but increases token budget variance.
+
+The financial implication is the important part. If an infra optimization reduces unit cost by a factor `r`, then:
+
+```text
+baseline_cost = requests * workload_per_request * cost_per_compute
+optimized_cost = requests * workload_per_request * cost_per_compute * r
+savings = requests * workload_per_request * cost_per_compute * (1 - r)
+```
+
+Under strong scaling, `workload_per_request ~= O(1)`, so savings mostly track traffic volume. Under weak scaling, `workload_per_request` grows with model size, context length, generated tokens, and agent steps. The same 20% kernel, compiler, cache, or batching win is therefore magnified by the growing workload. This is the "the more you buy, the more you save" property of AI infra: as token demand scales up, every percentage point of efficiency converts into a larger absolute dollar saving.
 
 The scaling-law literature explains why the pressure is not arbitrary. Kaplan et al. found language-model loss following power laws with model size, dataset size, and training compute across many orders of magnitude.[^kaplan] Hoffmann et al. showed that compute-optimal training needs model size and training tokens to scale together; Chinchilla improved quality under the same compute budget by training a smaller model on more tokens.[^chinchilla]
 
