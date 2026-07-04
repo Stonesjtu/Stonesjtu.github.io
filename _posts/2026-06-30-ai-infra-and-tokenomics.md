@@ -32,6 +32,11 @@ LLM infrastructure tightened the loop even further. Pretraining pushed cluster s
 
 Agentic infrastructure adds another layer of pressure. The system is not only generating one response. It may plan, call tools, read documents, write code, run tests, search memory, retry failed steps, and coordinate across many model calls. This increases the number of tokens consumed per task, but it also changes the workload shape. The value is no longer just in cheaper single-turn inference. It is in reducing the total tokens and wall-clock time needed to complete useful work.
 
+<figure class="post-figure">
+  <img src="{{ '/assets/infra-evolution-agentic.svg' | relative_url }}" alt="Timeline diagram showing infrastructure evolving from conventional request serving to machine learning jobs, deep learning training steps, LLM tokens, and agentic task loops.">
+  <figcaption>The important shift is the unit of work: infrastructure moves from operating services to scheduling accelerator-heavy token loops that must complete useful tasks.</figcaption>
+</figure>
+
 Why infra became so resource-demanding
 ---
 

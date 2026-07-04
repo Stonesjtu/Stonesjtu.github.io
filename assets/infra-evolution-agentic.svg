@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+  <title id="title">Infrastructure evolution from conventional services to agentic systems</title>
+  <desc id="desc">A five-stage timeline showing how the unit of work changes from requests to tensor jobs, distributed training steps, tokens, and agent tasks.</desc>
+  <rect width="960" height="560" fill="#f8fafc"/>
+  <text x="70" y="46" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Infra evolves as the unit of work changes</text>
+  <text x="70" y="76" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="14">The stack gets harder whenever the primitive being scheduled becomes more stateful, expensive, or feedback-driven.</text>
+
+  <line x1="118" y1="182" x2="842" y2="182" stroke="#9aa7b8" stroke-width="3"/>
+  <g fill="#ffffff" stroke="#9aa7b8" stroke-width="2">
+    <circle cx="118" cy="182" r="10"/>
+    <circle cx="299" cy="182" r="10"/>
+    <circle cx="480" cy="182" r="10"/>
+    <circle cx="661" cy="182" r="10"/>
+    <circle cx="842" cy="182" r="10"/>
+  </g>
+  <g fill="#9aa7b8">
+    <path d="M286 174 L303 182 L286 190 Z"/>
+    <path d="M467 174 L484 182 L467 190 Z"/>
+    <path d="M648 174 L665 182 L648 190 Z"/>
+    <path d="M829 174 L846 182 L829 190 Z"/>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="66" y="218" width="150" height="224" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+    <text x="88" y="250" fill="#172033" font-size="16" font-weight="700">Conventional</text>
+    <text x="88" y="271" fill="#172033" font-size="16" font-weight="700">infra</text>
+    <text x="88" y="304" fill="#8d302a" font-size="13" font-weight="700">unit</text>
+    <text x="88" y="324" fill="#344150" font-size="13">request</text>
+    <text x="88" y="344" fill="#344150" font-size="13">transaction</text>
+    <text x="88" y="378" fill="#235f99" font-size="13" font-weight="700">bottleneck</text>
+    <text x="88" y="398" fill="#344150" font-size="13">availability</text>
+    <text x="88" y="418" fill="#344150" font-size="13">throughput</text>
+
+    <rect x="247" y="126" width="150" height="224" rx="8" fill="#fff9e8" stroke="#d7aa45"/>
+    <text x="269" y="158" fill="#172033" font-size="16" font-weight="700">Machine</text>
+    <text x="269" y="179" fill="#172033" font-size="16" font-weight="700">learning infra</text>
+    <text x="269" y="212" fill="#8d302a" font-size="13" font-weight="700">unit</text>
+    <text x="269" y="232" fill="#344150" font-size="13">experiment</text>
+    <text x="269" y="252" fill="#344150" font-size="13">tensor job</text>
+    <text x="269" y="286" fill="#235f99" font-size="13" font-weight="700">bottleneck</text>
+    <text x="269" y="306" fill="#344150" font-size="13">data movement</text>
+    <text x="269" y="326" fill="#344150" font-size="13">GPU hours</text>
+
+    <rect x="428" y="218" width="150" height="224" rx="8" fill="#eefaf2" stroke="#69bb7f"/>
+    <text x="450" y="250" fill="#172033" font-size="16" font-weight="700">Deep</text>
+    <text x="450" y="271" fill="#172033" font-size="16" font-weight="700">learning infra</text>
+    <text x="450" y="304" fill="#8d302a" font-size="13" font-weight="700">unit</text>
+    <text x="450" y="324" fill="#344150" font-size="13">training step</text>
+    <text x="450" y="344" fill="#344150" font-size="13">kernel graph</text>
+    <text x="450" y="378" fill="#235f99" font-size="13" font-weight="700">bottleneck</text>
+    <text x="450" y="398" fill="#344150" font-size="13">parallelism</text>
+    <text x="450" y="418" fill="#344150" font-size="13">utilization</text>
+
+    <rect x="609" y="126" width="150" height="224" rx="8" fill="#f0f7ff" stroke="#6ba9e8"/>
+    <text x="631" y="158" fill="#172033" font-size="16" font-weight="700">LLM</text>
+    <text x="631" y="179" fill="#172033" font-size="16" font-weight="700">infra</text>
+    <text x="631" y="212" fill="#8d302a" font-size="13" font-weight="700">unit</text>
+    <text x="631" y="232" fill="#344150" font-size="13">token</text>
+    <text x="631" y="252" fill="#344150" font-size="13">KV cache</text>
+    <text x="631" y="286" fill="#235f99" font-size="13" font-weight="700">bottleneck</text>
+    <text x="631" y="306" fill="#344150" font-size="13">prefill/decode</text>
+    <text x="631" y="326" fill="#344150" font-size="13">latency SLOs</text>
+
+    <rect x="790" y="218" width="150" height="224" rx="8" fill="#f3f0ff" stroke="#a98cd9"/>
+    <text x="812" y="250" fill="#172033" font-size="16" font-weight="700">Agentic</text>
+    <text x="812" y="271" fill="#172033" font-size="16" font-weight="700">infra</text>
+    <text x="812" y="304" fill="#8d302a" font-size="13" font-weight="700">unit</text>
+    <text x="812" y="324" fill="#344150" font-size="13">task loop</text>
+    <text x="812" y="344" fill="#344150" font-size="13">tool call</text>
+    <text x="812" y="378" fill="#235f99" font-size="13" font-weight="700">bottleneck</text>
+    <text x="812" y="398" fill="#344150" font-size="13">state, retries</text>
+    <text x="812" y="418" fill="#344150" font-size="13">total tokens</text>
+  </g>
+
+  <rect x="196" y="474" width="568" height="48" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <text x="228" y="504" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">infra objective shifts: operate services -> feed accelerators -> deliver useful work per token</text>
+</svg>
