@@ -212,11 +212,32 @@ Blackwell continues the shift. NVIDIA's DGX B200 system lists 144 PFLOP/s FP4 Te
 
 These figures are not an apples-to-apples speedup curve. The datatype, sparsity mode, memory system, and programming model all changed. That is the important part. GPU progress came from changing the numerical contract: CUDA, SIMT execution, HBM, NVLink, tensor cores, TF32, BF16, FP8, FP4, sparsity, and compiler/runtime support made model structure visible to hardware.
 
-Compute per dollar improved too, but at a steadier rate. Epoch AI estimated that GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and roughly every 2.07 years for GPUs commonly used in ML research.[^gpu-price-performance] Their newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^epoch-ai-trends] Our World in Data publishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
+To make the price-performance curve concrete, use a simple rental-equivalent metric:
+
+<div class="math-block">
+$$
+\Pi = \frac{\text{peak TFLOP/s}}{\text{USD per GPU-hour}},
+\qquad
+\text{PFLOP-s per USD} = 3.6\Pi
+$$
+</div>
+
+One TFLOP/s sustained for one hour produces 3.6 PFLOP-s. For historical cards with public list prices, I convert purchase price into an implied GPU-hour by amortizing the card over three years at 100% utilization. For current cloud cards, I use Lambda's listed on-demand price per GPU-hour. C870 pricing comes from HPCwire's 2007 Tesla launch coverage, P100/V100 list prices come from Microway's 2018 price analysis, and A100/H100/B200 hourly prices come from Lambda's instances page.[^tesla-c870-price][^p100-v100-price][^lambda-pricing]
+
+| GPU | peak compute used | price basis | USD/GPU-hour | TFLOP/s per USD/hour | PFLOP-s per USD |
+| --- | ---: | --- | ---: | ---: | ---: |
+| Tesla C870 | 0.518 TFLOP/s FP32 | USD 1,499 list, 3-year amortized | 0.057 | 9.1 | 32.7 |
+| Tesla P100 SXM2 | 21.2 TFLOP/s FP16 | USD 9,428 list, 3-year amortized | 0.359 | 59.1 | 212.7 |
+| Tesla V100 SXM | 125 TFLOP/s Tensor | USD 10,664 list, 3-year amortized | 0.406 | 308.0 | 1,109.0 |
+| A100 SXM 80GB | 312 TFLOP/s FP16/BF16 Tensor | Lambda 8x A100 SXM price | 2.79 | 111.8 | 402.6 |
+| H100 SXM 80GB | 3,958 TFLOP/s FP8 Tensor | Lambda 8x H100 SXM price | 3.99 | 992.0 | 3,571.1 |
+| B200 SXM6 | 18,000 TFLOP/s FP4 Tensor | Lambda 8x B200 SXM6 price | 6.69 | 2,690.6 | 9,686.1 |
+
+This is still a rough engineering estimate, not a purchasing benchmark. The datatype changes across generations, the utilization assumption is optimistic for owned hardware, and cloud prices include more than the GPU chip. The shape is still useful: peak AI math has moved from sub-TFLOP FP32 to multi-PFLOP low-precision tensor paths, while compute per dollar improved in uneven steps rather than as a smooth free lunch. Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
 
 <figure class="post-figure">
-  <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Log-scale chart comparing representative NVIDIA GPU peak compute with an Epoch AI GPU compute per dollar trend, normalized to 2007.">
-  <figcaption>Peak AI math rates rose dramatically as GPUs adopted lower-precision tensor paths; compute per dollar improved too, but at a steadier hardware-economics trend.</figcaption>
+  <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Two-panel log-scale chart comparing representative NVIDIA GPU peak compute and estimated compute per dollar.">
+  <figcaption>Concrete price-performance estimates make the slowdown point sharper: raw peak math still jumps, but delivered compute per dollar depends on price, utilization, datatype, and cloud economics.</figcaption>
 </figure>
 
 The token is the economic unit
@@ -263,6 +284,9 @@ References
 [^blackwell-ultra]: NVIDIA Developer Blog, [Inside NVIDIA Blackwell Ultra](https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era/), 2026.
 [^rubin]: NVIDIA Newsroom, [NVIDIA Kicks Off the Next Generation of AI With Rubin](https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer), 2026.
 [^rubin-cpx]: NVIDIA Newsroom, [NVIDIA Unveils Rubin CPX](https://nvidianews.nvidia.com/news/nvidia-unveils-rubin-cpx-a-new-class-of-gpu-designed-for-massive-context-inference), 2025.
+[^tesla-c870-price]: Michael Feldman, [NVIDIA Takes Direct Aim at High Performance Computing](https://www.hpcwire.com/2007/06/22/nvidia_takes_direct_aim_at_high_performance_computing-1/), HPCwire, 2007.
+[^p100-v100-price]: Brett Newman, [NVIDIA Tesla V100 Price Analysis](https://www.microway.com/hpc-tech-tips/nvidia-tesla-v100-price-analysis/), Microway, 2018.
+[^lambda-pricing]: Lambda, [Instances](https://lambda.ai/instances), accessed 2026-07-04.
 [^gpu-price-performance]: Jaime Sevilla and Pablo Villalobos, [Trends in GPU Price-Performance](https://epoch.ai/publications/trends-in-gpu-price-performance), Epoch AI, 2022.
 [^epoch-ai-trends]: Epoch AI, [Trends in Artificial Intelligence: AI Hardware](https://epoch.ai/trends), accessed 2026-07-02.
 [^owid-gpu-price-performance]: Our World in Data, [GPU computational performance per dollar](https://ourworldindata.org/grapher/gpu-price-performance), accessed 2026-07-02.

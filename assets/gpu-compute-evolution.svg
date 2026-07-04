@@ -1,77 +1,117 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
-  <title id="title">GPU peak compute and compute per dollar evolution</title>
-  <desc id="desc">A log-scale chart comparing representative NVIDIA GPU peak AI compute against an Epoch AI GPU compute-per-dollar trend from 2007 to 2026, both normalized to 2007.</desc>
-  <rect width="960" height="560" fill="#f8fafc"/>
-  <text x="70" y="44" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">GPU compute rose faster than compute per dollar</text>
-  <text x="70" y="74" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="14">Log scale, normalized to Tesla C870-era 2007 = 1. Peak compute uses the headline AI/HPC datatype of each generation.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" role="img" aria-labelledby="title desc">
+  <title id="title">GPU peak compute and estimated compute per dollar</title>
+  <desc id="desc">Two log-scale charts showing representative NVIDIA GPU peak compute and estimated PFLOP-seconds per US dollar using public list prices or cloud GPU-hour prices.</desc>
+  <rect width="960" height="580" fill="#f8fafc"/>
 
-  <rect x="70" y="96" width="820" height="372" rx="8" fill="#ffffff" stroke="#d7dee8"/>
-  <line x1="110" y1="410" x2="850" y2="410" stroke="#7b8798" stroke-width="2"/>
-  <line x1="110" y1="410" x2="110" y2="80" stroke="#7b8798" stroke-width="2"/>
+  <text x="64" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">GPU compute power and compute per dollar</text>
+  <text x="64" y="70" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="13">
+    Concrete estimate: older GPUs use launch/list price amortized over 3 years at 100% utilization; current GPUs use Lambda on-demand GPU-hour prices.
+  </text>
+
+  <rect x="52" y="98" width="412" height="382" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <rect x="496" y="98" width="412" height="382" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+
+  <text x="80" y="126" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">Peak compute used</text>
+  <text x="520" y="126" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">Estimated compute per dollar</text>
+  <text x="80" y="146" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">TFLOP/s, log scale</text>
+  <text x="520" y="146" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">PFLOP-s per USD, log scale</text>
 
   <g stroke="#e5ebf3" stroke-width="1">
-    <line x1="110" y1="410" x2="850" y2="410"/>
-    <line x1="110" y1="344" x2="850" y2="344"/>
-    <line x1="110" y1="278" x2="850" y2="278"/>
-    <line x1="110" y1="212" x2="850" y2="212"/>
-    <line x1="110" y1="146" x2="850" y2="146"/>
-    <line x1="110" y1="80" x2="850" y2="80"/>
+    <line x1="80" y1="420" x2="440" y2="420"/>
+    <line x1="80" y1="371.3" x2="440" y2="371.3"/>
+    <line x1="80" y1="322.7" x2="440" y2="322.7"/>
+    <line x1="80" y1="274" x2="440" y2="274"/>
+    <line x1="80" y1="225.3" x2="440" y2="225.3"/>
+    <line x1="80" y1="176.7" x2="440" y2="176.7"/>
+    <line x1="80" y1="128" x2="440" y2="128"/>
+    <line x1="520" y1="420" x2="880" y2="420"/>
+    <line x1="520" y1="328.8" x2="880" y2="328.8"/>
+    <line x1="520" y1="237.5" x2="880" y2="237.5"/>
+    <line x1="520" y1="146.3" x2="880" y2="146.3"/>
   </g>
 
-  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">
-    <text x="72" y="414">1x</text>
-    <text x="68" y="348">10x</text>
-    <text x="60" y="282">100x</text>
-    <text x="52" y="216">1,000x</text>
-    <text x="44" y="150">10,000x</text>
-    <text x="36" y="84">100,000x</text>
+  <g stroke="#7b8798" stroke-width="2">
+    <line x1="80" y1="420" x2="440" y2="420"/>
+    <line x1="80" y1="420" x2="80" y2="128"/>
+    <line x1="520" y1="420" x2="880" y2="420"/>
+    <line x1="520" y1="420" x2="520" y2="128"/>
   </g>
 
-  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">
-    <text x="98" y="438">2007</text>
-    <text x="292" y="438">2012</text>
-    <text x="448" y="438">2016</text>
-    <text x="604" y="438">2020</text>
-    <text x="760" y="438">2024</text>
-    <text x="836" y="438">2026</text>
+  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="11">
+    <text x="48" y="424">0.1</text>
+    <text x="62" y="375">1</text>
+    <text x="56" y="327">10</text>
+    <text x="50" y="278">100</text>
+    <text x="42" y="229">1k</text>
+    <text x="36" y="181">10k</text>
+    <text x="30" y="132">100k</text>
+    <text x="488" y="424">10</text>
+    <text x="482" y="333">100</text>
+    <text x="476" y="242">1k</text>
+    <text x="470" y="150">10k</text>
   </g>
 
-  <polyline points="110.0,410.0 148.9,393.1 304.7,351.8 460.5,303.6 499.5,252.7 616.3,226.5 694.2,153.7 772.1,110.3 850.0,81.0" fill="none" stroke="#d1495b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
-  <polyline points="110.0,410.0 304.7,369.6 460.5,337.3 616.3,305.0 772.1,272.7 850.0,256.5" fill="none" stroke="#2f80ed" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="8 7"/>
+  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="11">
+    <text x="68" y="444">2007</text>
+    <text x="238" y="444">2016</text>
+    <text x="314" y="444">2020</text>
+    <text x="390" y="444">2024</text>
+    <text x="428" y="444">2026</text>
+    <text x="508" y="444">2007</text>
+    <text x="678" y="444">2016</text>
+    <text x="754" y="444">2020</text>
+    <text x="830" y="444">2024</text>
+    <text x="868" y="444">2026</text>
+  </g>
+
+  <polyline points="80.0,385.2 250.5,306.8 269.5,269.3 326.3,250.0 402.1,196.3 440.0,164.2" fill="none" stroke="#d1495b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <polyline points="520.0,373.0 690.5,298.8 709.5,233.4 766.3,273.6 842.1,187.1 880.0,147.5" fill="none" stroke="#2f80ed" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
 
   <g fill="#d1495b" stroke="#ffffff" stroke-width="2">
-    <circle cx="110.0" cy="410.0" r="5"/>
-    <circle cx="148.9" cy="393.1" r="5"/>
-    <circle cx="304.7" cy="351.8" r="5"/>
-    <circle cx="460.5" cy="303.6" r="5"/>
-    <circle cx="499.5" cy="252.7" r="5"/>
-    <circle cx="616.3" cy="226.5" r="5"/>
-    <circle cx="694.2" cy="153.7" r="5"/>
-    <circle cx="772.1" cy="110.3" r="5"/>
-    <circle cx="850.0" cy="81.0" r="5"/>
+    <circle cx="80.0" cy="385.2" r="5"/>
+    <circle cx="250.5" cy="306.8" r="5"/>
+    <circle cx="269.5" cy="269.3" r="5"/>
+    <circle cx="326.3" cy="250.0" r="5"/>
+    <circle cx="402.1" cy="196.3" r="5"/>
+    <circle cx="440.0" cy="164.2" r="5"/>
+  </g>
+  <g fill="#2f80ed" stroke="#ffffff" stroke-width="2">
+    <circle cx="520.0" cy="373.0" r="5"/>
+    <circle cx="690.5" cy="298.8" r="5"/>
+    <circle cx="709.5" cy="233.4" r="5"/>
+    <circle cx="766.3" cy="273.6" r="5"/>
+    <circle cx="842.1" cy="187.1" r="5"/>
+    <circle cx="880.0" cy="147.5" r="5"/>
   </g>
 
-  <g fill="#172033" font-family="Inter, Arial, sans-serif" font-size="11">
-    <text x="118" y="399">C870</text>
-    <text x="156" y="386">C1060</text>
-    <text x="278" y="343">K20X</text>
-    <text x="435" y="295">P100</text>
-    <text x="506" y="248">V100</text>
-    <text x="590" y="218">A100</text>
-    <text x="664" y="143">H100</text>
-    <text x="738" y="101">B200</text>
-    <text x="812" y="72">Rubin</text>
+  <g fill="#172033" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">
+    <text x="88" y="379">C870</text>
+    <text x="221" y="302">P100</text>
+    <text x="277" y="265">V100</text>
+    <text x="296" y="245">A100</text>
+    <text x="372" y="191">H100</text>
+    <text x="404" y="158">B200</text>
+    <text x="528" y="368">33</text>
+    <text x="660" y="294">213</text>
+    <text x="717" y="228">1,109</text>
+    <text x="736" y="269">403</text>
+    <text x="812" y="182">3,571</text>
+    <text x="838" y="142">9,686</text>
   </g>
 
-  <rect x="144" y="112" width="292" height="72" rx="8" fill="#fff4f2" stroke="#dd7a74"/>
-  <line x1="166" y1="136" x2="216" y2="136" stroke="#d1495b" stroke-width="4" stroke-linecap="round"/>
-  <text x="228" y="140" fill="#8d302a" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">representative peak GPU compute</text>
-  <text x="166" y="162" fill="#8d302a" font-family="Inter, Arial, sans-serif" font-size="12">SP -> FP16/BF16/FP8/FP4 tensor peaks</text>
+  <g font-family="Inter, Arial, sans-serif" font-size="11">
+    <rect x="92" y="160" width="188" height="54" rx="6" fill="#fff4f2" stroke="#dd7a74"/>
+    <text x="108" y="181" fill="#8d302a" font-weight="700">Headline datatype changes</text>
+    <text x="108" y="199" fill="#8d302a">FP32 -> FP16/BF16/FP8/FP4</text>
+    <rect x="548" y="160" width="208" height="54" rx="6" fill="#f0f7ff" stroke="#6ba9e8"/>
+    <text x="564" y="181" fill="#235f99" font-weight="700">Price basis changes too</text>
+    <text x="564" y="199" fill="#235f99">list-price amortized -> cloud rental</text>
+  </g>
 
-  <rect x="144" y="198" width="292" height="72" rx="8" fill="#f0f7ff" stroke="#6ba9e8"/>
-  <line x1="166" y1="222" x2="216" y2="222" stroke="#2f80ed" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 7"/>
-  <text x="228" y="226" fill="#235f99" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">GPU compute/$ trend</text>
-  <text x="166" y="248" fill="#235f99" font-family="Inter, Arial, sans-serif" font-size="12">Epoch all-GPU trend: about 2.46 yr doubling</text>
-
-  <text x="70" y="508" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">Note: This compares headline peak math rates across changing datatypes. It is useful for infrastructure intuition, not for exact workload speedup prediction.</text>
+  <text x="64" y="512" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">
+    Values are order-of-magnitude infrastructure intuition, not workload benchmarks. Owned historical GPUs assume 26,280 billable hours over 3 years.
+  </text>
+  <text x="64" y="532" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">
+    A100/H100/B200 use Lambda 8x instance prices per GPU-hour: 2.79, 3.99, and 6.69 USD. B200 uses DGX B200 system-level 144 PFLOP/s divided by 8 GPUs.
+  </text>
 </svg>
