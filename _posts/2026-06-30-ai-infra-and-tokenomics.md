@@ -199,9 +199,11 @@ The constraints in this section have a hierarchy:
 | layer | question | useful price metric |
 | --- | --- | --- |
 | compute | How much math can one accelerator expose? | FP16-normalized compute per GPU-hour |
+| ALU manufacturing | How cheaply can arithmetic lanes be replicated? | raw ALU area-cost proxy |
 | on-chip SRAM | How many hot bytes can stay near compute? | raw SRAM area-cost proxy per MB |
 | off-chip DRAM / HBM | How much capacity and bandwidth can the package feed? | USD/GB and USD per TB/s |
 | manufacturing | How expensive is each new square millimeter of silicon? | USD per 300 mm wafer |
+| interconnect | How expensive is coordination across accelerators? | communication time per collective / all-to-all |
 
 ### 1. Compute: peak math is now conditional
 
@@ -252,6 +254,31 @@ This is still a rough engineering estimate, not a purchasing benchmark. The util
   <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Two-panel log-scale chart titled GPU compute rose faster than compute per dollar, comparing FP16-normalized NVIDIA GPU compute with real estimated GPU compute-per-dollar points.">
   <figcaption>Concrete FP16-normalized price-performance estimates make the slowdown point sharper: raw math still jumps, but delivered compute per dollar depends on price, utilization, and cloud economics.</figcaption>
 </figure>
+
+#### 2.1 ALU manufacturing: narrow math buys more lanes
+
+The ALU-level version of the story is simpler. Arithmetic got cheaper because accelerators stopped treating every operation as a wide general-purpose floating-point operation. A lower-bound manufacturing proxy is:
+
+<div class="math-block">
+$$
+\text{raw ALU cost}
+\approx
+\text{ALU area}
+\times
+\text{wafer price per mm}^2
+$$
+</div>
+
+Using Horowitz's 45nm operation-area table and a 45nm 300mm wafer cost of about USD 2,000, the raw area-cost difference is already large before considering power, routing, register files, schedulers, or tensor-core reuse.[^horowitz][^alu-area-cost][^cmos-cost]
+
+| operation at 45nm | area | units per mm2 | raw cost per 1M units | area advantage |
+| --- | ---: | ---: | ---: | ---: |
+| 16-bit FP add | 1,360 um2 | 735 | USD 38 | 3.1x vs FP32 add |
+| 32-bit FP add | 4,184 um2 | 239 | USD 118 | baseline |
+| 16-bit FP multiply | 1,640 um2 | 610 | USD 46 | 4.7x vs FP32 multiply |
+| 32-bit FP multiply | 7,700 um2 | 130 | USD 218 | baseline |
+
+This is the silicon reason lower-precision tensor paths can improve compute per dollar. If a workload tolerates FP16, BF16, FP8, FP4, sparsity, or structured matrix engines, the chip can spend the same die area on many more arithmetic lanes. The catch is that those lanes only become useful when the model, compiler, kernels, and memory system keep them fed.
 
 ### 3. Memory hierarchy: bytes have different economics
 
@@ -312,7 +339,39 @@ The manufacturing layer is the shared denominator under both compute and SRAM. I
   <figcaption>Memory economics explain why AI infra is increasingly about locality: on-chip SRAM density is harder to buy with node shrinks, HBM bandwidth is expensive capacity, commodity DRAM is cheap but far away, and advanced wafer prices keep rising.</figcaption>
 </figure>
 
-This is why "chips are slowing down" is not only a FLOP story. It is a locality story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory bandwidth do useful work more often.
+### 4. Interconnection and communication: scale-out has a tax
+
+The next bottleneck appears when one accelerator is not enough. Scaling out turns compute into a distributed system problem: GPUs must exchange gradients, activations, KV cache state, expert routes, pipeline bubbles, and scheduling metadata. A useful first-order model is the latency-bandwidth model:
+
+<div class="math-block">
+$$
+T_{\text{comm}}
+\approx
+\alpha \cdot n_{\text{messages}}
++
+\frac{\text{bytes moved}}{B_{\text{effective}}}
+$$
+</div>
+
+Here `alpha` is the per-message latency cost and `B_effective` is achieved communication bandwidth after topology, protocol, contention, and collective implementation overhead. That term matters because modern training and inference are full of collectives:
+
+| parallelism pattern | communication pressure |
+| --- | --- |
+| data parallel | gradient all-reduce or reduce-scatter / all-gather |
+| tensor parallel | activation all-reduce and all-gather inside layers |
+| pipeline parallel | boundary activations and pipeline bubbles |
+| expert parallel / MoE | token dispatch and all-to-all routing |
+| disaggregated serving | KV cache movement, prefill/decode handoff, remote memory access |
+
+Interconnect bandwidth is improving aggressively because this tax is now first-order. NVIDIA lists NVLink bandwidth per GPU rising from 900 GB/s on Hopper to 1.8 TB/s on Blackwell and 3.6 TB/s on Rubin; its NVLink Switch table lists NVL72 aggregate bandwidth rising from 130 TB/s on Blackwell to 260 TB/s on Rubin.[^nvlink] NVIDIA's HGX Rubin page makes the same point at the system level: higher token throughput is tied not only to more NVFP4 compute, but also to more HBM bandwidth and more NVLink Switch bandwidth.[^hgx-rubin]
+
+| system generation | interconnect anchor | why it matters |
+| --- | ---: | --- |
+| Hopper | 900 GB/s NVLink per GPU | scale-up communication becomes part of model throughput |
+| Blackwell | 1.8 TB/s NVLink per GPU; 130 TB/s NVL72 aggregate | larger rack-scale GPU domains for model parallelism |
+| Rubin | 3.6 TB/s NVLink per GPU; 260 TB/s NVL72 aggregate | communication bandwidth has to scale with MoE, long context, and agentic inference |
+
+This is why "chips are slowing down" is not only a FLOP story. It is a locality and communication story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, interconnect bandwidth, synchronization time, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory and network bandwidth do useful work more often.
 
 The token is the economic unit
 ---
@@ -320,7 +379,7 @@ The token is the economic unit
 The token is a useful accounting unit because it connects the full stack:
 
 ```text
-token cost ~= model math + memory movement + cache residency + scheduling overhead + verification/retry overhead
+token cost ~= model math + memory movement + cache residency + communication + scheduling overhead + verification/retry overhead
 ```
 
 That is why low-level details matter:
@@ -330,6 +389,7 @@ That is why low-level details matter:
 - Better batching changes utilization and latency tails.
 - Better routing changes expert-model cost.
 - Better cache management changes context feasibility.
+- Better interconnect and collective scheduling changes scale-out efficiency.
 - Better compiler lowering changes which model shapes are practical.
 - Better parallelism changes whether training runs are stable and affordable.
 
@@ -373,3 +433,7 @@ References
 [^chips-b200-cache]: Chips and Cheese, [Nvidia's B200: Keeping the CUDA Juggernaut Rolling](https://chipsandcheese.com/p/nvidias-b200-keeping-the-cuda-juggernaut), 2025.
 [^stanford-memory-prices]: David Shim, Stanford DAM, [Memory Prices](https://dam.stanford.edu/memory-prices.html), accessed 2026-07-04.
 [^rambus-hbm]: Rambus, [High Bandwidth Memory: Everything You Need to Know](https://www.rambus.com/blogs/hbm3-everything-you-need-to-know/), updated 2026.
+[^alu-area-cost]: Ting-Yu Yeh, [Accelerator Architectures for Machine Learning](https://people.cs.nycu.edu.tw/~ttyeh/course/2023_Fall/IOC5009/slide/lecture-3.pdf), lecture slides citing Horowitz ISSCC 2014 operation energy and area data, accessed 2026-07-04.
+[^cmos-cost]: Tim Johnson, [CMOS Cost](https://faculty-web.msoe.edu/johnsontimoj/EE4980/files4980/cmos_cost.pdf), MSOE EE 4980 notes, accessed 2026-07-04.
+[^nvlink]: NVIDIA, [NVLink and NVLink Switch](https://www.nvidia.com/en-us/data-center/nvlink/), accessed 2026-07-04.
+[^hgx-rubin]: NVIDIA, [HGX Platform](https://www.nvidia.com/en-us/data-center/hgx/), accessed 2026-07-04.
