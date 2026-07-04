@@ -194,6 +194,17 @@ Chips are slowing down
 
 Hardware is still improving quickly, but the improvement is more specialized and more conditional.
 
+The constraints in this section have a hierarchy:
+
+| layer | question | useful price metric |
+| --- | --- | --- |
+| compute | How much math can one accelerator expose? | FP16-normalized compute per GPU-hour |
+| on-chip SRAM | How many hot bytes can stay near compute? | raw SRAM area-cost proxy per MB |
+| off-chip DRAM / HBM | How much capacity and bandwidth can the package feed? | USD/GB and USD per TB/s |
+| manufacturing | How expensive is each new square millimeter of silicon? | USD per 300 mm wafer |
+
+### 1. Compute: peak math is now conditional
+
 The H100 is a useful example. NVIDIA's Hopper material highlights HBM3 bandwidth around 3 TB/s, a 50 MB L2 cache, Transformer Engine support, NVLink/NVSwitch scale-out, and low-precision tensor paths.[^h100] These are not just "more FLOPs." They are area, power, and system-design choices that help specific workload shapes.
 
 The GPU timeline shows the same pattern:
@@ -211,6 +222,8 @@ Representative figures make the jump visible. Tesla C870 was advertised at 518 G
 Blackwell continues the shift. NVIDIA's DGX B200 system lists 144 PFLOP/s FP4 Tensor Core performance across eight Blackwell GPUs, roughly 18 PFLOP/s per GPU at the published system level, while Blackwell Ultra emphasizes 15 PFLOP/s dense NVFP4 per GPU.[^blackwell-b200][^blackwell-ultra] NVIDIA's Rubin announcement lists 50 PFLOP/s NVFP4 inference compute per Rubin GPU, and Vera Rubin NVL144 CPX is framed around 8 exaFLOP/s of rack-scale AI performance for massive-context inference.[^rubin][^rubin-cpx]
 
 These figures are not an apples-to-apples speedup curve. The datatype, sparsity mode, memory system, and programming model all changed. That is the important part. GPU progress came from changing the numerical contract: CUDA, SIMT execution, HBM, NVLink, tensor cores, TF32, BF16, FP8, FP4, sparsity, and compiler/runtime support made model structure visible to hardware.
+
+### 2. Compute per dollar: normalize before comparing
 
 To make the price-performance curve concrete, use a simple rental-equivalent metric:
 
@@ -240,7 +253,11 @@ This is still a rough engineering estimate, not a purchasing benchmark. The util
   <figcaption>Concrete FP16-normalized price-performance estimates make the slowdown point sharper: raw math still jumps, but delivered compute per dollar depends on price, utilization, and cloud economics.</figcaption>
 </figure>
 
+### 3. Memory hierarchy: bytes have different economics
+
 Memory and manufacturing show the same pattern. Compute can keep rising, but every token also needs bytes close to the math unit. The difficult part is that each level of memory optimizes a different constraint: on-chip SRAM is fast but area-expensive, HBM is bandwidth-rich but package-expensive, commodity DRAM is capacity-rich but far away, and advanced wafers are no longer getting cheap fast enough to hide the tradeoff.
+
+#### 3.1 On-chip SRAM: fast bytes are area-limited
 
 For on-chip SRAM, there is no public spot price per MB. A useful lower-bound proxy is:
 
@@ -267,6 +284,8 @@ The punchline is not that SRAM got worse in absolute density. It got much denser
 
 NVIDIA GPU caches show the architectural response. P100 had about 4 MB of L2, V100 6 MB, A100 40 MB, H100 50 MB, and public B200 analysis reports about 126 MB of total L2.[^a100][^h100][^chips-b200-cache] More on-chip SRAM is being used because going to HBM is expensive in energy and latency, but the amount is still tiny compared with model state and KV cache.
 
+#### 3.2 Off-chip memory: capacity and bandwidth diverge
+
 Off-chip memory has split into two worlds. Commodity DRAM remains the capacity workhorse, but its price-per-GB improvement slowed sharply after 2010. Stanford DAM's compiled memory-price dataset shows cheapest DRAM falling from about USD 185/GB in 2005 to USD 12.2/GB in 2010, then only to USD 3.0/GB by 2020 and about USD 3.45/GB in July 2026.[^stanford-memory-prices] HBM moves in the other direction: it is not cheap capacity, it is purchased bandwidth close to the accelerator. Rambus summarizes HBM's speed evolution from 128 GB/s per HBM device to 2.048 TB/s for HBM4, while Stanford DAM's modeled HBM data puts HBM2e around USD 6/GB and HBM3e peak around USD 18/GB.[^rambus-hbm][^stanford-memory-prices]
 
 | off-chip memory trend | representative anchors |
@@ -276,6 +295,17 @@ Off-chip memory has split into two worlds. Commodity DRAM remains the capacity w
 | commodity DRAM price/capacity | about USD 185/GB in 2005, USD 12.2/GB in 2010, USD 3.0/GB in 2020, and USD 3.45/GB in July 2026[^stanford-memory-prices] |
 | HBM price/capacity | HBM2e around USD 6/GB, HBM3 around USD 9/GB, HBM3e peak around USD 18/GB, HBM4 projected around USD 16.5/GB[^stanford-memory-prices] |
 | HBM price/bandwidth | HBM2e around USD 209 per TB/s, HBM3 around USD 264 per TB/s, HBM3e peak around USD 352 per TB/s, HBM4 projected around USD 297 per TB/s[^stanford-memory-prices] |
+
+#### 3.3 Manufacturing: wafer cost pushes back
+
+The manufacturing layer is the shared denominator under both compute and SRAM. If each wafer gets more expensive, every large die, cache expansion, interposer choice, and yield loss has a higher dollar impact.
+
+| process node | approximate era | wafer price anchor | why it matters |
+| --- | ---: | ---: | --- |
+| 28nm | 2010 | USD 3,000 | cheap enough that SRAM scaling still translated into lower raw MB cost |
+| 7nm | 2018 | USD 9,346 | density improved, but wafer price more than tripled |
+| 5nm | 2020 | USD 16,988 | raw SRAM cost proxy rose again despite smaller cells |
+| 3nm | 2024 | USD 19,500 | wafer price keeps rising while SRAM bitcell shrink slows |
 
 <figure class="post-figure">
   <img src="{{ '/assets/memory-manufacturing-trends.svg' | relative_url }}" alt="Four-panel chart showing SRAM cost proxy, commodity DRAM price per GB, HBM price per bandwidth, and wafer price by process node.">
