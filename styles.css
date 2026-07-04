@@ -722,6 +722,11 @@ li::marker {
   font-weight: 760;
 }
 
+.math-block {
+  margin: 1.3rem 0;
+  overflow-x: auto;
+}
+
 .post-content a {
   color: var(--accent-dark);
   text-decoration: underline;
