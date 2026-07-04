@@ -280,6 +280,30 @@ Using Horowitz's 45nm operation-area table and a 45nm 300mm wafer cost of about 
 
 This is the silicon reason lower-precision tensor paths can improve compute per dollar. If a workload tolerates FP16, BF16, FP8, FP4, sparsity, or structured matrix engines, the chip can spend the same die area on many more arithmetic lanes. The catch is that those lanes only become useful when the model, compiler, kernels, and memory system keep them fed.
 
+For a rough 20-year shrinkage estimate, take the 45nm 16-bit FP add plus 16-bit FP multiply area as the baseline:
+
+<div class="math-block">
+$$
+A_{\text{FP16 mul+add},45\text{nm}}
+\approx
+1{,}360 + 1{,}640
+= 3{,}000\ \mu m^2
+$$
+</div>
+
+Then scale that logical datapath by public logic-density estimates. This is not a real vendor tensor-core layout. It is a normalized "same logic, denser process" estimate. The density anchors use 28/16/7nm TSMC comparisons, 5nm process-node density data, and 3nm process-node density data; wafer prices reuse the same public wafer-price anchors used above.[^logic-density-28-7][^process-density-5nm][^process-density-3nm][^cset-wafer-cost][^wafer-pricing]
+
+| node | era | logic-density reference | estimated FP16 mul+add area | area shrink vs 45nm | units per mm2 | raw cost per 1M units |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 45nm | 2007 | 6.25 MTr/mm2 baseline | 3,000 um2 | 1.0x | 333 | USD 85 |
+| 28nm | 2010 | 15.3 MTr/mm2 | 1,225 um2 | 2.4x | 816 | USD 52 |
+| 16nm | 2015 | 28.9 MTr/mm2 | 649 um2 | 4.6x | 1,541 | USD 37 |
+| 7nm | 2018 | 91.2 MTr/mm2 | 206 um2 | 14.6x | 4,864 | USD 27 |
+| 5nm | 2020 | 138.2 MTr/mm2 | 136 um2 | 22.1x | 7,371 | USD 33 |
+| 3nm | 2024 | 216 MTr/mm2 | 87 um2 | 34.6x | 11,520 | USD 24 |
+
+The area trend is the important signal: a 16-bit floating-point multiply-plus-add datapath that is about 3,000 um2 at 45nm becomes an order of magnitude smaller by 7nm and roughly 35x smaller by 3nm under a pure logic-density scaling model. The raw wafer-cost proxy falls less smoothly because advanced wafer prices rise sharply. Real ALUs also need registers, operand routing, control, clocking, SRAM, verification margin, and yield. Tensor cores improve the economics further by amortizing control and data movement across matrix tiles instead of treating every multiply-add as an isolated scalar unit.
+
 ### 3. Memory hierarchy: bytes have different economics
 
 Memory and manufacturing show the same pattern. Compute can keep rising, but every token also needs bytes close to the math unit. The difficult part is that each level of memory optimizes a different constraint: on-chip SRAM is fast but area-expensive, HBM is bandwidth-rich but package-expensive, commodity DRAM is capacity-rich but far away, and advanced wafers are no longer getting cheap fast enough to hide the tradeoff.
@@ -435,5 +459,8 @@ References
 [^rambus-hbm]: Rambus, [High Bandwidth Memory: Everything You Need to Know](https://www.rambus.com/blogs/hbm3-everything-you-need-to-know/), updated 2026.
 [^alu-area-cost]: Ting-Yu Yeh, [Accelerator Architectures for Machine Learning](https://people.cs.nycu.edu.tw/~ttyeh/course/2023_Fall/IOC5009/slide/lecture-3.pdf), lecture slides citing Horowitz ISSCC 2014 operation energy and area data, accessed 2026-07-04.
 [^cmos-cost]: Tim Johnson, [CMOS Cost](https://faculty-web.msoe.edu/johnsontimoj/EE4980/files4980/cmos_cost.pdf), MSOE EE 4980 notes, accessed 2026-07-04.
+[^logic-density-28-7]: Team VLSI, [TSMC 7nm, 16nm and 28nm Technology node comparisons](https://teamvlsi.com/2021/09/tsmc-7nm-16nm-and-28nm-technology-node-comparisons.html), 2021.
+[^process-density-5nm]: Wikipedia, [5 nm process](https://en.wikipedia.org/wiki/5_nm_process), accessed 2026-07-04.
+[^process-density-3nm]: Wikipedia, [3 nm process](https://en.wikipedia.org/wiki/3_nm_process), accessed 2026-07-04.
 [^nvlink]: NVIDIA, [NVLink and NVLink Switch](https://www.nvidia.com/en-us/data-center/nvlink/), accessed 2026-07-04.
 [^hgx-rubin]: NVIDIA, [HGX Platform](https://www.nvidia.com/en-us/data-center/hgx/), accessed 2026-07-04.
