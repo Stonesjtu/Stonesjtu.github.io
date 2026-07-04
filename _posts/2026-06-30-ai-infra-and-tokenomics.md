@@ -206,7 +206,7 @@ The GPU timeline shows the same pattern:
 | A100 / H100 | BF16, TF32, FP8, sparsity, larger memory systems |
 | Blackwell / Rubin | FP4/NVFP4 and rack-scale AI systems |
 
-Representative figures make the jump visible. Tesla C870 was advertised at 518 GFLOP/s peak single precision in 2007.[^tesla-c870] C1060 reached 933 GFLOP/s in 2008.[^tesla-c1060] K20X reached 3.95 TFLOP/s single precision and 1.31 TFLOP/s double precision in 2012.[^tesla-k20x] P100 delivered 21.2 TFLOP/s FP16 in 2016, V100 delivered about 125-130 Tensor TFLOP/s, A100 reached 312 TFLOP/s dense FP16/BF16 Tensor Core performance, and H100 lists 1,979 TFLOP/s FP16/BF16 Tensor Core and 3,958 TFLOP/s FP8 Tensor Core performance.[^p100][^v100][^a100][^h100-spec]
+Representative figures make the jump visible. Tesla C870 was advertised at 518 GFLOP/s peak single precision in 2007.[^tesla-c870] C1060 reached 933 GFLOP/s in 2008.[^tesla-c1060] K20X reached 3.95 TFLOP/s single precision and 1.31 TFLOP/s double precision in 2012.[^tesla-k20x] P100 delivered 21.2 TFLOP/s FP16 in 2016, V100 delivered about 125-130 Tensor TFLOP/s, A100 reached 312 TFLOP/s dense FP16/BF16 Tensor Core performance, and H100 lists 1,979 TFLOP/s FP16/BF16 Tensor Core with sparsity, or half that without sparsity.[^p100][^v100][^a100][^h100-spec]
 
 Blackwell continues the shift. NVIDIA's DGX B200 system lists 144 PFLOP/s FP4 Tensor Core performance across eight Blackwell GPUs, roughly 18 PFLOP/s per GPU at the published system level, while Blackwell Ultra emphasizes 15 PFLOP/s dense NVFP4 per GPU.[^blackwell-b200][^blackwell-ultra] NVIDIA's Rubin announcement lists 50 PFLOP/s NVFP4 inference compute per Rubin GPU, and Vera Rubin NVL144 CPX is framed around 8 exaFLOP/s of rack-scale AI performance for massive-context inference.[^rubin][^rubin-cpx]
 
@@ -222,22 +222,22 @@ $$
 $$
 </div>
 
-One TFLOP/s sustained for one hour produces 3.6 PFLOP-s. For historical cards with public list prices, I convert purchase price into an implied GPU-hour by amortizing the card over three years at 100% utilization. For current cloud cards, I use Lambda's listed on-demand price per GPU-hour. C870 pricing comes from HPCwire's 2007 Tesla launch coverage, P100/V100 list prices come from Microway's 2018 price analysis, and A100/H100/B200 hourly prices come from Lambda's instances page.[^tesla-c870-price][^p100-v100-price][^lambda-pricing]
+One TFLOP/s sustained for one hour produces 3.6 PFLOP-s. To keep the comparison closer to apples-to-apples, the table uses dense FP16/BF16 Tensor Core throughput where the GPU supports it. For Tesla C870, which predates FP16 Tensor Cores, I use FP32 peak as a legacy proxy. For H100 and B200, I use dense FP16/BF16, not FP8/FP4 and not sparse-mode peaks.[^h100-spec][^b200-lenovo] For historical cards with public list prices, I convert purchase price into an implied GPU-hour by amortizing the card over three years at 100% utilization. For current cloud cards, I use Lambda's listed on-demand price per GPU-hour. C870 pricing comes from HPCwire's 2007 Tesla launch coverage, P100/V100 list prices come from Microway's 2018 price analysis, and A100/H100/B200 hourly prices come from Lambda's instances page.[^tesla-c870-price][^p100-v100-price][^lambda-pricing]
 
-| GPU | peak compute used | price basis | USD/GPU-hour | TFLOP/s per USD/hour | PFLOP-s per USD |
+| GPU | normalized compute used | price basis | USD/GPU-hour | TFLOP/s per USD/hour | PFLOP-s per USD |
 | --- | ---: | --- | ---: | ---: | ---: |
-| Tesla C870 | 0.518 TFLOP/s FP32 | USD 1,499 list, 3-year amortized | 0.057 | 9.1 | 32.7 |
+| Tesla C870 | 0.518 TFLOP/s FP32 proxy | USD 1,499 list, 3-year amortized | 0.057 | 9.1 | 32.7 |
 | Tesla P100 SXM2 | 21.2 TFLOP/s FP16 | USD 9,428 list, 3-year amortized | 0.359 | 59.1 | 212.7 |
 | Tesla V100 SXM | 125 TFLOP/s Tensor | USD 10,664 list, 3-year amortized | 0.406 | 308.0 | 1,109.0 |
 | A100 SXM 80GB | 312 TFLOP/s FP16/BF16 Tensor | Lambda 8x A100 SXM price | 2.79 | 111.8 | 402.6 |
-| H100 SXM 80GB | 3,958 TFLOP/s FP8 Tensor | Lambda 8x H100 SXM price | 3.99 | 992.0 | 3,571.1 |
-| B200 SXM6 | 18,000 TFLOP/s FP4 Tensor | Lambda 8x B200 SXM6 price | 6.69 | 2,690.6 | 9,686.1 |
+| H100 SXM 80GB | 989 TFLOP/s dense FP16/BF16 Tensor | Lambda 8x H100 SXM price | 3.99 | 247.9 | 892.3 |
+| B200 SXM6 | 2,250 TFLOP/s dense FP16/BF16 Tensor | Lambda 8x B200 SXM6 price | 6.69 | 336.3 | 1,210.8 |
 
-This is still a rough engineering estimate, not a purchasing benchmark. The datatype changes across generations, the utilization assumption is optimistic for owned hardware, and cloud prices include more than the GPU chip. The shape is still useful: peak AI math has moved from sub-TFLOP FP32 to multi-PFLOP low-precision tensor paths, while compute per dollar improved in uneven steps rather than as a smooth free lunch. Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
+This is still a rough engineering estimate, not a purchasing benchmark. The utilization assumption is optimistic for owned hardware, cloud prices include more than the GPU chip, and C870 is only a legacy proxy. The normalized shape is still useful: FP16-class compute improved enormously, but compute per dollar improved in uneven steps rather than as a smooth free lunch. Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
 
 <figure class="post-figure">
-  <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Two-panel log-scale chart titled GPU compute rose faster than compute per dollar, comparing representative NVIDIA GPU peak compute with real estimated GPU compute-per-dollar points.">
-  <figcaption>Concrete price-performance estimates make the slowdown point sharper: raw peak math still jumps, but delivered compute per dollar depends on price, utilization, datatype, and cloud economics.</figcaption>
+  <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Two-panel log-scale chart titled GPU compute rose faster than compute per dollar, comparing FP16-normalized NVIDIA GPU compute with real estimated GPU compute-per-dollar points.">
+  <figcaption>Concrete FP16-normalized price-performance estimates make the slowdown point sharper: raw math still jumps, but delivered compute per dollar depends on price, utilization, and cloud economics.</figcaption>
 </figure>
 
 The token is the economic unit
@@ -284,6 +284,7 @@ References
 [^blackwell-ultra]: NVIDIA Developer Blog, [Inside NVIDIA Blackwell Ultra](https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era/), 2026.
 [^rubin]: NVIDIA Newsroom, [NVIDIA Kicks Off the Next Generation of AI With Rubin](https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer), 2026.
 [^rubin-cpx]: NVIDIA Newsroom, [NVIDIA Unveils Rubin CPX](https://nvidianews.nvidia.com/news/nvidia-unveils-rubin-cpx-a-new-class-of-gpu-designed-for-massive-context-inference), 2025.
+[^b200-lenovo]: Lenovo Press, [ThinkSystem NVIDIA HGX B200 180GB 1000W GPU](https://lenovopress.lenovo.com/lp2226-thinksystem-nvidia-b200-180gb-1000w-gpu), accessed 2026-07-04.
 [^tesla-c870-price]: Michael Feldman, [NVIDIA Takes Direct Aim at High Performance Computing](https://www.hpcwire.com/2007/06/22/nvidia_takes_direct_aim_at_high_performance_computing-1/), HPCwire, 2007.
 [^p100-v100-price]: Brett Newman, [NVIDIA Tesla V100 Price Analysis](https://www.microway.com/hpc-tech-tips/nvidia-tesla-v100-price-analysis/), Microway, 2018.
 [^lambda-pricing]: Lambda, [Instances](https://lambda.ai/instances), accessed 2026-07-04.
