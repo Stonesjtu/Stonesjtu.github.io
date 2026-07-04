@@ -22,6 +22,11 @@ There is a simple reason this layer has become so valuable: demand is compoundin
 From conventional infra to agentic infra
 ---
 
+<figure class="post-figure">
+  <img src="{{ '/assets/infra-evolution-agentic.svg' | relative_url }}" alt="Timeline diagram showing infrastructure evolving from conventional request serving to machine learning jobs, deep learning training steps, LLM tokens, and agentic task loops.">
+  <figcaption>The important shift is the unit of work: infrastructure moves from operating services to scheduling accelerator-heavy token loops that must complete useful tasks.</figcaption>
+</figure>
+
 Conventional infrastructure was built around services. The central problems were availability, isolation, deployment, storage, observability, and request throughput. The unit of work was usually a request, a job, or a transaction. Good infrastructure made software easier to operate.
 
 Machine learning infrastructure changed the unit of work. Instead of serving deterministic business logic, the system had to move tensors through training and inference pipelines. The scarce resources became GPU hours, memory bandwidth, distributed data loading, experiment reproducibility, and model artifact management. Good infrastructure made model iteration possible.
@@ -31,11 +36,6 @@ Deep learning infrastructure made the stack more specialized. GPUs were no longe
 LLM infrastructure tightened the loop even further. Pretraining pushed cluster scale, interconnect bandwidth, checkpointing, parallelism strategies, and failure recovery to the center. Inference then became its own systems problem: KV cache management, batching, prefill/decode separation, speculative decoding, quantization, routing, memory pressure, and latency SLOs. The model is no longer a file that sits behind a service. It is a dynamic workload that reshapes the service around itself.
 
 Agentic infrastructure adds another layer of pressure. The system is not only generating one response. It may plan, call tools, read documents, write code, run tests, search memory, retry failed steps, and coordinate across many model calls. This increases the number of tokens consumed per task, but it also changes the workload shape. The value is no longer just in cheaper single-turn inference. It is in reducing the total tokens and wall-clock time needed to complete useful work.
-
-<figure class="post-figure">
-  <img src="{{ '/assets/infra-evolution-agentic.svg' | relative_url }}" alt="Timeline diagram showing infrastructure evolving from conventional request serving to machine learning jobs, deep learning training steps, LLM tokens, and agentic task loops.">
-  <figcaption>The important shift is the unit of work: infrastructure moves from operating services to scheduling accelerator-heavy token loops that must complete useful tasks.</figcaption>
-</figure>
 
 Why infra became so resource-demanding
 ---
