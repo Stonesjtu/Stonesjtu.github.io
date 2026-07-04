@@ -58,6 +58,11 @@ Why infra became so resource-demanding
 
 Two scaling modes show why the infra problem does not stay fixed.
 
+<figure class="post-figure">
+  <img src="{{ '/assets/strong-weak-scaling.svg' | relative_url }}" alt="Two-panel diagram comparing strong scaling with fixed per-request work and weak scaling with growing LLM per-request work.">
+  <figcaption>Pre-LLM infrastructure mostly optimizes fixed per-user work. LLM infrastructure optimizes a workload that grows with model size, token length, and inference-time steps.</figcaption>
+</figure>
+
 In strong scaling, the workload is fixed and more hardware is added to finish sooner. The limiting terms are communication, synchronization, stragglers, and idle time. Adding more devices eventually exposes imperfect overlap and coordination overhead.
 
 Pre-LLM consumer infrastructure mostly fits this pattern. A video stream, social-network feed, or game session can be expensive at global scale, but the compute per user is usually bounded by the product workload:
@@ -93,11 +98,19 @@ $$
 
 <div class="math-block">
 $$
-C_{\text{request}} \approx O(M \cdot T \cdot S) + C_{\text{attention/cache}}(T)
+C_{\text{request}} \approx O(M \cdot T \cdot S)
 $$
 </div>
 
-Post-LLM serving is not $O(1)$ per request when $M$, $T$, and $S$ keep growing.
+For this section, I will keep the model simple and use request workload as normalized compute:
+
+<div class="math-block">
+$$
+W_{\text{req}} \propto C_{\text{request}} \approx O(M \cdot T \cdot S)
+$$
+</div>
+
+This intentionally drops a separate attention/cache term. KV cache size, attention pattern, and memory bandwidth still matter a lot in real systems, but they can be discussed as implementation constraints rather than as part of the high-level scaling formula. The important point is that post-LLM serving is not $O(1)$ per request when $M$, $T$, and $S$ keep growing.
 
 This is why LLMs fit weak scaling better. In weak scaling, the hardware grows and the workload grows with it. More compute is used to train larger models, consume more data, extend context length, add modalities, and spend more compute at inference time. The bottleneck moves instead of disappearing:
 
