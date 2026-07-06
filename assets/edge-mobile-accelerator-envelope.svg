@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+  <title id="title">Edge and mobile neural accelerator envelope</title>
+  <desc id="desc">Comparison of mobile and edge AI accelerators. Mobile NPUs are bundled into devices, while buyable edge modules show visible dollar per TOPS from roughly 3 to 18 dollars per TOPS.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbfaf7; }
+      .grid { stroke: #ded9cf; stroke-width: 1; }
+      .axis { stroke: #5d564d; stroke-width: 1.3; }
+      .title { fill: #2f2a25; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 24px; font-weight: 700; }
+      .subtitle { fill: #655d52; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; }
+      .label { fill: #3f3932; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; }
+      .small { fill: #665d52; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 11px; }
+      .mobile { fill: #2d7f8f; }
+      .edge { fill: #16835f; }
+      .robotics { fill: #8b5fbf; }
+      .cost { fill: #c24a3a; }
+      .white { fill: #fffdf8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 12px; font-weight: 700; }
+      .panel { fill: #fffdf8; stroke: #e4d9ca; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="960" height="560"/>
+  <text class="title" x="72" y="42">Edge/mobile NN accelerator envelope</text>
+  <text class="subtitle" x="72" y="64">Useful throughput depends on quantization, memory, compiler support, and sustained thermals.</text>
+
+  <rect class="panel" x="60" y="88" width="840" height="292" rx="8"/>
+  <text class="label" x="82" y="118">Peak NN compute anchor</text>
+  <line class="axis" x1="250" y1="338" x2="760" y2="338"/>
+  <line class="axis" x1="250" y1="118" x2="250" y2="338"/>
+  <line class="grid" x1="343" y1="118" x2="343" y2="338"/>
+  <line class="grid" x1="436" y1="118" x2="436" y2="338"/>
+  <line class="grid" x1="529" y1="118" x2="529" y2="338"/>
+  <line class="grid" x1="622" y1="118" x2="622" y2="338"/>
+  <line class="grid" x1="715" y1="118" x2="715" y2="338"/>
+
+  <text class="small" x="250" y="360" text-anchor="middle">0</text>
+  <text class="small" x="343" y="360" text-anchor="middle">50</text>
+  <text class="small" x="436" y="360" text-anchor="middle">100</text>
+  <text class="small" x="529" y="360" text-anchor="middle">150</text>
+  <text class="small" x="622" y="360" text-anchor="middle">200</text>
+  <text class="small" x="715" y="360" text-anchor="middle">250 TOPS</text>
+
+  <text class="label" x="82" y="156">Edge TPU</text>
+  <rect class="edge" x="250" y="140" width="8" height="20" rx="3"/>
+  <text class="small" x="266" y="155">4 TOPS, 2 W</text>
+
+  <text class="label" x="82" y="194">Raspberry AI HAT+</text>
+  <rect class="edge" x="250" y="178" width="48" height="20" rx="3"/>
+  <text class="small" x="306" y="193">26 TOPS, $110</text>
+
+  <text class="label" x="82" y="232">Apple M4 NPU</text>
+  <rect class="mobile" x="250" y="216" width="70" height="20" rx="3"/>
+  <text class="small" x="328" y="231">38 TOPS, bundled SoC</text>
+
+  <text class="label" x="82" y="270">AI HAT+ 2</text>
+  <rect class="edge" x="250" y="254" width="74" height="20" rx="3"/>
+  <text class="small" x="332" y="269">40 TOPS INT4, 8 GB, $130</text>
+
+  <text class="label" x="82" y="308">Jetson Orin Nano</text>
+  <rect class="robotics" x="250" y="292" width="124" height="20" rx="3"/>
+  <text class="small" x="382" y="307">67 TOPS, $249</text>
+
+  <rect class="robotics" x="250" y="322" width="508" height="12" rx="3"/>
+  <text class="small" x="766" y="333" text-anchor="start">AGX Orin: 275 TOPS</text>
+
+  <rect class="panel" x="60" y="405" width="840" height="104" rx="8"/>
+  <text class="label" x="82" y="435">Visible module $/TOPS proxy</text>
+  <text class="small" x="82" y="459">Only for buyable edge modules; phones and tablets bundle the NPU into the full device.</text>
+
+  <rect class="cost" x="128" y="474" width="114" height="24" rx="5"/>
+  <text class="white" x="185" y="490" text-anchor="middle">$3.25/TOPS</text>
+  <text class="small" x="185" y="518" text-anchor="middle">AI HAT+ 2</text>
+
+  <rect class="cost" x="303" y="474" width="114" height="24" rx="5"/>
+  <text class="white" x="360" y="490" text-anchor="middle">$3.72/TOPS</text>
+  <text class="small" x="360" y="518" text-anchor="middle">Jetson Nano</text>
+
+  <rect class="cost" x="478" y="474" width="114" height="24" rx="5"/>
+  <text class="white" x="535" y="490" text-anchor="middle">$4.23/TOPS</text>
+  <text class="small" x="535" y="518" text-anchor="middle">AI HAT+ 26T</text>
+
+  <rect class="cost" x="653" y="474" width="114" height="24" rx="5"/>
+  <text class="white" x="710" y="490" text-anchor="middle">$5.38/TOPS</text>
+  <text class="small" x="710" y="518" text-anchor="middle">AI HAT+ 13T</text>
+
+  <text class="small" x="72" y="545">Takeaway: useful local AI is often memory-, compiler-, and thermal-limited rather than raw-math-limited.</text>
+</svg>

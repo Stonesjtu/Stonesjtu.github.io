@@ -428,6 +428,41 @@ The punchline is subtle: network silicon has delivered a large cost-per-bit impr
 
 This is why "chips are slowing down" is not only a FLOP story. It is a locality and communication story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, interconnect bandwidth, synchronization time, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory and network bandwidth do useful work more often.
 
+### 5. Edge and mobile accelerators: locality beats peak TOPS
+
+Edge and mobile NN accelerators sit at the opposite end of the cluster story. A data-center GPU buys throughput by spending HBM, power, cooling, and network. A phone, camera, robot, car sensor, or Raspberry Pi accessory buys usefulness by staying inside a tiny power and memory envelope. The unit of value is often not "maximum tokens per second." It is:
+
+<div class="math-block">
+$$
+\text{edge value}
+\approx
+\frac{\text{useful local decisions}}{\text{watts} \cdot \text{latency} \cdot \text{device cost}}
+$$
+</div>
+
+That is why the accelerator looks different. Mobile NPUs and edge ASICs are optimized for quantized inference, predictable tensor graphs, aggressive SRAM reuse, camera / audio pipelines, privacy, and always-on duty cycles. Apple says M4's Neural Engine reaches 38 TOPS, about 60x the first A11 Neural Engine, while A18 is optimized for large generative models and runs ML models up to 2x faster than A16.[^apple-m4][^apple-a18] Qualcomm's Hexagon NPU page describes a 45 TOPS fused scalar/vector/tensor architecture with shared memory and micro-tile inferencing.[^qualcomm-hexagon] On maker and industrial edge devices, the anchors are smaller but more observable: Google's Edge TPU class devices are around 4 TOPS at 2 W, Raspberry Pi AI HAT+ offers 13 or 26 TOPS at USD 70 or USD 110, AI HAT+ 2 adds a Hailo-10H with 40 INT4 TOPS and 8 GB of local memory at USD 130, and Jetson Orin Nano Super advertises 67 TOPS at USD 249.[^coral-edge-tpu][^raspberry-ai-hat][^raspberry-ai-hat-2][^jetson-orin-nano]
+
+| edge / mobile tier | public compute anchor | visible constraint | economic reading |
+| --- | ---: | --- | --- |
+| phone / tablet NPU | Apple M4-class: 38 TOPS; A18-class: optimized for on-device generative models | battery, thermal skin temperature, unified memory | best for private, latency-sensitive, short-context tasks |
+| laptop / tablet NPU | Qualcomm Hexagon / AI PC-class: around 45 TOPS | sustained power and shared DRAM bandwidth | good for background assistants, media, small local models |
+| low-power edge ASIC | Edge TPU / Hailo-8L: 4-13 TOPS | 2-3 W class power, narrow compiler target | excellent for fixed vision/audio pipelines |
+| richer edge module | Hailo-8 / Hailo-10H / Orin Nano: 26-67 TOPS | local memory, PCIe lane, software stack, thermal design | enables multi-camera, robotics, VLM, and small LLM workflows |
+| embedded robotics computer | Jetson AGX Orin: up to 275 TOPS at 15-60 W[^jetson-orin] | module cost, enclosure cooling, sensor IO | closer to a compact server than a phone NPU |
+
+<figure class="post-figure">
+  <img src="{{ '/assets/edge-mobile-accelerator-envelope.svg' | relative_url }}" alt="Chart comparing edge and mobile neural accelerators by TOPS, power envelope, and dollar per TOPS for public edge modules.">
+  <figcaption>Edge AI economics are constrained by power, memory, and locality. Buyable modules can look cheap per TOPS, but the practical workload depends on quantization support, compiler coverage, local memory, and sustained thermals.</figcaption>
+</figure>
+
+This is the mirror image of scale-out AI infra. In the cloud, weak scaling makes optimization valuable because each user can trigger more tokens, more agents, and longer-running jobs. At the edge, the hard ceiling is local state: how much model, cache, sensor context, and runtime can fit without waking a server or burning the battery. The right design is usually hybrid:
+
+- **Do local inference** when latency, privacy, offline availability, or sensor bandwidth dominates.
+- **Call the cloud** when the task needs broad knowledge, large context, tool orchestration, or high-quality generation.
+- **Split the pipeline** when local models can filter, compress, route, or verify before an expensive cloud call.
+
+The important lesson is that edge accelerators do not weaken the AI infra thesis. They extend it. Once inference leaves the data center, infrastructure has to optimize a wider control loop: model size, quantization, compiler lowering, memory layout, thermal policy, network fallback, privacy boundary, and user-visible latency.
+
 The token is the economic unit
 ---
 
@@ -506,3 +541,11 @@ References
 [^mellanox-switch-prices]: Router-Switch.com, [NVIDIA Mellanox switches price list](https://www.router-switch.com/mellanox-switches-price.html), accessed 2026-07-04.
 [^sn5610-price]: NADDOD, [NVIDIA SN5610 Spectrum-4 800GbE switch listing](https://www.naddod.com/products/102969.html), accessed 2026-07-04.
 [^sn5610-specs]: NVIDIA Networking Docs, [NVIDIA Spectrum-4 SN5000 specifications](https://docs.nvidia.com/networking/display/sn5000/specifications), accessed 2026-07-04.
+[^apple-m4]: Apple, [Apple introduces M4 chip](https://www.apple.com/newsroom/2024/05/apple-introduces-m4-chip/), 2024.
+[^apple-a18]: Apple, [Apple introduces iPhone 16 and iPhone 16 Plus](https://www.apple.com/newsroom/2024/09/apple-introduces-iphone-16-and-iphone-16-plus/), 2024.
+[^qualcomm-hexagon]: Qualcomm, [Hexagon NPU](https://www.qualcomm.com/processors/hexagon), accessed 2026-07-06.
+[^coral-edge-tpu]: Murata, [AI Accelerator Module featuring the Coral Edge TPU from Google](https://www.murata.com/en-us/products/connectivitymodule/edge-ai/overview/lineup/type1wv), accessed 2026-07-06.
+[^raspberry-ai-hat]: Raspberry Pi, [Introducing the Raspberry Pi AI HAT+ with up to 26 TOPS](https://www.raspberrypi.com/news/raspberry-pi-ai-hat/), 2024.
+[^raspberry-ai-hat-2]: Raspberry Pi, [Introducing the Raspberry Pi AI HAT+ 2](https://www.raspberrypi.com/news/introducing-the-raspberry-pi-ai-hat-plus-2-generative-ai-on-raspberry-pi-5/), 2026.
+[^jetson-orin-nano]: NVIDIA, [Jetson Orin Nano Super Developer Kit](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/), accessed 2026-07-06.
+[^jetson-orin]: NVIDIA, [Jetson AGX Orin series](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/), accessed 2026-07-06.
