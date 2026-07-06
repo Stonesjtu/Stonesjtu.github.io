@@ -476,6 +476,16 @@ The trend line for buyable edge hardware is dramatic, but it needs careful label
 
 The important caveat is that the curve is partly architectural, not only manufacturing progress. A 2014 Jetson TK1 and a 2026 Hailo-based AI HAT+ 2 are not running the same numerical contract. The later devices win by narrowing the workload: quantized inference, compiler-supported operator sets, smaller activation footprints, and local SRAM reuse. That makes them excellent at camera, audio, sensor, and small local-model loops, but much less flexible than a data-center GPU. Edge compute-per-dollar improved because the hardware gave up generality in exchange for useful local inference.
 
+Phone SoCs are harder to put on the same curve because Apple does not sell A-series chips, Qualcomm pricing is negotiated per OEM and volume, and the application processor is bundled with CPU, GPU, ISP, modem interfaces, security, media, and memory controllers. Still, teardown and industry-estimate data give a useful sanity check. Digitimes reported the A16 processor in iPhone 15 at about USD 35 and A18 in iPhone 16 at about USD 45; TechCrunch reported A18 / A18 Pro's 16-core Neural Engine at 35 TOPS; Wccftech reported Snapdragon 8 Gen 3 around USD 200 and Snapdragon 8 Gen 4 / 8 Elite estimates around USD 220-240; Notebookcheck later summarized Snapdragon 8 Elite Gen 5 estimates around USD 240-280, versus about USD 200 for Snapdragon 8 Gen 3.[^iphone16-bom][^apple-a18-tops][^snapdragon-8gen3-tops][^snapdragon-8g4-cost][^snapdragon-8elite-cost][^snapdragon-8elite-gen5-tops] Using those estimates, phone SoC NPU dollars can look competitive with edge modules, but this comparison is not apples-to-apples: a phone SoC is a subsidized internal or high-volume OEM component, while Jetson / Coral / Hailo boards include packaging, carrier hardware, memory, connectors, distribution margin, and developer support.
+
+| phone SoC price sanity check | year | NPU / AI compute anchor | estimated SoC price | implied NPU TOPS per USD |
+| --- | ---: | ---: | ---: | ---: |
+| Apple A16 | 2022 | 17 TOPS | USD 35 teardown/BOM estimate | 0.49 |
+| Apple A18 | 2024 | 35 TOPS | USD 45 teardown/BOM estimate | 0.78 |
+| Snapdragon 8 Gen 3 | 2023 | about 45 TOPS | about USD 170-200 industry estimate | 0.23-0.26 |
+| Snapdragon 8 Elite / 8 Gen 4 class | 2024 | higher than 8 Gen 3, but vendor reports often use relative gains | about USD 220-240 industry estimate | not comparable without a stable TOPS number |
+| Snapdragon 8 Elite Gen 5 estimate | 2025 | reported around 100 TOPS by industry press | about USD 240-280 industry estimate | 0.36-0.42 |
+
 This is the mirror image of scale-out AI infra. In the cloud, weak scaling makes optimization valuable because each user can trigger more tokens, more agents, and longer-running jobs. At the edge, the hard ceiling is local state: how much model, cache, sensor context, and runtime can fit without waking a server or burning the battery. The right design is usually hybrid:
 
 - **Do local inference** when latency, privacy, offline availability, or sensor bandwidth dominates.
@@ -578,3 +588,9 @@ References
 [^jetson-tx2-spec]: NVIDIA, [Jetson TX2 series technical specifications](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-tx2/), accessed 2026-07-06.
 [^coral-dev-board-price]: IEEE Spectrum, [The Coral Dev Board Takes Google's AI to the Edge](https://spectrum.ieee.org/the-coral-dev-board-takes-googles-ai-to-the-edge), 2019.
 [^xavier-nx-price]: LinuxGizmos, [Xavier NX Dev Kit ships as Nvidia adds cloud-native support for all the Jetsons](https://linuxgizmos.com/xavier-nx-dev-kit-ships-as-nvidia-adds-cloud-native-support-for-all-the-jetsons/), 2020.
+[^iphone16-bom]: Digitimes, [iPhone 16 series teardown shows increased costs in certain components](https://www.digitimes.com/news/a20241004PD214/apple-iphone-component-cost-production-profit.html), 2024.
+[^apple-a18-tops]: TechCrunch, [Apple announces its new A18 and A18 Pro iPhone chips](https://techcrunch.com/2024/09/09/apple-announces-its-new-a18-iphone-chip/), 2024.
+[^snapdragon-8gen3-tops]: Moor Insights & Strategy / Forbes, [AI Dominates Qualcomm Snapdragon Summit With New Snapdragon Products](https://www.forbes.com/sites/moorinsights/2023/10/25/ai-dominates-qualcomm-snapdragon-summit-with-new-snapdragon-products/), 2023.
+[^snapdragon-8g4-cost]: Wccftech, [Snapdragon 8 Gen 4 Orders Not Yet Placed By Qualcomm's Partners](https://wccftech.com/snapdragon-8-gen-4-orders-yet-to-be-placed-making-unit-cost-calculation-hard/), 2024.
+[^snapdragon-8elite-cost]: Notebookcheck, [Snapdragon 8 Elite Gen 5 price estimate signals bad news for affordable flagship phones](https://www.notebookcheck.net/Snapdragon-8-Elite-Gen-5-price-estimate-signals-bad-news-for-affordable-flagship-phones.1135980.0.html), 2025.
+[^snapdragon-8elite-gen5-tops]: Jon Peddie Research, [Qualcomm Snapdragon 8 Elite Gen 5](https://www.jonpeddie.com/news/qualcomm-snapdragon-8-elite-gen-5/), 2025.
