@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620" role="img" aria-labelledby="title desc">
+  <title id="title">Edge AI compute and compute per dollar trend</title>
+  <desc id="desc">Two-panel chart showing advertised edge AI compute rising from sub-TOPS devices in 2014 and 2017 to tens of TOPS by 2026, and advertised compute per dollar rising from about 0.001 TOPS per dollar to about 0.3 TOPS per dollar.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbfaf7; }
+      .panel { fill: #fffdf8; stroke: #e4d9ca; stroke-width: 1; }
+      .grid { stroke: #ded9cf; stroke-width: 1; }
+      .axis { stroke: #5d564d; stroke-width: 1.2; }
+      .title { fill: #2f2a25; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 24px; font-weight: 700; }
+      .subtitle { fill: #655d52; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; }
+      .label { fill: #3f3932; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; }
+      .small { fill: #665d52; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 11px; }
+      .compute { fill: none; stroke: #16835f; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+      .value { fill: none; stroke: #c24a3a; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+      .dot1 { fill: #16835f; stroke: #fffdf8; stroke-width: 2; }
+      .dot2 { fill: #c24a3a; stroke: #fffdf8; stroke-width: 2; }
+      .tag { fill: #fff8ef; stroke: #ead8c4; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="960" height="620"/>
+  <text class="title" x="74" y="42">Edge AI compute and compute-per-dollar trend</text>
+  <text class="subtitle" x="74" y="64">Public buyable edge modules/dev kits; advertised TOPS/TFLOPS are not FP16-normalized.</text>
+
+  <rect class="panel" x="62" y="88" width="836" height="218" rx="8"/>
+  <text class="label" x="84" y="116">Advertised edge AI compute</text>
+  <line class="axis" x1="90" y1="270" x2="800" y2="270"/>
+  <line class="axis" x1="90" y1="80" x2="90" y2="270"/>
+  <line class="grid" x1="90" y1="264" x2="800" y2="264"/>
+  <line class="grid" x1="90" y1="203" x2="800" y2="203"/>
+  <line class="grid" x1="90" y1="142" x2="800" y2="142"/>
+  <line class="grid" x1="90" y1="81" x2="800" y2="81"/>
+
+  <text class="small" x="80" y="268" text-anchor="end">0.1</text>
+  <text class="small" x="80" y="207" text-anchor="end">1</text>
+  <text class="small" x="80" y="146" text-anchor="end">10</text>
+  <text class="small" x="80" y="85" text-anchor="end">100 TOPS</text>
+
+  <path class="compute" d="M 90 233 L 149 203 L 268 264 L 279 195 L 386 166 L 445 122 L 682 116 L 729 91 L 800 104"/>
+  <circle class="dot1" cx="90" cy="233" r="5"/>
+  <circle class="dot1" cx="149" cy="203" r="5"/>
+  <circle class="dot1" cx="268" cy="264" r="5"/>
+  <circle class="dot1" cx="279" cy="195" r="5"/>
+  <circle class="dot1" cx="386" cy="166" r="5"/>
+  <circle class="dot1" cx="445" cy="122" r="5"/>
+  <circle class="dot1" cx="682" cy="116" r="5"/>
+  <circle class="dot1" cx="729" cy="91" r="5"/>
+  <circle class="dot1" cx="800" cy="104" r="5"/>
+
+  <text class="small" x="90" y="291" text-anchor="middle">2014</text>
+  <text class="small" x="268" y="291" text-anchor="middle">2017</text>
+  <text class="small" x="386" y="291" text-anchor="middle">2019</text>
+  <text class="small" x="445" y="291" text-anchor="middle">2020</text>
+  <text class="small" x="682" y="291" text-anchor="middle">2024</text>
+  <text class="small" x="800" y="291" text-anchor="middle">2026</text>
+
+  <text class="small" x="90" y="223" text-anchor="middle">TK1</text>
+  <text class="small" x="149" y="193" text-anchor="middle">TX1</text>
+  <text class="small" x="268" y="254" text-anchor="middle">NCS</text>
+  <text class="small" x="296" y="188">TX2</text>
+  <text class="small" x="386" y="156" text-anchor="middle">Coral</text>
+  <text class="small" x="445" y="112" text-anchor="middle">Xavier</text>
+  <text class="small" x="682" y="106" text-anchor="middle">AI HAT+</text>
+  <text class="small" x="729" y="83" text-anchor="middle">Orin</text>
+  <text class="small" x="800" y="96" text-anchor="end">HAT+2</text>
+
+  <rect class="panel" x="62" y="334" width="836" height="218" rx="8"/>
+  <text class="label" x="84" y="362">Advertised compute per dollar</text>
+  <line class="axis" x1="90" y1="515" x2="800" y2="515"/>
+  <line class="axis" x1="90" y1="350" x2="90" y2="515"/>
+  <line class="grid" x1="90" y1="509" x2="800" y2="509"/>
+  <line class="grid" x1="90" y1="448" x2="800" y2="448"/>
+  <line class="grid" x1="90" y1="387" x2="800" y2="387"/>
+
+  <text class="small" x="80" y="513" text-anchor="end">0.001</text>
+  <text class="small" x="80" y="452" text-anchor="end">0.01</text>
+  <text class="small" x="80" y="391" text-anchor="end">0.1</text>
+  <text class="small" x="80" y="356" text-anchor="end">0.5 TOPS/$</text>
+
+  <path class="value" d="M 90 501 L 149 501 L 268 509 L 279 494 L 386 428 L 445 410 L 682 370 L 729 366 L 800 363"/>
+  <circle class="dot2" cx="90" cy="501" r="5"/>
+  <circle class="dot2" cx="149" cy="501" r="5"/>
+  <circle class="dot2" cx="268" cy="509" r="5"/>
+  <circle class="dot2" cx="279" cy="494" r="5"/>
+  <circle class="dot2" cx="386" cy="428" r="5"/>
+  <circle class="dot2" cx="445" cy="410" r="5"/>
+  <circle class="dot2" cx="682" cy="370" r="5"/>
+  <circle class="dot2" cx="729" cy="366" r="5"/>
+  <circle class="dot2" cx="800" cy="363" r="5"/>
+
+  <text class="small" x="90" y="536" text-anchor="middle">2014</text>
+  <text class="small" x="268" y="536" text-anchor="middle">2017</text>
+  <text class="small" x="386" y="536" text-anchor="middle">2019</text>
+  <text class="small" x="445" y="536" text-anchor="middle">2020</text>
+  <text class="small" x="682" y="536" text-anchor="middle">2024</text>
+  <text class="small" x="800" y="536" text-anchor="middle">2026</text>
+
+  <rect class="tag" x="548" y="382" width="250" height="54" rx="6"/>
+  <text class="small" x="564" y="402">Approximate gain:</text>
+  <text class="label" x="564" y="421">~180x higher TOPS/$</text>
+  <text class="small" x="564" y="435">from TK1 to AI HAT+ 2</text>
+
+  <text class="small" x="74" y="585">Caveat: this mixes marketed FP TFLOPS and INT8/INT4 TOPS. It is a product-envelope chart, not a strict benchmark across datatypes or operator coverage.</text>
+</svg>

@@ -455,6 +455,27 @@ That is why the accelerator looks different. Mobile NPUs and edge ASICs are opti
   <figcaption>Edge AI economics are constrained by power, memory, and locality. Buyable modules can look cheap per TOPS, but the practical workload depends on quantization support, compiler coverage, local memory, and sustained thermals.</figcaption>
 </figure>
 
+The trend line for buyable edge hardware is dramatic, but it needs careful labeling. Early Jetson boards advertised GPU floating-point throughput, while later Edge TPU, Hailo, and Orin products advertise quantized neural-network TOPS. The table below therefore uses the public metric each product was sold with and treats it as an **advertised edge-AI compute envelope**, not as a strict FP16-normalized benchmark. The historical anchors combine Jetson TK1/TX1/TX2 public launch material, Intel Movidius Neural Compute Stick launch coverage, Coral Dev Board coverage, Xavier NX launch coverage, Raspberry Pi AI HAT pricing, and Jetson Orin Nano Super pricing.[^jetson-tk1][^jetson-tx1-price][^jetson-tx1-spec][^movidius-ncs][^jetson-tx2-price][^jetson-tx2-spec][^coral-dev-board-price][^xavier-nx-price][^raspberry-ai-hat][^raspberry-ai-hat-2][^jetson-orin-nano]
+
+| edge device / module | year | advertised compute anchor | public price anchor | advertised TOPS per USD |
+| --- | ---: | ---: | ---: | ---: |
+| Jetson TK1 dev kit | 2014 | 0.326 TFLOPS | USD 192 | 0.0017 |
+| Jetson TX1 dev kit | 2015 | 1 TFLOPS | USD 599 | 0.0017 |
+| Intel Movidius Neural Compute Stick | 2017 | 0.1 TFLOPS | USD 79 | 0.0013 |
+| Jetson TX2 dev kit | 2017 | 1.33 TFLOPS | USD 599 | 0.0022 |
+| Google Coral Dev Board | 2019 | 4 TOPS | USD 150 | 0.0267 |
+| Jetson Xavier NX dev kit | 2020 | 21 TOPS | USD 399 | 0.0526 |
+| Raspberry Pi AI HAT+ | 2024 | 26 TOPS | USD 110 | 0.236 |
+| Jetson Orin Nano Super | 2024 | 67 TOPS | USD 249 | 0.269 |
+| Raspberry Pi AI HAT+ 2 | 2026 | 40 INT4 TOPS | USD 130 | 0.308 |
+
+<figure class="post-figure">
+  <img src="{{ '/assets/edge-compute-cost-trend.svg' | relative_url }}" alt="Two-panel line chart showing advertised edge AI compute and advertised edge AI compute per dollar from 2014 through 2026.">
+  <figcaption>Public edge AI modules moved from sub-TOPS GPU-era boards to tens-of-TOPS quantized accelerators. The dollar curve bends sharply once fixed-function INT8/INT4 inference hardware became cheap and widely available.</figcaption>
+</figure>
+
+The important caveat is that the curve is partly architectural, not only manufacturing progress. A 2014 Jetson TK1 and a 2026 Hailo-based AI HAT+ 2 are not running the same numerical contract. The later devices win by narrowing the workload: quantized inference, compiler-supported operator sets, smaller activation footprints, and local SRAM reuse. That makes them excellent at camera, audio, sensor, and small local-model loops, but much less flexible than a data-center GPU. Edge compute-per-dollar improved because the hardware gave up generality in exchange for useful local inference.
+
 This is the mirror image of scale-out AI infra. In the cloud, weak scaling makes optimization valuable because each user can trigger more tokens, more agents, and longer-running jobs. At the edge, the hard ceiling is local state: how much model, cache, sensor context, and runtime can fit without waking a server or burning the battery. The right design is usually hybrid:
 
 - **Do local inference** when latency, privacy, offline availability, or sensor bandwidth dominates.
@@ -549,3 +570,11 @@ References
 [^raspberry-ai-hat-2]: Raspberry Pi, [Introducing the Raspberry Pi AI HAT+ 2](https://www.raspberrypi.com/news/introducing-the-raspberry-pi-ai-hat-plus-2-generative-ai-on-raspberry-pi-5/), 2026.
 [^jetson-orin-nano]: NVIDIA, [Jetson Orin Nano Super Developer Kit](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/), accessed 2026-07-06.
 [^jetson-orin]: NVIDIA, [Jetson AGX Orin series](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/), accessed 2026-07-06.
+[^jetson-tk1]: NVIDIA, [Jetson TK1 platform brief](https://developer.download.nvidia.com/embedded/jetson/TK1/docs/Jetson_platform_brief_May2014.pdf), 2014; NVIDIA Developer Forums, [Jetson TK1 Development Kit Now Available](https://forums.developer.nvidia.com/t/jetson-tk1-development-kit-now-available/32672), 2014.
+[^jetson-tx1-price]: NVIDIA Developer Blog, [NVIDIA Jetson TX1 Supercomputer-on-Module Drives Next Wave of Autonomous Machines](https://developer.nvidia.com/blog/nvidia-jetson-tx1-supercomputer-on-module-drives-next-wave-of-autonomous-machines/), 2015.
+[^jetson-tx1-spec]: NVIDIA Developer, [Jetson TX1 Module](https://developer.nvidia.com/embedded/jetson-tx1), accessed 2026-07-06.
+[^movidius-ncs]: SiliconANGLE, [Intel introduces a USD 79 USB stick for running neural networks](https://siliconangle.com/2017/07/20/intel-introduces-79-usb-stick-running-neural-networks/), 2017.
+[^jetson-tx2-price]: Seeed Studio, [NVIDIA Jetson TX2 Developer Kit](https://www.seeedstudio.com/NVIDIA-Jetson-TX2-Developer-Kit-p-4413.html), accessed 2026-07-06.
+[^jetson-tx2-spec]: NVIDIA, [Jetson TX2 series technical specifications](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-tx2/), accessed 2026-07-06.
+[^coral-dev-board-price]: IEEE Spectrum, [The Coral Dev Board Takes Google's AI to the Edge](https://spectrum.ieee.org/the-coral-dev-board-takes-googles-ai-to-the-edge), 2019.
+[^xavier-nx-price]: LinuxGizmos, [Xavier NX Dev Kit ships as Nvidia adds cloud-native support for all the Jetsons](https://linuxgizmos.com/xavier-nx-dev-kit-ships-as-nvidia-adds-cloud-native-support-for-all-the-jetsons/), 2020.
