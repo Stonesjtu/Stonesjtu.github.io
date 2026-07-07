@@ -457,34 +457,34 @@ That is why the accelerator looks different. Mobile NPUs and edge ASICs are opti
 
 The trend line for buyable edge hardware is dramatic, but it needs careful labeling. Early Jetson boards advertised GPU floating-point throughput, while later Edge TPU, Hailo, and Orin products advertise quantized neural-network TOPS. The table below therefore uses the public metric each product was sold with and treats it as an **advertised edge-AI compute envelope**, not as a strict FP16-normalized benchmark. The historical anchors combine Jetson TK1/TX1/TX2 public launch material, Intel Movidius Neural Compute Stick launch coverage, Coral Dev Board coverage, Xavier NX launch coverage, Raspberry Pi AI HAT pricing, and Jetson Orin Nano Super pricing.[^jetson-tk1][^jetson-tx1-price][^jetson-tx1-spec][^movidius-ncs][^jetson-tx2-price][^jetson-tx2-spec][^coral-dev-board-price][^xavier-nx-price][^raspberry-ai-hat][^raspberry-ai-hat-2][^jetson-orin-nano]
 
-| edge device / module | year | advertised compute anchor | public price anchor | advertised TOPS per USD |
+| edge device / module | year | advertised compute anchor | public price anchor | advertised dollars per TOPS |
 | --- | ---: | ---: | ---: | ---: |
-| Jetson TK1 dev kit | 2014 | 0.326 TFLOPS | USD 192 | 0.0017 |
-| Jetson TX1 dev kit | 2015 | 1 TFLOPS | USD 599 | 0.0017 |
-| Intel Movidius Neural Compute Stick | 2017 | 0.1 TFLOPS | USD 79 | 0.0013 |
-| Jetson TX2 dev kit | 2017 | 1.33 TFLOPS | USD 599 | 0.0022 |
-| Google Coral Dev Board | 2019 | 4 TOPS | USD 150 | 0.0267 |
-| Jetson Xavier NX dev kit | 2020 | 21 TOPS | USD 399 | 0.0526 |
-| Raspberry Pi AI HAT+ | 2024 | 26 TOPS | USD 110 | 0.236 |
-| Jetson Orin Nano Super | 2024 | 67 TOPS | USD 249 | 0.269 |
-| Raspberry Pi AI HAT+ 2 | 2026 | 40 INT4 TOPS | USD 130 | 0.308 |
+| Jetson TK1 dev kit | 2014 | 0.326 TFLOPS | USD 192 | USD 589/TOPS |
+| Jetson TX1 dev kit | 2015 | 1 TFLOPS | USD 599 | USD 599/TOPS |
+| Intel Movidius Neural Compute Stick | 2017 | 0.1 TFLOPS | USD 79 | USD 790/TOPS |
+| Jetson TX2 dev kit | 2017 | 1.33 TFLOPS | USD 599 | USD 450/TOPS |
+| Google Coral Dev Board | 2019 | 4 TOPS | USD 150 | USD 37.5/TOPS |
+| Jetson Xavier NX dev kit | 2020 | 21 TOPS | USD 399 | USD 19/TOPS |
+| Raspberry Pi AI HAT+ | 2024 | 26 TOPS | USD 110 | USD 4.23/TOPS |
+| Jetson Orin Nano Super | 2024 | 67 TOPS | USD 249 | USD 3.72/TOPS |
+| Raspberry Pi AI HAT+ 2 | 2026 | 40 INT4 TOPS | USD 130 | USD 3.25/TOPS |
 
 <figure class="post-figure">
-  <img src="{{ '/assets/edge-compute-cost-trend.svg' | relative_url }}" alt="Two-panel line chart showing advertised edge AI compute and advertised edge AI compute per dollar from 2014 through 2026.">
-  <figcaption>Public edge AI modules moved from sub-TOPS GPU-era boards to tens-of-TOPS quantized accelerators. The dollar curve bends sharply once fixed-function INT8/INT4 inference hardware became cheap and widely available.</figcaption>
+  <img src="{{ '/assets/edge-compute-cost-trend.svg' | relative_url }}" alt="Two-panel line chart showing advertised edge AI compute and advertised dollars per TOPS from 2014 through 2026.">
+  <figcaption>Public edge AI modules moved from sub-TOPS GPU-era boards to tens-of-TOPS quantized accelerators. The cost curve falls sharply once fixed-function INT8/INT4 inference hardware became cheap and widely available.</figcaption>
 </figure>
 
-The important caveat is that the curve is partly architectural, not only manufacturing progress. A 2014 Jetson TK1 and a 2026 Hailo-based AI HAT+ 2 are not running the same numerical contract. The later devices win by narrowing the workload: quantized inference, compiler-supported operator sets, smaller activation footprints, and local SRAM reuse. That makes them excellent at camera, audio, sensor, and small local-model loops, but much less flexible than a data-center GPU. Edge compute-per-dollar improved because the hardware gave up generality in exchange for useful local inference.
+The important caveat is that the curve is partly architectural, not only manufacturing progress. A 2014 Jetson TK1 and a 2026 Hailo-based AI HAT+ 2 are not running the same numerical contract. The later devices win by narrowing the workload: quantized inference, compiler-supported operator sets, smaller activation footprints, and local SRAM reuse. That makes them excellent at camera, audio, sensor, and small local-model loops, but much less flexible than a data-center GPU. Edge dollars-per-compute fell because the hardware gave up generality in exchange for useful local inference.
 
 Phone SoCs are harder to put on the same curve because Apple does not sell A-series chips, Qualcomm pricing is negotiated per OEM and volume, and the application processor is bundled with CPU, GPU, ISP, modem interfaces, security, media, and memory controllers. Still, teardown and industry-estimate data give a useful sanity check. Digitimes reported the A16 processor in iPhone 15 at about USD 35 and A18 in iPhone 16 at about USD 45; TechCrunch reported A18 / A18 Pro's 16-core Neural Engine at 35 TOPS; Wccftech reported Snapdragon 8 Gen 3 around USD 200 and Snapdragon 8 Gen 4 / 8 Elite estimates around USD 220-240; Notebookcheck later summarized Snapdragon 8 Elite Gen 5 estimates around USD 240-280, versus about USD 200 for Snapdragon 8 Gen 3.[^iphone16-bom][^apple-a18-tops][^snapdragon-8gen3-tops][^snapdragon-8g4-cost][^snapdragon-8elite-cost][^snapdragon-8elite-gen5-tops] Using those estimates, phone SoC NPU dollars can look competitive with edge modules, but this comparison is not apples-to-apples: a phone SoC is a subsidized internal or high-volume OEM component, while Jetson / Coral / Hailo boards include packaging, carrier hardware, memory, connectors, distribution margin, and developer support.
 
-| phone SoC price sanity check | year | NPU / AI compute anchor | estimated SoC price | implied NPU TOPS per USD |
+| phone SoC price sanity check | year | NPU / AI compute anchor | estimated SoC price | implied NPU dollars per TOPS |
 | --- | ---: | ---: | ---: | ---: |
-| Apple A16 | 2022 | 17 TOPS | USD 35 teardown/BOM estimate | 0.49 |
-| Apple A18 | 2024 | 35 TOPS | USD 45 teardown/BOM estimate | 0.78 |
-| Snapdragon 8 Gen 3 | 2023 | about 45 TOPS | about USD 170-200 industry estimate | 0.23-0.26 |
+| Apple A16 | 2022 | 17 TOPS | USD 35 teardown/BOM estimate | USD 2.06/TOPS |
+| Apple A18 | 2024 | 35 TOPS | USD 45 teardown/BOM estimate | USD 1.29/TOPS |
+| Snapdragon 8 Gen 3 | 2023 | about 45 TOPS | about USD 170-200 industry estimate | USD 3.8-4.4/TOPS |
 | Snapdragon 8 Elite / 8 Gen 4 class | 2024 | higher than 8 Gen 3, but vendor reports often use relative gains | about USD 220-240 industry estimate | not comparable without a stable TOPS number |
-| Snapdragon 8 Elite Gen 5 estimate | 2025 | reported around 100 TOPS by industry press | about USD 240-280 industry estimate | 0.36-0.42 |
+| Snapdragon 8 Elite Gen 5 estimate | 2025 | reported around 100 TOPS by industry press | about USD 240-280 industry estimate | USD 2.4-2.8/TOPS |
 
 This is the mirror image of scale-out AI infra. In the cloud, weak scaling makes optimization valuable because each user can trigger more tokens, more agents, and longer-running jobs. At the edge, the hard ceiling is local state: how much model, cache, sensor context, and runtime can fit without waking a server or burning the battery. The right design is usually hybrid:
 
