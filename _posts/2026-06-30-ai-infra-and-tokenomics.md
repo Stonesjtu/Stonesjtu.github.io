@@ -29,8 +29,16 @@ This is why AI infrastructure is not a support layer around the model. It is par
   <figcaption>AI infrastructure matters because the curve to serve is steeper than the curve hardware gives us for free.</figcaption>
 </figure>
 
-From conventional infra to agentic infra
----
+A useful reading order for the rest of the post is:
+
+1. **Workload shift:** infrastructure moved from request serving to token loops.
+2. **Demand side:** model size, context, and agent loops make the workload weak-scale.
+3. **Stack view:** token cost is created across model, serving, compiler, kernel, and chip layers.
+4. **Supply side:** compute, memory, manufacturing, and interconnect improve, but not as a free lunch.
+5. **Edge contrast:** local AI has different economics because power, memory, and privacy dominate.
+6. **Accounting:** the token ties these layers back to cost, latency, and product quality.
+
+## 1. From requests to token loops
 
 <figure class="post-figure">
   <img src="{{ '/assets/infra-evolution-agentic.svg' | relative_url }}" alt="Timeline diagram showing infrastructure evolving from conventional request serving to machine learning jobs, deep learning training steps, LLM tokens, and agentic task loops.">
@@ -53,8 +61,21 @@ Deep learning infrastructure makes the accelerator the main computer. The system
 
 Agentic infrastructure adds feedback loops. A request can expand into planning, retrieval, tool calls, code execution, test runs, retries, and verification. The performance target is no longer "tokens per second" alone. It is useful completed work per token.
 
-Why infra became so resource-demanding
----
+## 2. Demand side: token work weak-scales
+
+Scaling has multiple knobs:
+
+- Model scale: parameters, activation size, depth, sparsity, experts.
+- Training scale: tokens, data quality, optimizer budget, parallelism efficiency.
+- Context scale: KV cache size, attention pattern, retrieval strategy.
+- Inference scale: samples, reasoning steps, tool calls, verification passes.
+
+The last knob is increasingly important. Brown et al. studied repeated sampling and found that solution coverage can continue improving as sample count grows over several orders of magnitude, with automatic verification converting samples into better measured performance in domains such as code and formal proofs.[^large-language-monkeys]
+
+This changes the serving objective. A system may improve quality by spending more inference compute, but the product only wins if the extra compute is controlled. Good infra therefore does two things:
+
+1. Lower the cost of each token.
+2. Reduce the number of tokens required to complete the task.
 
 Two scaling modes show why the infra problem does not stay fixed.
 
@@ -127,8 +148,7 @@ The scaling-law literature explains why the pressure is not arbitrary. Kaplan et
 
 The engineering takeaway is narrower than "make models bigger." Parameters, data, training FLOPs, context, and inference FLOPs are coupled. Infrastructure determines where that compute can be spent efficiently.
 
-The AI infra ecosystem
----
+## 3. Token cost is a stack property
 
 No single layer owns token cost. Each layer chooses constraints for the next one:
 
@@ -150,8 +170,7 @@ Most high-leverage infra work is therefore cross-layer work.
   <figcaption>The cost and latency of one useful token is the sum of many cross-layer decisions.</figcaption>
 </figure>
 
-Infra engineering is the exciting layer
----
+### 3.1 The infra engineering control loop
 
 The reason infra engineering is high-leverage is that it sits at the constraint boundary:
 
@@ -172,25 +191,7 @@ So the practical loop is:
 
 Tokenomics is the visible metric for that loop. The question is not just whether a model is intelligent. It is how much useful intelligence the system can deliver per dollar, watt, second, and engineer-hour.
 
-Models are still scaling
----
-
-Scaling has multiple knobs:
-
-- Model scale: parameters, activation size, depth, sparsity, experts.
-- Training scale: tokens, data quality, optimizer budget, parallelism efficiency.
-- Context scale: KV cache size, attention pattern, retrieval strategy.
-- Inference scale: samples, reasoning steps, tool calls, verification passes.
-
-The last knob is increasingly important. Brown et al. studied repeated sampling and found that solution coverage can continue improving as sample count grows over several orders of magnitude, with automatic verification converting samples into better measured performance in domains such as code and formal proofs.[^large-language-monkeys]
-
-This changes the serving objective. A system may improve quality by spending more inference compute, but the product only wins if the extra compute is controlled. Good infra therefore does two things:
-
-1. Lower the cost of each token.
-2. Reduce the number of tokens required to complete the task.
-
-Chips are slowing down
----
+## 4. Supply side: hardware progress is conditional
 
 Hardware is still improving quickly, but the improvement is more specialized and more conditional.
 
@@ -205,7 +206,7 @@ The constraints in this section have a hierarchy:
 | manufacturing | How expensive is each new square millimeter of silicon? | USD per 300 mm wafer |
 | interconnect | How expensive is coordination across accelerators? | communication time per collective / all-to-all |
 
-### 1. Compute: peak math is now conditional
+### 4.1 Compute: peak math is now conditional
 
 The H100 is a useful example. NVIDIA's Hopper material highlights HBM3 bandwidth around 3 TB/s, a 50 MB L2 cache, Transformer Engine support, NVLink/NVSwitch scale-out, and low-precision tensor paths.[^h100] These are not just "more FLOPs." They are area, power, and system-design choices that help specific workload shapes.
 
@@ -225,7 +226,7 @@ Blackwell continues the shift. NVIDIA's DGX B200 system lists 144 PFLOP/s FP4 Te
 
 These figures are not an apples-to-apples speedup curve. The datatype, sparsity mode, memory system, and programming model all changed. That is the important part. GPU progress came from changing the numerical contract: CUDA, SIMT execution, HBM, NVLink, tensor cores, TF32, BF16, FP8, FP4, sparsity, and compiler/runtime support made model structure visible to hardware.
 
-### 2. Compute per dollar: normalize before comparing
+### 4.2 Compute price-performance: normalize before comparing
 
 To make the price-performance curve concrete, use a simple rental-equivalent metric:
 
@@ -255,7 +256,7 @@ This is still a rough engineering estimate, not a purchasing benchmark. The util
   <figcaption>Concrete FP16-normalized price-performance estimates make the slowdown point sharper: raw math still jumps, but delivered compute per dollar depends on price, utilization, and cloud economics.</figcaption>
 </figure>
 
-#### 2.1 ALU manufacturing: narrow math buys more lanes
+### 4.3 ALU manufacturing: narrow math buys more lanes
 
 The ALU-level version of the story is simpler. Arithmetic got cheaper because accelerators stopped treating every operation as a wide general-purpose floating-point operation. A lower-bound manufacturing proxy is:
 
@@ -311,11 +312,11 @@ The area trend is the important signal: a 16-bit floating-point multiply-plus-ad
   <figcaption>Logic density keeps shrinking the raw FP16 arithmetic datapath, but wafer prices flatten the dollar-cost curve at leading-edge nodes.</figcaption>
 </figure>
 
-### 3. Memory hierarchy: bytes have different economics
+### 4.4 Memory hierarchy: bytes have different economics
 
 Memory and manufacturing show the same pattern. Compute can keep rising, but every token also needs bytes close to the math unit. The difficult part is that each level of memory optimizes a different constraint: on-chip SRAM is fast but area-expensive, HBM is bandwidth-rich but package-expensive, commodity DRAM is capacity-rich but far away, and advanced wafers are no longer getting cheap fast enough to hide the tradeoff.
 
-#### 3.1 On-chip SRAM: fast bytes are area-limited
+#### 4.4.1 On-chip SRAM: fast bytes are area-limited
 
 For on-chip SRAM, there is no public spot price per MB. A useful lower-bound proxy is:
 
@@ -342,7 +343,7 @@ The punchline is not that SRAM got worse in absolute density. It got much denser
 
 NVIDIA GPU caches show the architectural response. P100 had about 4 MB of L2, V100 6 MB, A100 40 MB, H100 50 MB, and public B200 analysis reports about 126 MB of total L2.[^a100][^h100][^chips-b200-cache] More on-chip SRAM is being used because going to HBM is expensive in energy and latency, but the amount is still tiny compared with model state and KV cache.
 
-#### 3.2 Off-chip memory: capacity and bandwidth diverge
+#### 4.4.2 Off-chip memory: capacity and bandwidth diverge
 
 Off-chip memory has split into two worlds. Commodity DRAM remains the capacity workhorse, but its price-per-GB improvement slowed sharply after 2010. Stanford DAM's compiled memory-price dataset shows cheapest DRAM falling from about USD 185/GB in 2005 to USD 12.2/GB in 2010, then only to USD 3.0/GB by 2020 and about USD 3.45/GB in July 2026.[^stanford-memory-prices] HBM moves in the other direction: it is not cheap capacity, it is purchased bandwidth close to the accelerator. Rambus summarizes HBM's speed evolution from 128 GB/s per HBM device to 2.048 TB/s for HBM4, while Stanford DAM's modeled HBM data puts HBM2e around USD 6/GB and HBM3e peak around USD 18/GB.[^rambus-hbm][^stanford-memory-prices]
 
@@ -354,7 +355,7 @@ Off-chip memory has split into two worlds. Commodity DRAM remains the capacity w
 | HBM price/capacity | HBM2e around USD 6/GB, HBM3 around USD 9/GB, HBM3e peak around USD 18/GB, HBM4 projected around USD 16.5/GB[^stanford-memory-prices] |
 | HBM price/bandwidth | HBM2e around USD 209 per TB/s, HBM3 around USD 264 per TB/s, HBM3e peak around USD 352 per TB/s, HBM4 projected around USD 297 per TB/s[^stanford-memory-prices] |
 
-#### 3.3 Manufacturing: wafer cost pushes back
+#### 4.4.3 Manufacturing: wafer cost pushes back
 
 The manufacturing layer is the shared denominator under both compute and SRAM. If each wafer gets more expensive, every large die, cache expansion, interposer choice, and yield loss has a higher dollar impact.
 
@@ -370,7 +371,7 @@ The manufacturing layer is the shared denominator under both compute and SRAM. I
   <figcaption>Memory economics explain why AI infra is increasingly about locality: on-chip SRAM density is harder to buy with node shrinks, HBM bandwidth is expensive capacity, commodity DRAM is cheap but far away, and advanced wafer prices keep rising.</figcaption>
 </figure>
 
-### 4. Interconnection and communication: scale-out has a tax
+### 4.5 Interconnection and communication: scale-out has a tax
 
 The next bottleneck appears when one accelerator is not enough. Scaling out turns compute into a distributed system problem: GPUs must exchange gradients, activations, KV cache state, expert routes, pipeline bubbles, and scheduling metadata. A useful first-order model is the latency-bandwidth model:
 
@@ -428,7 +429,7 @@ The punchline is subtle: network silicon has delivered a large cost-per-bit impr
 
 This is why "chips are slowing down" is not only a FLOP story. It is a locality and communication story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, interconnect bandwidth, synchronization time, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory and network bandwidth do useful work more often.
 
-### 5. Edge and mobile accelerators: locality beats peak TOPS
+## 5. Edge/mobile: locality beats peak TOPS
 
 Edge and mobile NN accelerators sit at the opposite end of the cluster story. A data-center GPU buys throughput by spending HBM, power, cooling, and network. A phone, camera, robot, car sensor, or Raspberry Pi accessory buys usefulness by staying inside a tiny power and memory envelope. The unit of value is often not "maximum tokens per second." It is:
 
@@ -494,8 +495,7 @@ This is the mirror image of scale-out AI infra. In the cloud, weak scaling makes
 
 The important lesson is that edge accelerators do not weaken the AI infra thesis. They extend it. Once inference leaves the data center, infrastructure has to optimize a wider control loop: model size, quantization, compiler lowering, memory layout, thermal policy, network fallback, privacy boundary, and user-visible latency.
 
-The token is the economic unit
----
+## 6. Token accounting: what the stack optimizes
 
 The token is a useful accounting unit because it connects the full stack:
 
@@ -516,8 +516,7 @@ That is why low-level details matter:
 
 The next AI infra frontier is not simply larger clusters. It is a tighter control loop between algorithms, model architecture, serving systems, kernels, compilers, and chips. The teams that win will not only have better models or better hardware. They will have better token economics.
 
-References
----
+## References
 
 [^openai-compute]: OpenAI, [AI and Compute](https://openai.com/index/ai-and-compute/), 2018.
 [^epoch-compute]: Jaime Sevilla et al., [Compute Trends Across Three Eras of Machine Learning](https://arxiv.org/abs/2202.05924), 2022.
