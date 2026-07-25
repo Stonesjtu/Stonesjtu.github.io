@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[WIP] AI infra and tokenomics, part 2: why current AI infra is hard"
+title: "[WIP] Why current AI infra is hard - AI-Infra Overview PART-2"
 topic: "AI infrastructure"
 sequence: 9
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[WIP] AI infra and tokenomics, part 1: from conventional infra to agentic infra"
+title: "[WIP] From conventional infra to agentic infra - AI-Infra Overview PART-1"
 topic: "AI infrastructure"
 sequence: 8
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6

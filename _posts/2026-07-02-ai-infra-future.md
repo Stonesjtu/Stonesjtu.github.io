@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[WIP] AI infra and tokenomics, part 3: predicting the future AI infra stack"
+title: "[WIP] Predicting the future AI infra stack - AI-Infra Overview PART-3"
 topic: "AI infrastructure"
 sequence: 10
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
