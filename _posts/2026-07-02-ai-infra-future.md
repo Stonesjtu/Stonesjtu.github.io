@@ -8,34 +8,22 @@ source_label: "Original outline on Notion"
 excerpt: "A supply-chain view of future AI infrastructure: heterogeneous computing, dedicated LLM hardware, memory locality, interconnect, and edge/cloud partitioning."
 ---
 
-This is the third part of the AI infrastructure and tokenomics series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) covered the history of AI infra as the bridge between workloads and hardware. [Part 2](/2026/07/01/ai-infra-scaling-problem/) covered the current problem: model, context, output, and agent-loop demand scale faster than hardware economics can hide.
+This is the third part of the series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) defined AI infrastructure as the bridge between workloads and hardware. [Part 2](/2026/07/01/ai-infra-scaling-problem/) showed how model work, context, output, and agent loops multiply demand.
 
-This part looks forward from the supply side. The prediction is simple: **AI infrastructure will become more heterogeneous, and more of the hardware will be designed around LLM-specific bottlenecks rather than generic FLOPs.**
+This part looks forward from the supply side. The prediction is simple: **AI infrastructure will become more heterogeneous, and more hardware will be designed around LLM-specific bottlenecks rather than generic FLOPs.**
 
-That does not mean general-purpose GPUs disappear. It means the winning systems increasingly look like coordinated packages: CPUs for orchestration, GPUs for dense math, tensor accelerators for low-precision matrix work, NPUs for local inference, HBM and SRAM for locality, scale-up fabrics for model parallelism, scale-out networks for cluster scheduling, and software that can route work across all of it.
+<figure class="post-figure">
+  <img src="{{ '/assets/ai-infra-unified-map.svg' | relative_url }}" alt="Excalidraw systems map showing workload pressures flowing through AI infrastructure placement, compilation, caching, scheduling, runtime, and data movement into compute, memory, communication, and edge hardware constraints, with a feedback loop.">
+  <figcaption>Part 3 returns to the same series map and follows its hardware side: the future stack coordinates specialization across compute, memory, communication, and edge placement.</figcaption>
+</figure>
 
-## Three future directions
+General-purpose GPUs will remain central, but the winning system increasingly looks like a coordinated package: CPUs for orchestration, GPUs for dense math, tensor engines for narrow numerical formats, NPUs for local inference, HBM and SRAM for locality, scale-up fabrics for model parallelism, scale-out networks for cluster scheduling, and software that can place work across all of them.
 
-1. **Heterogeneous computing becomes normal.** The stack will mix CPUs, GPUs, TPUs, NPUs, DPUs, smart NICs, storage-side preprocessing, edge accelerators, and possibly memory-side compute. The infra problem becomes placement: which part of the model or agent loop should run where?
-2. **LLM hardware becomes more dedicated.** More silicon area will be spent on low-precision tensor paths, KV-cache movement, attention variants, long-context prefill/decode separation, scale-up fabrics, and memory bandwidth rather than only headline FP64/FP32 performance.
-3. **Edge and cloud split the loop.** Local accelerators will handle privacy-sensitive, latency-sensitive, sensor-heavy, and always-on work. Cloud systems will handle broad knowledge, large context, tool orchestration, and high-quality generation.
+The evidence falls into four constraints. Compute progress increasingly depends on narrower numerical contracts. Memory determines how much model and context can stay close to arithmetic. Communication determines whether many accelerators behave like one system. Edge hardware makes placement, privacy, and thermal limits part of the same infrastructure problem.
 
-## Supply side: hardware progress is conditional
+## 1. Compute becomes specialized
 
-Hardware is still improving quickly, but the improvement is more specialized and more conditional.
-
-The constraints in this section have a hierarchy:
-
-| layer | question | useful price metric |
-| --- | --- | --- |
-| compute | How much math can one accelerator expose? | FP16-normalized compute per GPU-hour |
-| ALU manufacturing | How cheaply can arithmetic lanes be replicated? | raw ALU area-cost proxy |
-| on-chip SRAM | How many hot bytes can stay near compute? | raw SRAM area-cost proxy per MB |
-| off-chip DRAM / HBM | How much capacity and bandwidth can the package feed? | USD/GB and USD per TB/s |
-| manufacturing | How expensive is each new square millimeter of silicon? | USD per 300 mm wafer |
-| interconnect | How expensive is coordination across accelerators? | communication time per collective / all-to-all |
-
-### Compute: peak math is now conditional
+### Peak math is conditional
 
 The H100 is a useful example. NVIDIA's Hopper material highlights HBM3 bandwidth around 3 TB/s, a 50 MB L2 cache, Transformer Engine support, NVLink/NVSwitch scale-out, and low-precision tensor paths.[^h100] These are not just "more FLOPs." They are area, power, and system-design choices that help specific workload shapes.
 
@@ -51,43 +39,77 @@ The GPU timeline shows the same pattern:
 
 Representative figures make the jump visible. Tesla C870 was advertised at 518 GFLOP/s peak single precision in 2007.[^tesla-c870] C1060 reached 933 GFLOP/s in 2008.[^tesla-c1060] K20X reached 3.95 TFLOP/s single precision and 1.31 TFLOP/s double precision in 2012.[^tesla-k20x] P100 delivered 21.2 TFLOP/s FP16 in 2016, V100 delivered about 125-130 Tensor TFLOP/s, A100 reached 312 TFLOP/s dense FP16/BF16 Tensor Core performance, and H100 lists 1,979 TFLOP/s FP16/BF16 Tensor Core with sparsity, or half that without sparsity.[^p100][^v100][^a100][^h100-spec]
 
-Blackwell continues the shift. NVIDIA's DGX B200 system lists 144 PFLOP/s FP4 Tensor Core performance across eight Blackwell GPUs, roughly 18 PFLOP/s per GPU at the published system level, while Blackwell Ultra emphasizes 15 PFLOP/s dense NVFP4 per GPU.[^blackwell-b200][^blackwell-ultra] NVIDIA's Rubin announcement lists 50 PFLOP/s NVFP4 inference compute per Rubin GPU, and Vera Rubin NVL144 CPX is framed around 8 exaFLOP/s of rack-scale AI performance for massive-context inference.[^rubin][^rubin-cpx]
+Blackwell continues the shift. NVIDIA's DGX B200 system lists 144 PFLOP/s FP4 Tensor Core performance across eight Blackwell GPUs, roughly 18 PFLOP/s per GPU at the published system level, while Blackwell Ultra emphasizes 15 PFLOP/s dense NVFP4 per GPU.[^blackwell-b200][^blackwell-ultra] NVIDIA's preliminary Rubin specifications list 4 PFLOP/s dense FP16/BF16 and 50 PFLOP/s NVFP4 inference compute per GPU. Vera Rubin NVL144 CPX is framed around 8 exaFLOP/s of rack-scale AI performance for massive-context inference.[^vera-rubin-spec][^rubin][^rubin-cpx]
 
 These figures are not an apples-to-apples speedup curve. The datatype, sparsity mode, memory system, and programming model all changed. That is the important part. GPU progress came from changing the numerical contract: CUDA, SIMT execution, HBM, NVLink, tensor cores, TF32, BF16, FP8, FP4, sparsity, and compiler/runtime support made model structure visible to hardware.
 
-### Compute price-performance: normalize before comparing
+### Three views of GPU economics
 
-To make the price-performance curve concrete, use a simple rental-equivalent metric:
+<details class="post-details" markdown="1">
+<summary>Show normalization method and GPU price data</summary>
+
+Peak compute, launch purchase price, and current rental price answer different questions. Keep them separate, but normalize both cost views against the same dense peak compute:
 
 <div class="math-block">
 $$
-\Pi = \frac{\text{peak TFLOP/s}}{\text{USD per GPU-hour}},
-\qquad
-\text{PFLOP-s per USD} = 3.6\Pi
+\begin{aligned}
+F &= \text{peak dense FP16/BF16 PFLOP/s}, \\
+L &= \frac{\text{launch system price}}{\text{GPU count}}, \\
+\text{buy USD per peak PFLOP/s} &= \frac{L}{F}, \\
+\text{rental USD per PFLOP-s} &= \frac{\text{USD per GPU-hour}}{3600F}
+\end{aligned}
 $$
 </div>
 
-One TFLOP/s sustained for one hour produces 3.6 PFLOP-s. To keep the comparison closer to apples-to-apples, the table uses dense FP16/BF16 Tensor Core throughput where the GPU supports it. For Tesla C870, which predates FP16 Tensor Cores, I use FP32 peak as a legacy proxy. For H100 and B200, I use dense FP16/BF16, not FP8/FP4 and not sparse-mode peaks.[^h100-spec][^b200-lenovo] For historical cards with public list prices, I convert purchase price into an implied GPU-hour by amortizing the card over three years at 100% utilization. For current cloud cards, I use Lambda's listed on-demand price per GPU-hour. C870 pricing comes from HPCwire's 2007 Tesla launch coverage, P100/V100 list prices come from Microway's 2018 price analysis, and A100/H100/B200 hourly prices come from Lambda's instances page.[^tesla-c870-price][^p100-v100-price][^lambda-pricing]
+Tesla C870 predates FP16 Tensor Cores, so its FP32 peak is a legacy proxy. Every later point uses dense FP16/BF16 without sparsity or lower-precision headline modes.[^h100-spec][^b200-lenovo][^vera-rubin-spec] C870 uses its standalone launch price. P100, V100, and A100 use documented DGX launch prices divided by eight GPUs. H100 and B200 use launch-window DGX-equivalent system estimates on the same per-GPU basis.[^tesla-c870-price][^dgx1-price][^gpu-launch-prices]
 
-| GPU | normalized compute used | price basis | USD/GPU-hour | TFLOP/s per USD/hour | PFLOP-s per USD |
-| --- | ---: | --- | ---: | ---: | ---: |
-| Tesla C870 | 0.518 TFLOP/s FP32 proxy | USD 1,499 list, 3-year amortized | 0.057 | 9.1 | 32.7 |
-| Tesla P100 SXM2 | 21.2 TFLOP/s FP16 | USD 9,428 list, 3-year amortized | 0.359 | 59.1 | 212.7 |
-| Tesla V100 SXM | 125 TFLOP/s Tensor | USD 10,664 list, 3-year amortized | 0.406 | 308.0 | 1,109.0 |
-| A100 SXM 80GB | 312 TFLOP/s FP16/BF16 Tensor | Lambda 8x A100 SXM price | 2.79 | 111.8 | 402.6 |
-| H100 SXM 80GB | 989 TFLOP/s dense FP16/BF16 Tensor | Lambda 8x H100 SXM price | 3.99 | 247.9 | 892.3 |
-| B200 SXM6 | 2,250 TFLOP/s dense FP16/BF16 Tensor | Lambda 8x B200 SXM6 price | 6.69 | 336.3 | 1,210.8 |
+<details class="post-details" markdown="1">
+<summary>Show launch purchase data</summary>
 
-This is still a rough engineering estimate, not a purchasing benchmark. The utilization assumption is optimistic for owned hardware, cloud prices include more than the GPU chip, and C870 is only a legacy proxy. The normalized shape is still useful: FP16-class compute improved enormously, but compute per dollar improved in uneven steps rather than as a smooth free lunch. In the chart, I plot the inverse, dollar per PFLOP-s, so lower points mean cheaper compute. Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
+| GPU | normalized compute used | launch-price basis | launch cost/GPU | USD per peak PFLOP/s |
+| --- | ---: | --- | ---: | ---: |
+| Tesla C870 | 0.518 TFLOP/s FP32 proxy | standalone list price | USD 1,499 | USD 2.89M |
+| Tesla P100 SXM2 | 21.2 TFLOP/s FP16 | DGX-1: USD 129,000 / 8 | USD 16,125 | USD 761K |
+| Tesla V100 SXM | 125 TFLOP/s Tensor | DGX-1V: USD 149,000 / 8 | USD 18,625 | USD 149K |
+| A100 SXM 80GB | 312 TFLOP/s FP16/BF16 Tensor | DGX A100: USD 199,000 / 8 | USD 24,875 | USD 79.7K |
+| H100 SXM 80GB | 989 TFLOP/s dense FP16/BF16 Tensor | DGX-equivalent estimate: USD 269,000 / 8 | USD 33,600 | USD 34.0K |
+| B200 SXM6 | 2,250 TFLOP/s dense FP16/BF16 Tensor | DGX B200 launch-window listing: USD 515,410 / 8 | USD 64,426 | USD 28.6K |
+
+</details>
+
+<details class="post-details" markdown="1">
+<summary>Show current cloud rental data</summary>
+
+For the current rental view, use one provider and one bundle size: Lambda's eight-GPU on-demand tier. That gives a continuous currently offered series from V100 through B200 without mixing providers or commitment discounts.[^lambda-pricing]
+
+| GPU | dense compute | current USD/GPU-hour | rental USD per PFLOP-s |
+| --- | ---: | ---: | ---: |
+| Tesla V100 16GB | 0.125 PFLOP/s | USD 0.79 | USD 0.00176 |
+| A100 SXM 80GB | 0.312 PFLOP/s | USD 2.79 | USD 0.00248 |
+| H100 SXM 80GB | 0.989 PFLOP/s | USD 3.99 | USD 0.00112 |
+| B200 SXM6 | 2.250 PFLOP/s | USD 6.69 | USD 0.000826 |
+
+</details>
+
+</details>
+
+These are infrastructure proxies, not chip MSRPs or workload benchmarks. Dividing a DGX price by eight allocates CPUs, memory, storage, networking, and chassis cost to each GPU; the H100 and B200 values are launch-window estimates rather than NVIDIA-published standalone prices.[^gpu-launch-prices] Rental prices also include the provider's host system, operations, capacity, and margin. That is why the current rental curve can move differently from launch purchase economics: in Lambda's current catalog, A100 costs more per theoretical unit of dense compute than V100, then H100 and B200 resume the decline. Rubin appears only in peak compute because comparable purchase and rental prices are not yet public.
+
+Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
 
 <figure class="post-figure">
-  <img src="{{ '/assets/gpu-compute-evolution.svg' | relative_url }}" alt="Two-panel log-scale chart titled GPU compute rose while dollar per compute fell unevenly, comparing FP16-normalized NVIDIA GPU compute with real estimated dollar-per-compute points.">
-  <figcaption>Concrete FP16-normalized price-performance estimates make the slowdown point sharper: raw math still jumps, but dollar per unit compute falls in uneven steps because price, utilization, and cloud economics all matter.</figcaption>
+  <img src="{{ '/assets/gpu-compute-buy-rent.svg' | relative_url }}" alt="Three aligned log-scale plots comparing dense FP16-normalized GPU peak compute, launch purchase dollars per peak PFLOP per second, and current cloud rental dollars per PFLOP-second.">
+  <figcaption>Three distinct views share one compute basis. Peak compute uses dense FP16/BF16, except C870's FP32 legacy proxy. Historical buy cost uses release-era standalone or eight-GPU system price divided by GPU count. Current rental cost uses Lambda's eight-GPU on-demand rates accessed July 26, 2026. Lower is better in both cost plots; Rubin has a preliminary compute point but no public cost point.</figcaption>
 </figure>
 
 ### ALU manufacturing: narrow math buys more lanes
 
-The ALU-level version of the story is simpler. Arithmetic got cheaper because accelerators stopped treating every operation as a wide general-purpose floating-point operation. A lower-bound manufacturing proxy is:
+The ALU-level version of the story is simpler. Arithmetic got cheaper because accelerators stopped treating every operation as a wide general-purpose floating-point operation.
+
+<details class="post-details" markdown="1">
+<summary>Show the FP16 ALU area-cost model</summary>
+
+A lower-bound manufacturing proxy is:
 
 <div class="math-block">
 $$
@@ -101,12 +123,17 @@ $$
 
 Using Horowitz's 45nm operation-area table and a 45nm 300mm wafer cost of about USD 2,000, the raw area-cost difference is already large before considering power, routing, register files, schedulers, or tensor-core reuse.[^horowitz][^alu-area-cost][^cmos-cost]
 
+<details class="post-details" markdown="1">
+<summary>Show the 45nm operation-area baseline</summary>
+
 | operation at 45nm | area | units per mm2 | raw cost per 1M units | area advantage |
 | --- | ---: | ---: | ---: | ---: |
 | 16-bit FP add | 1,360 um2 | 735 | USD 38 | 3.1x vs FP32 add |
 | 32-bit FP add | 4,184 um2 | 239 | USD 118 | baseline |
 | 16-bit FP multiply | 1,640 um2 | 610 | USD 46 | 4.7x vs FP32 multiply |
 | 32-bit FP multiply | 7,700 um2 | 130 | USD 218 | baseline |
+
+</details>
 
 This is the silicon reason lower-precision tensor paths can improve compute per dollar. If a workload tolerates FP16, BF16, FP8, FP4, sparsity, or structured matrix engines, the chip can spend the same die area on many more arithmetic lanes. The catch is that those lanes only become useful when the model, compiler, kernels, and memory system keep them fed.
 
@@ -123,6 +150,11 @@ $$
 
 Then scale that logical datapath by public logic-density estimates. This is not a real vendor tensor-core layout. It is a normalized "same logic, denser process" estimate. The density anchors use 28/16/7nm TSMC comparisons, 5nm process-node density data, 3nm process-node density data, and next-node N2 / 18A estimates. Wafer prices reuse the same public wafer-price anchors used above; the next-node row uses a USD 30,000 wafer proxy from public 2nm pricing reports.[^logic-density-28-7][^process-density-5nm][^process-density-3nm][^next-node-density][^cset-wafer-cost][^wafer-pricing][^n2-wafer-price]
 
+N+1, N+2, and N+3 are **SMIC**, not TSMC, process names. They form a separate 7nm-class branch confirmed through product teardowns. Public N+1 density is not sufficiently documented for this model. For N+2, I infer about 92.9 MTr/mm2 from SemiAnalysis measurements showing N+3's cell height and contacted-gate pitch each shrinking 9.5% from N+2. N+3 itself measures 113.4 MTr/mm2.[^smic-n1-n2][^smic-n3]
+
+<details class="post-details" markdown="1">
+<summary>Show the process-node ALU model</summary>
+
 | node | era | logic-density reference | estimated FP16 mul+add area | area shrink vs 45nm | units per mm2 | raw cost per 1M units |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 45nm | 2007 | 6.25 MTr/mm2 baseline | 3,000 um2 | 1.0x | 333 | USD 85 |
@@ -130,22 +162,37 @@ Then scale that logical datapath by public logic-density estimates. This is not 
 | 16nm | 2015 | 28.9 MTr/mm2 | 649 um2 | 4.6x | 1,541 | USD 37 |
 | 7nm | 2018 | 91.2 MTr/mm2 | 206 um2 | 14.6x | 4,864 | USD 27 |
 | 5nm | 2020 | 138.2 MTr/mm2 | 136 um2 | 22.1x | 7,371 | USD 33 |
+| SMIC N+1, 7nm-class | 2021-2022 | teardown confirmed; density not used | not modeled | not modeled | not modeled | wafer price not public |
+| SMIC N+2, 7nm-class | 2023 | about 92.9 MTr/mm2, inferred | 202 um2 | 14.9x | 4,955 | wafer price not public |
 | 3nm | 2024 | 216 MTr/mm2 | 87 um2 | 34.6x | 11,520 | USD 24 |
+| SMIC N+3, 7nm-class | 2025 | 113.4 MTr/mm2, teardown | 165 um2 | 18.1x | 6,048 | wafer price not public |
 | N2 estimate | 2026 | 313 MTr/mm2 | 60 um2 | 50.1x | 16,693 | USD 25 |
 | 18A estimate | 2026 | 238 MTr/mm2 | 79 um2 | 38.1x | 12,693 | USD 33 |
+| Huawei LogicFolding roadmap | 2026 onward | 3D/package-footprint density; not a node | not comparable | not comparable | not comparable | not modeled |
 
-The area trend is the important signal: a 16-bit floating-point multiply-plus-add datapath that is about 3,000 um2 at 45nm becomes an order of magnitude smaller by 7nm, roughly 35x smaller by 3nm, and about 50x smaller at an N2-style next node under a pure logic-density scaling model. The raw wafer-cost proxy falls less smoothly because advanced wafer prices rise sharply. N2 can fit more arithmetic, but a USD 30,000 wafer can erase much of the dollar-per-ALU gain versus 3nm. Real ALUs also need registers, operand routing, control, clocking, SRAM, verification margin, and yield. Tensor cores improve the economics further by amortizing control and data movement across matrix tiles instead of treating every multiply-add as an isolated scalar unit.
+</details>
+
+</details>
+
+The area trend is the important signal: a 16-bit floating-point multiply-plus-add datapath that is about 3,000 um2 at 45nm becomes an order of magnitude smaller by 7nm, roughly 35x smaller by 3nm, and about 50x smaller at an N2-style next node under a pure logic-density scaling model. SMIC's N+1 to N+3 branch shows how DUV multi-patterning and design-technology co-optimization can keep improving a 7nm-class platform, but SemiAnalysis finds that N+3 pays for its TSMC N6-class density in process complexity, efficiency, and control.[^smic-n3]
+
+Huawei LogicFolding is a different scaling axis. Huawei describes it as shortening critical-path wiring, increasing density, and reaching its first commercial Kirin implementation in fall 2026; SemiAnalysis characterizes the approach as stacking active logic and recovering density through advanced packaging.[^huawei-logic-folding][^smic-n3] It should not be converted into a smaller planar ALU area: package-footprint density can rise by stacking active layers even when each underlying die remains on a less-dense process.
+
+The raw wafer-cost proxy falls less smoothly because advanced wafer prices rise sharply. N2 can fit more arithmetic, but a USD 30,000 wafer can erase much of the dollar-per-ALU gain versus 3nm. Real ALUs also need registers, operand routing, control, clocking, SRAM, verification margin, and yield. Tensor cores improve the economics further by amortizing control and data movement across matrix tiles instead of treating every multiply-add as an isolated scalar unit.
 
 <figure class="post-figure">
   <img src="{{ '/assets/alu-dollar-cost-trend.svg' | relative_url }}" alt="Line chart showing estimated raw FP16 multiply-add ALU cost per one million units from 45nm through N2 and Intel 18A.">
   <figcaption>Logic density keeps shrinking the raw FP16 arithmetic datapath, but wafer prices flatten the dollar-cost curve at leading-edge nodes.</figcaption>
 </figure>
 
-### Memory hierarchy: bytes have different economics
+## 2. Memory sets the working set
 
 Memory and manufacturing show the same pattern. Compute can keep rising, but every token also needs bytes close to the math unit. The difficult part is that each level of memory optimizes a different constraint: on-chip SRAM is fast but area-expensive, HBM is bandwidth-rich but package-expensive, commodity DRAM is capacity-rich but far away, and advanced wafers are no longer getting cheap fast enough to hide the tradeoff.
 
-#### On-chip SRAM: fast bytes are area-limited
+<details class="post-details" markdown="1">
+<summary>Show SRAM, HBM, DRAM, and wafer methodology</summary>
+
+### On-chip SRAM: fast bytes are area-limited
 
 For on-chip SRAM, there is no public spot price per MB. A useful lower-bound proxy is:
 
@@ -161,6 +208,9 @@ $$
 
 This ignores periphery, redundancy, yield, cache tags, routing, and design cost, so it is not a product cost. It is still useful because it shows why cache capacity is no longer free. TSMC reported a 0.127 um2 28nm 6T SRAM cell in 2009; public 5nm and 2nm SRAM reports put high-density bitcells around 0.021 um2; CSET estimated 7nm and 5nm wafer sale prices at USD 9,346 and USD 16,988 respectively; public 2026 wafer-price roundups put TSMC 3nm around USD 19,500.[^tsmc-28nm-sram][^tsmc-5nm-sram][^tsmc-2nm-sram][^cset-wafer-cost][^wafer-pricing]
 
+<details class="post-details" markdown="1">
+<summary>Show the SRAM area-cost proxy</summary>
+
 | node | SRAM bitcell | wafer price used | raw MB area | raw SRAM cost proxy |
 | --- | ---: | ---: | ---: | ---: |
 | 28nm | 0.127 um2 | USD 3,000 | 1.065 mm2/MB | USD 0.045/MB |
@@ -168,25 +218,39 @@ This ignores periphery, redundancy, yield, cache tags, routing, and design cost,
 | 5nm | 0.021 um2 | USD 16,988 | 0.176 mm2/MB | USD 0.042/MB |
 | 3nm / 2nm-class | 0.021 um2 | USD 19,500 | 0.176 mm2/MB | USD 0.049/MB |
 
+</details>
+
 The punchline is not that SRAM got worse in absolute density. It got much denser. The punchline is that after 7nm, bitcell shrink is small while wafer cost keeps rising. That means larger on-chip caches require more deliberate architectural justification: more L2, more shared memory, tensor memory, larger register files, and better reuse have to earn their silicon area.
 
 NVIDIA GPU caches show the architectural response. P100 had about 4 MB of L2, V100 6 MB, A100 40 MB, H100 50 MB, and public B200 analysis reports about 126 MB of total L2.[^a100][^h100][^chips-b200-cache] More on-chip SRAM is being used because going to HBM is expensive in energy and latency, but the amount is still tiny compared with model state and KV cache.
 
-#### Off-chip memory: capacity and bandwidth diverge
+### Off-chip memory: capacity and bandwidth diverge
 
 Off-chip memory has split into two worlds. Commodity DRAM remains the capacity workhorse, but its price-per-GB improvement slowed sharply after 2010. Stanford DAM's compiled memory-price dataset shows cheapest DRAM falling from about USD 185/GB in 2005 to USD 12.2/GB in 2010, then only to USD 3.0/GB by 2020 and about USD 3.45/GB in July 2026.[^stanford-memory-prices] HBM moves in the other direction: it is not cheap capacity, it is purchased bandwidth close to the accelerator. Rambus summarizes HBM's speed evolution from 128 GB/s per HBM device to 2.048 TB/s for HBM4, while Stanford DAM's modeled HBM data puts HBM2e around USD 6/GB and HBM3e peak around USD 18/GB.[^rambus-hbm][^stanford-memory-prices]
 
+Vera Rubin makes the next step concrete. NVIDIA's preliminary specification assigns each Rubin GPU 288 GB of HBM4 with 22 TB/s of memory bandwidth. That is 1.6x B200's 180 GB capacity and about 2.9x its 7.7 TB/s bandwidth. At NVL72 scale, 72 Rubin GPUs aggregate to 20.7 TB of HBM4 and 1,580 TB/s of memory bandwidth.[^vera-rubin-spec]
+
+<details class="post-details" markdown="1">
+<summary>Show off-chip capacity and bandwidth anchors</summary>
+
 | off-chip memory trend | representative anchors |
 | --- | --- |
-| GPU HBM capacity | P100: 16 GB; V100: 16 GB; A100: 40 GB; H100: 80 GB; B200: 180 GB[^p100][^v100][^a100][^h100][^b200-lenovo] |
-| GPU HBM bandwidth | P100: 720 GB/s; V100: 900 GB/s; A100: 1,555 GB/s; H100: over 3 TB/s; B200: 7.7 TB/s[^p100][^v100][^a100][^h100][^b200-lenovo] |
+| GPU HBM generation | P100/V100: HBM2; A100 40GB: HBM2; A100 80GB: HBM2e; H100: HBM3; B200: HBM3e; Rubin: HBM4[^p100][^v100][^a100][^h100][^b200-lenovo][^vera-rubin-spec] |
+| GPU HBM capacity | P100: 16 GB; V100: 16 GB; A100: 40 GB; H100: 80 GB; B200: 180 GB; Rubin: 288 GB[^p100][^v100][^a100][^h100][^b200-lenovo][^vera-rubin-spec] |
+| GPU HBM bandwidth | P100: 720 GB/s; V100: 900 GB/s; A100: 1,555 GB/s; H100: over 3 TB/s; B200: 7.7 TB/s; Rubin: 22 TB/s[^p100][^v100][^a100][^h100][^b200-lenovo][^vera-rubin-spec] |
+| Vera Rubin NVL72 aggregate | 20.7 TB HBM4 capacity and 1,580 TB/s memory bandwidth across 72 Rubin GPUs[^vera-rubin-spec] |
 | commodity DRAM price/capacity | about USD 185/GB in 2005, USD 12.2/GB in 2010, USD 3.0/GB in 2020, and USD 3.45/GB in July 2026[^stanford-memory-prices] |
 | HBM price/capacity | HBM2e around USD 6/GB, HBM3 around USD 9/GB, HBM3e peak around USD 18/GB, HBM4 projected around USD 16.5/GB[^stanford-memory-prices] |
 | HBM price/bandwidth | HBM2e around USD 209 per TB/s, HBM3 around USD 264 per TB/s, HBM3e peak around USD 352 per TB/s, HBM4 projected around USD 297 per TB/s[^stanford-memory-prices] |
 
-#### Manufacturing: wafer cost pushes back
+</details>
+
+### Manufacturing: wafer cost pushes back
 
 The manufacturing layer is the shared denominator under both compute and SRAM. If each wafer gets more expensive, every large die, cache expansion, interposer choice, and yield loss has a higher dollar impact.
+
+<details class="post-details" markdown="1">
+<summary>Show advanced wafer-price anchors</summary>
 
 | process node | approximate era | wafer price anchor | why it matters |
 | --- | ---: | ---: | --- |
@@ -195,12 +259,16 @@ The manufacturing layer is the shared denominator under both compute and SRAM. I
 | 5nm | 2020 | USD 16,988 | raw SRAM cost proxy rose again despite smaller cells |
 | 3nm | 2024 | USD 19,500 | wafer price keeps rising while SRAM bitcell shrink slows |
 
+</details>
+
+</details>
+
 <figure class="post-figure">
   <img src="{{ '/assets/memory-manufacturing-trends.svg' | relative_url }}" alt="Four-panel chart showing SRAM cost proxy, commodity DRAM price per GB, HBM price per bandwidth, and wafer price by process node.">
   <figcaption>Memory economics explain why AI infra is increasingly about locality: on-chip SRAM density is harder to buy with node shrinks, HBM bandwidth is expensive capacity, commodity DRAM is cheap but far away, and advanced wafer prices keep rising.</figcaption>
 </figure>
 
-### Interconnection and communication: scale-out has a tax
+## 3. Communication becomes topology
 
 The next bottleneck appears when one accelerator is not enough. Scaling out turns compute into a distributed system problem: GPUs must exchange gradients, activations, KV cache state, expert routes, pipeline bubbles, and scheduling metadata. A useful first-order model is the latency-bandwidth model:
 
@@ -216,6 +284,12 @@ $$
 
 Here `alpha` is the per-message latency cost and `B_effective` is achieved communication bandwidth after topology, protocol, contention, and collective implementation overhead. That term matters because modern training and inference are full of collectives:
 
+<details class="post-details" markdown="1">
+<summary>Show parallelism and scale-up bandwidth anchors</summary>
+
+<details class="post-details" markdown="1">
+<summary>Show communication pressure by parallelism pattern</summary>
+
 | parallelism pattern | communication pressure |
 | --- | --- |
 | data parallel | gradient all-reduce or reduce-scatter / all-gather |
@@ -224,7 +298,12 @@ Here `alpha` is the per-message latency cost and `B_effective` is achieved commu
 | expert parallel / MoE | token dispatch and all-to-all routing |
 | disaggregated serving | KV cache movement, prefill/decode handoff, remote memory access |
 
+</details>
+
 Interconnect bandwidth is improving aggressively because this tax is now first-order. NVIDIA lists NVLink bandwidth per GPU rising from 900 GB/s on Hopper to 1.8 TB/s on Blackwell and 3.6 TB/s on Rubin; its NVLink Switch table lists NVL72 aggregate bandwidth rising from 130 TB/s on Blackwell to 260 TB/s on Rubin.[^nvlink] NVIDIA's HGX Rubin page makes the same point at the system level: higher token throughput is tied not only to more NVFP4 compute, but also to more HBM bandwidth and more NVLink Switch bandwidth.[^hgx-rubin]
+
+<details class="post-details" markdown="1">
+<summary>Show Hopper, Blackwell, and Rubin scale-up anchors</summary>
 
 | system generation | interconnect anchor | why it matters |
 | --- | ---: | --- |
@@ -232,14 +311,29 @@ Interconnect bandwidth is improving aggressively because this tax is now first-o
 | Blackwell | 1.8 TB/s NVLink per GPU; 130 TB/s NVL72 aggregate | larger rack-scale GPU domains for model parallelism |
 | Rubin | 3.6 TB/s NVLink per GPU; 260 TB/s NVL72 aggregate | communication bandwidth has to scale with MoE, long context, and agentic inference |
 
+</details>
+
+</details>
+
 There are two different network curves hiding behind the same word "interconnect":
 
 - **Scale-up** is the tightly coupled GPU domain inside a box or rack. NVLink / NVSwitch bandwidth is not sold like a generic switch port; it is bundled into GPU systems, board design, power delivery, and thermal design. The useful public metric is bandwidth per GPU or per rack-scale domain.
 - **Scale-out** is the cluster fabric across nodes and racks. Ethernet and InfiniBand have visible port speeds, switch radix, optics, cables, NICs, and sometimes observable street prices. This is where a rough dollar-per-Gb/s proxy is possible.
 
+<figure class="post-figure">
+  <img src="{{ '/assets/scale-up-scale-out-excalidraw.svg' | relative_url }}" alt="Excalidraw topology showing GPUs connected by NVSwitch inside two rack-scale domains, with the domains joined by an Ethernet or InfiniBand scale-out fabric.">
+  <figcaption>Scale-up tries to make accelerators behave like one machine; scale-out connects many machines while exposing more latency, topology, and software-visible coordination.</figcaption>
+</figure>
+
 The speed curve is steep. InfiniBand moved from 4x QDR at 32 Gb/s in the late 2000s, to EDR 100 Gb/s, HDR 200 Gb/s, NDR 400 Gb/s, and XDR 800 Gb/s. Ethernet followed the same broad shape: 40/100GbE was standardized in 2010, 200/400GbE in 2017, and 800GbE in 2024.[^infiniband-rates][^ethernet-100g][^ethernet-400g][^ethernet-800g] NVIDIA's current Quantum-X800 documentation lists 72-port and 144-port XDR systems at 800 Gb/s per port, up to 115.2 Tb/s of maximum throughput for the 4U system.[^quantum-x800]
 
+<details class="post-details" markdown="1">
+<summary>Show scale-out price methodology and switch data</summary>
+
 For a dollar-per-speed proxy, use switch chassis price divided by front-panel bandwidth. This is not total cluster networking cost. It excludes optics, cables, NICs, support contracts, power, rack layout, and topology oversubscription. It is still useful because it shows the direction of the switching layer itself. The anchors below combine a legacy Cisco 10GbE price-list snapshot, public Mellanox / NVIDIA InfiniBand switch listings, and current SN5610 800GbE listing/spec data.[^nexus-price][^mellanox-switch-prices][^sn5610-price][^sn5610-specs]
+
+<details class="post-details" markdown="1">
+<summary>Show scale-out switch price anchors</summary>
 
 | scale-out switch proxy | approximate era | ports x port speed | public price anchor | switch dollars per Gb/s |
 | --- | ---: | ---: | ---: | ---: |
@@ -248,6 +342,10 @@ For a dollar-per-speed proxy, use switch chassis price divided by front-panel ba
 | Mellanox QM8700 HDR | 2018 | 40 x 200 Gb/s | USD 18,740 channel listing | USD 2.34/Gb/s |
 | NVIDIA QM9700 NDR | 2022 | 64 x 400 Gb/s | USD 32,870 channel listing | USD 1.28/Gb/s |
 | NVIDIA SN5610 800GbE | 2026 | 64 x 800 Gb/s | USD 51,999 channel listing | USD 1.02/Gb/s |
+
+</details>
+
+</details>
 
 <figure class="post-figure">
   <img src="{{ '/assets/interconnect-speed-cost-trend.svg' | relative_url }}" alt="Dual-axis chart showing scale-out switch port speed rising from 10G to 800G while switch dollar per gigabit falls from about 72 dollars per gigabit to about one dollar per gigabit.">
@@ -258,7 +356,7 @@ The punchline is subtle: network silicon has delivered a large cost-per-bit impr
 
 This is why "chips are slowing down" is not only a FLOP story. It is a locality and communication story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, interconnect bandwidth, synchronization time, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory and network bandwidth do useful work more often.
 
-## Edge/mobile: locality beats peak TOPS
+## 4. Edge makes placement part of infra
 
 Edge and mobile NN accelerators sit at the opposite end of the cluster story. A data-center GPU buys throughput by spending HBM, power, cooling, and network. A phone, camera, robot, car sensor, or Raspberry Pi accessory buys usefulness by staying inside a tiny power and memory envelope. The unit of value is often not "maximum tokens per second." It is:
 
@@ -272,6 +370,12 @@ $$
 
 That is why the accelerator looks different. Mobile NPUs and edge ASICs are optimized for quantized inference, predictable tensor graphs, aggressive SRAM reuse, camera / audio pipelines, privacy, and always-on duty cycles. Apple says M4's Neural Engine reaches 38 TOPS, about 60x the first A11 Neural Engine, while A18 is optimized for large generative models and runs ML models up to 2x faster than A16.[^apple-m4][^apple-a18] Qualcomm's Hexagon NPU page describes a 45 TOPS fused scalar/vector/tensor architecture with shared memory and micro-tile inferencing.[^qualcomm-hexagon] On maker and industrial edge devices, the anchors are smaller but more observable: Google's Edge TPU class devices are around 4 TOPS at 2 W, Raspberry Pi AI HAT+ offers 13 or 26 TOPS at USD 70 or USD 110, AI HAT+ 2 adds a Hailo-10H with 40 INT4 TOPS and 8 GB of local memory at USD 130, and Jetson Orin Nano Super advertises 67 TOPS at USD 249.[^coral-edge-tpu][^raspberry-ai-hat][^raspberry-ai-hat-2][^jetson-orin-nano]
 
+<details class="post-details" markdown="1">
+<summary>Show current edge accelerator examples</summary>
+
+<details class="post-details" markdown="1">
+<summary>Show edge and mobile accelerator tiers</summary>
+
 | edge / mobile tier | public compute anchor | visible constraint | economic reading |
 | --- | ---: | --- | --- |
 | phone / tablet NPU | Apple M4-class: 38 TOPS; A18-class: optimized for on-device generative models | battery, thermal skin temperature, unified memory | best for private, latency-sensitive, short-context tasks |
@@ -280,12 +384,17 @@ That is why the accelerator looks different. Mobile NPUs and edge ASICs are opti
 | richer edge module | Hailo-8 / Hailo-10H / Orin Nano: 26-67 TOPS | local memory, PCIe lane, software stack, thermal design | enables multi-camera, robotics, VLM, and small LLM workflows |
 | embedded robotics computer | Jetson AGX Orin: up to 275 TOPS at 15-60 W[^jetson-orin] | module cost, enclosure cooling, sensor IO | closer to a compact server than a phone NPU |
 
-<figure class="post-figure">
-  <img src="{{ '/assets/edge-mobile-accelerator-envelope.svg' | relative_url }}" alt="Chart comparing edge and mobile neural accelerators by TOPS, power envelope, and dollar per TOPS for public edge modules.">
-  <figcaption>Edge AI economics are constrained by power, memory, and locality. Buyable modules can look cheap per TOPS, but the practical workload depends on quantization support, compiler coverage, local memory, and sustained thermals.</figcaption>
-</figure>
+</details>
+
+</details>
 
 The trend line for buyable edge hardware is dramatic, but it needs careful labeling. Early Jetson boards advertised GPU floating-point throughput, while later Edge TPU, Hailo, and Orin products advertise quantized neural-network TOPS. The table below therefore uses the public metric each product was sold with and treats it as an **advertised edge-AI compute envelope**, not as a strict FP16-normalized benchmark. The historical anchors combine Jetson TK1/TX1/TX2 public launch material, Intel Movidius Neural Compute Stick launch coverage, Coral Dev Board coverage, Xavier NX launch coverage, Raspberry Pi AI HAT pricing, and Jetson Orin Nano Super pricing.[^jetson-tk1][^jetson-tx1-price][^jetson-tx1-spec][^movidius-ncs][^jetson-tx2-price][^jetson-tx2-spec][^coral-dev-board-price][^xavier-nx-price][^raspberry-ai-hat][^raspberry-ai-hat-2][^jetson-orin-nano]
+
+<details class="post-details" markdown="1">
+<summary>Show historical edge product-envelope data</summary>
+
+<details class="post-details" markdown="1">
+<summary>Show public edge module prices and advertised compute</summary>
 
 | edge device / module | year | advertised compute anchor | public price anchor | advertised dollars per TOPS |
 | --- | ---: | ---: | ---: | ---: |
@@ -299,14 +408,24 @@ The trend line for buyable edge hardware is dramatic, but it needs careful label
 | Jetson Orin Nano Super | 2024 | 67 TOPS | USD 249 | USD 3.72/TOPS |
 | Raspberry Pi AI HAT+ 2 | 2026 | 40 INT4 TOPS | USD 130 | USD 3.25/TOPS |
 
+</details>
+
+</details>
+
 <figure class="post-figure">
-  <img src="{{ '/assets/edge-compute-cost-trend.svg' | relative_url }}" alt="Two-panel line chart showing advertised edge AI compute and advertised dollars per TOPS from 2014 through 2026.">
-  <figcaption>Public edge AI modules moved from sub-TOPS GPU-era boards to tens-of-TOPS quantized accelerators. The cost curve falls sharply once fixed-function INT8/INT4 inference hardware became cheap and widely available.</figcaption>
+  <img src="{{ '/assets/edge-compute-cost-envelope.svg' | relative_url }}" alt="Two-panel chart showing advertised edge AI compute and dollars per TOPS from 2014 through 2026, with a marked change from legacy floating-point metrics to dedicated quantized inference metrics.">
+  <figcaption>Advertised edge-AI capability rose sharply as products moved from general GPU FLOPs toward dedicated INT8/INT4 inference. The line is directional, not a datatype-normalized benchmark.</figcaption>
 </figure>
 
 The important caveat is that the curve is partly architectural, not only manufacturing progress. A 2014 Jetson TK1 and a 2026 Hailo-based AI HAT+ 2 are not running the same numerical contract. The later devices win by narrowing the workload: quantized inference, compiler-supported operator sets, smaller activation footprints, and local SRAM reuse. That makes them excellent at camera, audio, sensor, and small local-model loops, but much less flexible than a data-center GPU. Edge dollars-per-compute fell because the hardware gave up generality in exchange for useful local inference.
 
 Phone SoCs are harder to put on the same curve because Apple does not sell A-series chips, Qualcomm pricing is negotiated per OEM and volume, and the application processor is bundled with CPU, GPU, ISP, modem interfaces, security, media, and memory controllers. Still, teardown and industry-estimate data give a useful sanity check. Digitimes reported the A16 processor in iPhone 15 at about USD 35 and A18 in iPhone 16 at about USD 45; TechCrunch reported A18 / A18 Pro's 16-core Neural Engine at 35 TOPS; Wccftech reported Snapdragon 8 Gen 3 around USD 200 and Snapdragon 8 Gen 4 / 8 Elite estimates around USD 220-240; Notebookcheck later summarized Snapdragon 8 Elite Gen 5 estimates around USD 240-280, versus about USD 200 for Snapdragon 8 Gen 3.[^iphone16-bom][^apple-a18-tops][^snapdragon-8gen3-tops][^snapdragon-8g4-cost][^snapdragon-8elite-cost][^snapdragon-8elite-gen5-tops] Using those estimates, phone SoC NPU dollars can look competitive with edge modules, but this comparison is not apples-to-apples: a phone SoC is a subsidized internal or high-volume OEM component, while Jetson / Coral / Hailo boards include packaging, carrier hardware, memory, connectors, distribution margin, and developer support.
+
+<details class="post-details" markdown="1">
+<summary>Show phone SoC BOM sanity checks</summary>
+
+<details class="post-details" markdown="1">
+<summary>Show phone SoC price sanity checks</summary>
 
 | phone SoC price sanity check | year | NPU / AI compute anchor | estimated SoC price | implied NPU dollars per TOPS |
 | --- | ---: | ---: | ---: | ---: |
@@ -316,38 +435,32 @@ Phone SoCs are harder to put on the same curve because Apple does not sell A-ser
 | Snapdragon 8 Elite / 8 Gen 4 class | 2024 | higher than 8 Gen 3, but vendor reports often use relative gains | about USD 220-240 industry estimate | not comparable without a stable TOPS number |
 | Snapdragon 8 Elite Gen 5 estimate | 2025 | reported around 100 TOPS by industry press | about USD 240-280 industry estimate | USD 2.4-2.8/TOPS |
 
+</details>
+
+</details>
+
 This is the mirror image of scale-out AI infra. In the cloud, weak scaling makes optimization valuable because each user can trigger more tokens, more agents, and longer-running jobs. At the edge, the hard ceiling is local state: how much model, cache, sensor context, and runtime can fit without waking a server or burning the battery. The right design is usually hybrid:
 
 - **Do local inference** when latency, privacy, offline availability, or sensor bandwidth dominates.
 - **Call the cloud** when the task needs broad knowledge, large context, tool orchestration, or high-quality generation.
 - **Split the pipeline** when local models can filter, compress, route, or verify before an expensive cloud call.
 
+<figure class="post-figure">
+  <img src="{{ '/assets/edge-cloud-partition-excalidraw.svg' | relative_url }}" alt="Excalidraw placement map showing an AI runtime routing work between private, latency-sensitive edge inference and cloud systems with larger models, long context, tools, and shared state.">
+  <figcaption>The edge/cloud boundary is a placement decision: keep private, latency-sensitive state local and spend network and cloud compute only where broader capability is worth it.</figcaption>
+</figure>
+
 The important lesson is that edge accelerators do not weaken the AI infra thesis. They extend it. Once inference leaves the data center, infrastructure has to optimize a wider control loop: model size, quantization, compiler lowering, memory layout, thermal policy, network fallback, privacy boundary, and user-visible latency.
 
-## Token accounting: what the stack optimizes
+## Prediction: heterogeneity becomes the default
 
-The token is a useful accounting unit because it connects the full stack:
+The accounting unit connects the evidence:
 
 ```text
-token cost ~= model math + memory movement + cache residency + communication + scheduling overhead + verification/retry overhead
+token cost ~= math + memory movement + communication + scheduling + retries
 ```
 
-That is why low-level details matter:
-
-- Faster attention changes long-context serving cost.
-- Better quantization changes memory pressure and batch size.
-- Better batching changes utilization and latency tails.
-- Better routing changes expert-model cost.
-- Better cache management changes context feasibility.
-- Better interconnect and collective scheduling changes scale-out efficiency.
-- Better compiler lowering changes which model shapes are practical.
-- Better parallelism changes whether training runs are stable and affordable.
-
-The next AI infra frontier is not simply larger clusters. It is a tighter control loop between algorithms, model architecture, serving systems, kernels, compilers, and chips. The teams that win will not only have better models or better hardware. They will have better token economics.
-
-## Prediction
-
-The next AI infra frontier is not simply larger clusters. It is a tighter control loop between algorithms, model architecture, serving systems, kernels, compilers, memory hierarchy, interconnect, and chips.
+The next AI infra frontier is not simply a larger cluster. It is a tighter control loop between algorithms, model architecture, serving systems, kernels, compilers, memory hierarchy, interconnect, edge devices, and chips.
 
 The practical direction is heterogeneous and increasingly LLM-specific:
 
@@ -357,7 +470,7 @@ The practical direction is heterogeneous and increasingly LLM-specific:
 - More edge/cloud partitioning, because not every inference should cross the network and not every local device can host the whole model.
 - More compiler/runtime responsibility, because specialized hardware only matters when the software stack can expose locality, regularity, and parallelism.
 
-The teams that win will not only have better models or better hardware. They will have better translation between the two.
+The teams that win will not only have better models or better hardware. They will have better translation between the two: less work per useful result, better placement for every stage, and higher utilization of every expensive byte and arithmetic lane.
 
 ## References
 
@@ -371,12 +484,14 @@ The teams that win will not only have better models or better hardware. They wil
 [^h100-spec]: NVIDIA, [H100 Tensor Core GPU](https://www.nvidia.com/en-us/data-center/h100/), accessed 2026-07-02.
 [^blackwell-b200]: NVIDIA, [DGX B200](https://www.nvidia.com/en-us/data-center/dgx-b200/), accessed 2026-07-02.
 [^blackwell-ultra]: NVIDIA Developer Blog, [Inside NVIDIA Blackwell Ultra](https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era/), 2026.
+[^vera-rubin-spec]: NVIDIA, [Vera Rubin NVL72](https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/), preliminary specifications accessed 2026-07-26.
 [^rubin]: NVIDIA Newsroom, [NVIDIA Kicks Off the Next Generation of AI With Rubin](https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer), 2026.
 [^rubin-cpx]: NVIDIA Newsroom, [NVIDIA Unveils Rubin CPX](https://nvidianews.nvidia.com/news/nvidia-unveils-rubin-cpx-a-new-class-of-gpu-designed-for-massive-context-inference), 2025.
 [^b200-lenovo]: Lenovo Press, [ThinkSystem NVIDIA HGX B200 180GB 1000W GPU](https://lenovopress.lenovo.com/lp2226-thinksystem-nvidia-b200-180gb-1000w-gpu), accessed 2026-07-04.
 [^tesla-c870-price]: Michael Feldman, [NVIDIA Takes Direct Aim at High Performance Computing](https://www.hpcwire.com/2007/06/22/nvidia_takes_direct_aim_at_high_performance_computing-1/), HPCwire, 2007.
-[^p100-v100-price]: Brett Newman, [NVIDIA Tesla V100 Price Analysis](https://www.microway.com/hpc-tech-tips/nvidia-tesla-v100-price-analysis/), Microway, 2018.
-[^lambda-pricing]: Lambda, [Instances](https://lambda.ai/instances), accessed 2026-07-04.
+[^dgx1-price]: NVIDIA, [NVIDIA DGX-1](https://www.nvidia.com/en-au/data-center/dgx-1/), listing USD 129,000 for the eight-P100 system and USD 149,000 for the eight-V100 system.
+[^gpu-launch-prices]: CCIR Research, [Rent and MSRP: Five Generations of Posted Prices](https://ccir.io/research/rent-and-msrp), 2026. The dataset derives per-GPU launch-window prices from eight-GPU system prices and grades the H100 and B200 estimates as vendor-adjacent rather than official standalone MSRP.
+[^lambda-pricing]: Lambda, [GPU Instances](https://lambda.ai/instances), eight-GPU on-demand price per GPU-hour, accessed 2026-07-26.
 [^gpu-price-performance]: Jaime Sevilla and Pablo Villalobos, [Trends in GPU Price-Performance](https://epoch.ai/publications/trends-in-gpu-price-performance), Epoch AI, 2022.
 [^epoch-ai-trends]: Epoch AI, [Trends in Artificial Intelligence: AI Hardware](https://epoch.ai/trends), accessed 2026-07-02.
 [^owid-gpu-price-performance]: Our World in Data, [GPU computational performance per dollar](https://ourworldindata.org/grapher/gpu-price-performance), accessed 2026-07-02.
@@ -387,6 +502,9 @@ The teams that win will not only have better models or better hardware. They wil
 [^process-density-5nm]: Wikipedia, [5 nm process](https://en.wikipedia.org/wiki/5_nm_process), accessed 2026-07-04.
 [^process-density-3nm]: Wikipedia, [3 nm process](https://en.wikipedia.org/wiki/3_nm_process), accessed 2026-07-04.
 [^next-node-density]: Anton Shilov, [Intel's 18A and TSMC's N2 process nodes compared](https://www.tomshardware.com/tech-industry/intels-18a-and-tsmcs-n2-process-nodes-compared-intel-is-faster-but-tsmc-is-denser), Tom's Hardware, 2025.
+[^smic-n1-n2]: TechInsights, [Confirming SMIC N+2 7nm in Huawei Mate 60 Pro](https://www.techinsights.com/blog/techinsights-confirming-smic-n2-7nm-huawei-mate-60-pro), documenting N+1 in 2022 and the commercial N+2 generation in 2023.
+[^smic-n3]: SemiAnalysis STEEL Team et al., [Is SMIC N+3's Metal Pitch Smaller than Intel 18A's?](https://newsletter.semianalysis.com/p/steel-smic-n3-teardown), 2026.
+[^huawei-logic-folding]: Huawei, [Huawei Presents the Tau Scaling Law](https://www.huawei.com/en/news/2026/5/ieee-iscas-tau-scaling), 2026.
 [^cset-wafer-cost]: Center for Security and Emerging Technology, [Analysts believe that a single TSMC 5nm wafer costs USD 17,000](https://cset.georgetown.edu/article/analysts-believe-that-a-single-tsmc-5nm-wafer-costs-17000/), 2020.
 [^wafer-pricing]: Silicon Analysts, [Semiconductor Wafer Pricing by Process Node](https://siliconanalysts.com/data/wafer-pricing), accessed 2026-07-04.
 [^n2-wafer-price]: Astute Group, [TSMC's 2nm Wafer Price Hits USD 30,000 Amid Monopoly Concerns](https://www.astutegroup.com/news/industrial/tsmcs-2nm-wafer-price-hits-30000-amid-monopoly-concerns/), 2025.

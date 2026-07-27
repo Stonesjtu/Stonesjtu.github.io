@@ -8,157 +8,95 @@ source_label: "Original outline on Notion"
 excerpt: "Why model size, request volume, context length, output length, and agent loops scale faster than hardware economics can hide."
 ---
 
-This is the second part of the AI infrastructure and tokenomics series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) explained the historical shift from conventional request-serving infrastructure to agentic token-loop infrastructure. This part focuses on the pressure that makes the current layer so difficult: **the workload is scaling faster than hardware can hide.**
+This is the second part of the series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) followed the unit of work from a request to an agent loop. This part explains why that transition creates a qualitatively harder systems problem: **both the work inside one goal and the number of machine-generated steps behind it can grow.**
 
-This post is about a simple systems question:
+## The workload multiplies
 
-```text
-How many useful tokens can a stack produce per dollar, watt, second, and engineer-hour?
-```
-
-For LLM systems, the token is the unit where model quality, hardware capacity, serving policy, and product economics meet. Training consumes tokens to create capability. Inference consumes tokens to deliver capability. Agentic workflows consume even more tokens to plan, call tools, verify work, and recover from failure. Token cost is therefore not just a pricing metric. It is a full-stack performance metric.
-
-The core argument is:
-
-- Model demand is still scaling: parameters, training tokens, context length, multimodal inputs, and inference-time compute all keep increasing.
-- Hardware supply is improving, but less like the old free lunch: power, memory bandwidth, packaging, and manufacturing cost are now first-order constraints.
-- The gap is closed by infrastructure: model architecture, serving systems, kernels, compilers, accelerator backends, memory hierarchy, networking, and chip design have to be optimized together.
-
-This is why AI infrastructure is not a support layer around the model. It is part of the model's unit economics. OpenAI's 2018 analysis found that compute used in the largest AI training runs had been doubling every 3.4 months from 2012 onward.[^openai-compute] Epoch AI's later study gives a more conservative but still aggressive estimate: since the early deep learning era, training compute for milestone ML systems has doubled roughly every 5 to 6 months.[^epoch-compute] That demand curve is faster than what hardware economics can hide automatically.
+The difference is not only that an LLM request is larger. It is that the user no longer has to pace every expensive operation:
 
 <figure class="post-figure">
-  <img src="{{ '/assets/ai-infra-demand-supply.svg' | relative_url }}" alt="Conceptual chart showing AI model and token demand rising faster than accelerator compute, memory bandwidth, and power budgets.">
-  <figcaption>AI infrastructure matters because the curve to serve is steeper than the curve hardware gives us for free.</figcaption>
+  <img src="{{ '/assets/user-agent-loop-excalidraw.svg' | relative_url }}" alt="Excalidraw comparison showing a traditional application waiting for the user after each bounded request, versus an agentic application where one delegated goal launches concurrent model, tool, and verification loops.">
+  <figcaption>Traditional workloads return control to the user after each approximately bounded request; the system waits for the user to evaluate the response and make the next decision. For agentic workloads, \(W=A\cdot S\cdot T\cdot q\), where \(W\) is compute work per goal, \(A\) is concurrent agents, \(S\) is model or tool steps per agent, \(T\) is tokens per step, and \(q\) is compute per token. Total cost is \(C=U\cdot G\cdot W\cdot p/\eta\), where \(U\) is active users, \(G\) is goals per user, \(p\) is hardware price per unit compute, and \(\eta\) is full-stack efficiency. Infrastructure lowers cost by increasing \(\eta\) and by reducing the branches, steps, tokens, and data movement required to finish useful work.</figcaption>
 </figure>
 
-## The current problem
+Pre-LLM consumer workloads usually keep most of these factors bounded. A person clicks, watches, scrolls, types, or plays; the user remains in the loop and paces expensive work. A video frame, feed request, or game tick can be optimized aggressively, but its shape does not expand because a model gained parameters or a context window doubled.
 
-The hard part of current AI infrastructure is that demand scales along several axes at once:
+Agentic systems remove that pacing limit. One goal can launch several agents. Each agent can issue model calls, retrieve data, invoke tools, run tests, retry failures, and verify results for hours. At the same time, larger models, longer context, longer outputs, multimodal inputs, and inference-time reasoning increase \(T\) and \(q\). Brown et al. showed that repeated sampling with verification can improve measured solution coverage across large increases in sample count.[^large-language-monkeys]
 
-- **Model size scaling:** more parameters, deeper networks, wider expert pools, larger activations.
-- **User request scaling:** more users, more sessions, and more AI features embedded into products.
-- **Context and output scaling:** longer prompts, larger KV cache, multimodal context, longer generated artifacts.
-- **Agent-loop scaling:** one user can define a goal and let multiple agents run concurrently for hours.
+This is the demand-side reason AI infrastructure matters. OpenAI's 2018 analysis found that compute used in the largest training runs had been doubling every 3.4 months from 2012 onward.[^openai-compute] Epoch AI's later estimate is more conservative but still aggressive: training compute for milestone systems has doubled roughly every 5 to 6 months since the early deep-learning era.[^epoch-compute] Kaplan et al. found power-law relationships between language-model loss and model size, data, and compute; Hoffmann et al. then showed that compute-optimal training requires model size and training tokens to scale together.[^kaplan][^chinchilla]
 
-At the same time, the hardware side is no longer a clean Dennard/Moore free lunch. Transistors still improve, but power, memory bandwidth, packaging, interconnect, and wafer cost increasingly decide whether peak math becomes useful work.
+## Strong and weak scaling are the systems analogy
 
-## Demand side: token work weak-scales
-
-Scaling has multiple knobs:
-
-- Model scale: parameters, activation size, depth, sparsity, experts.
-- Training scale: tokens, data quality, optimizer budget, parallelism efficiency.
-- Context scale: KV cache size, attention pattern, retrieval strategy.
-- Inference scale: samples, reasoning steps, tool calls, verification passes.
-
-The last knob is increasingly important. Brown et al. studied repeated sampling and found that solution coverage can continue improving as sample count grows over several orders of magnitude, with automatic verification converting samples into better measured performance in domains such as code and formal proofs.[^large-language-monkeys]
-
-This changes the serving objective. A system may improve quality by spending more inference compute, but the product only wins if the extra compute is controlled. Good infra therefore does two things:
-
-1. Lower the cost of each token.
-2. Reduce the number of tokens required to complete the task.
-
-Two scaling modes show why the infra problem does not stay fixed.
+Strong and weak scaling have precise meanings in parallel computing:
 
 <figure class="post-figure">
-  <img src="{{ '/assets/strong-weak-scaling.svg' | relative_url }}" alt="Two-panel diagram comparing strong scaling with fixed per-request work and weak scaling with growing LLM per-request work.">
-  <figcaption>Pre-LLM infrastructure mostly optimizes fixed per-user work. LLM infrastructure optimizes a workload that grows with model size, token length, and inference-time steps.</figcaption>
+  <img src="{{ '/assets/strong-weak-scaling-canonical.svg' | relative_url }}" alt="Canonical comparison of strong scaling, where fixed total work finishes faster with more processors, and weak scaling, where work grows with processor count while time ideally remains constant.">
+  <figcaption>Strong scaling fixes total work; weak scaling grows total work with resources. AI product demand increasingly resembles the second regime.</figcaption>
 </figure>
 
-In strong scaling, the workload is fixed and more hardware is added to finish sooner. The limiting terms are communication, synchronization, stragglers, and idle time. Adding more devices eventually exposes imperfect overlap and coordination overhead.
-
-Pre-LLM consumer infrastructure mostly fits this pattern. A video stream, social-network feed, or game session can be expensive at global scale, but the compute per user is usually bounded by the product workload and paced by active user actions:
+For strong scaling, total work \(W\) is fixed and more parallel resources \(P\) reduce completion time:
 
 <div class="math-block">
 $$
-\begin{aligned}
-W_{\text{pre}} &\approx O(1) \\
-R_{\text{pre}} &\approx R_{\text{user}}
-\end{aligned}
+T_{\text{strong}}(W,P)
+\approx
+\frac{W}{P}+T_{\text{comm}}(P)
 $$
 </div>
 
-Here \(W\) is work per request and \(R\) is requests per user. In the pre-LLM loop, the user usually stays in the loop: click, watch, scroll, type, play, wait. That bounds both the work per request and how many expensive requests one person can trigger.
-
-For a fixed workload $W$, strong scaling tries to reduce time by adding parallel resources $P$:
+For weak scaling, work grows with resources so that work per processor stays approximately constant:
 
 <div class="math-block">
 $$
-T_{\text{strong}}(W, P) \approx \frac{W}{P} + T_{\text{comm}}(P)
+W(P) \approx P \cdot W_0,
+\qquad
+T_{\text{weak}}(P)
+\approx
+W_0+T_{\text{comm}}(P)
 $$
 </div>
 
-In other words, once the product behavior is fixed, infra optimization mostly reduces the constant factor for serving the same request, stream, feed, or frame. The user count grows, but the compute size of each user's unit of work does not keep expanding because the model got larger or the context got longer.
+Pre-LLM and post-LLM products are not literally parallel-computing benchmarks, but the analogy is useful. Conventional products mostly ask infrastructure to reduce the constant factor of a bounded, user-paced request. AI products repeatedly spend new hardware capacity on larger models, longer contexts, more reasoning, and more autonomous steps. The workload grows with the available system.
 
-LLM infrastructure is different. Both terms can grow. Let \(M\) be model size, \(T\) be total tokens, \(S\) be inference-time steps such as tool calls, retries, or verification passes, \(A\) be concurrent agents per user, and \(R_{\text{agent}}\) be the request rate inside each agent loop:
+The bottleneck therefore moves instead of disappearing:
+
+- More GPUs expose collective communication, topology, and straggler costs.
+- Longer context turns KV-cache capacity and bandwidth into serving constraints.
+- Larger batches improve throughput while increasing latency and memory pressure.
+- MoE routing reduces active compute while adding placement and load-balancing problems.
+- Test-time compute improves quality while making per-goal cost less predictable.
+
+## Why every efficiency point is magnified
+
+If an optimization leaves a fraction \(r\) of the original unit cost, then:
 
 <div class="math-block">
 $$
-\begin{aligned}
-W_{\text{post}} &\approx O(M \cdot T \cdot S) \\
-R_{\text{post}} &\approx R_{\text{user}} + A \cdot R_{\text{agent}}
-\end{aligned}
+C_{\text{optimized}}=rC,
+\qquad
+\text{savings}=(1-r)C
 $$
 </div>
 
-This intentionally drops a separate attention/cache term. KV cache size, attention pattern, and memory bandwidth still matter a lot in real systems, but they are implementation constraints for this high-level model. The important point is simpler: post-LLM serving has two weak-scaling axes. Work per request grows with \(M\), \(T\), and \(S\); request count per user can grow because a user can define a goal once and let agents run for hours, call tools, inspect files, run tests, monitor state, and spawn concurrent subtasks.
+The percentage is ordinary; the base is not. As \(A\), \(S\), \(T\), and \(q\) grow, the same kernel, compiler, cache, quantization, batching, or routing improvement acts on more work. This is the economic meaning of "the more you buy, the more you save": not that scale makes waste acceptable, but that each percentage point of efficiency converts into a larger absolute saving.
 
-This is why LLMs fit weak scaling better. In weak scaling, the hardware grows and the workload grows with it. More compute is used to train larger models, consume more data, extend context length, add modalities, and spend more compute at inference time. The bottleneck moves instead of disappearing:
+Good infrastructure improves both sides of the equation:
 
-- More GPUs make interconnect topology and collective overlap important.
-- Longer context turns KV cache capacity and bandwidth into serving constraints.
-- Larger batches improve throughput but change latency and memory pressure.
-- MoE and routing improve parameter efficiency but add load-balancing problems.
-- Test-time compute improves quality but increases token budget variance.
+1. Increase \(\eta\): execute each unit of work more efficiently.
+2. Reduce \(W\): finish the goal with fewer tokens, tool calls, retries, or model passes.
 
-The financial implication is the important part. If an infra optimization reduces unit cost by a factor $r$, then:
+## The AI infra control loop
 
-<div class="math-block">
-$$
-\begin{aligned}
-\text{cost}_{\text{base}} &= N \cdot R \cdot W \cdot c \\
-\text{cost}_{\text{opt}} &= N \cdot R \cdot W \cdot c \cdot r \\
-\text{savings} &= N \cdot R \cdot W \cdot c \cdot (1-r)
-\end{aligned}
-$$
-</div>
+Hardware no longer provides a uniform free lunch. Single-thread performance stopped scaling automatically; dark silicon made power limits explicit; and data movement can cost orders of magnitude more energy than arithmetic.[^sutter][^dark-silicon][^horowitz]
 
-Under strong scaling, \(W\approx O(1)\) and \(R\) is mostly user-paced, so savings mostly track traffic volume \(N\). Under weak scaling, \(W\) grows with model size, context length, generated tokens, and agent steps, while \(R\) can grow with background agents and concurrent subtasks. The same 20% kernel, compiler, cache, or batching win is therefore magnified twice: by more work per request and by more requests per user goal. This is the "the more you buy, the more you save" property of AI infra: as token demand scales up, every percentage point of efficiency converts into a larger absolute dollar saving.
+Modern accelerators answer with HBM, larger SRAM, tensor cores, lower precision, faster fabrics, and advanced packaging. Infrastructure turns those features into useful work through a recurring loop:
 
-The scaling-law literature explains why the pressure is not arbitrary. Kaplan et al. found language-model loss following power laws with model size, dataset size, and training compute across many orders of magnitude.[^kaplan] Hoffmann et al. showed that compute-optimal training needs model size and training tokens to scale together; Chinchilla improved quality under the same compute budget by training a smaller model on more tokens.[^chinchilla]
+1. Measure the real workload: prefill/decode mix, cache residency, batch distribution, communication, and kernel hotspots.
+2. Change model architecture or serving policy when the bottleneck is structural.
+3. Change kernels, compiler lowering, layouts, and runtime scheduling when execution is the bottleneck.
+4. Feed the remaining constraints back into model and hardware design.
 
-The engineering takeaway is narrower than "make models bigger." Parameters, data, training FLOPs, context, and inference FLOPs are coupled. Infrastructure determines where that compute can be spent efficiently.
-
-## The infra engineering control loop
-
-The reason infra engineering is high-leverage is that it sits at the constraint boundary:
-
-```text
-model demand grows faster than cheap hardware supply
-```
-
-Single-thread performance stopped being a free source of software speedup a long time ago.[^sutter] Dark silicon made the power limit explicit: a chip can have many transistors that cannot all be active under the power envelope.[^dark-silicon] For AI workloads, data movement is often a larger constraint than arithmetic. Horowitz's energy numbers are a useful mental model: moving data from memory can cost orders of magnitude more energy than simple arithmetic.[^horowitz]
-
-Modern accelerators respond with HBM, larger on-chip memories, tensor cores, lower-precision formats, faster interconnects, and tighter packaging. But those features only translate into token throughput if the software exposes locality, regularity, and parallelism.
-
-So the practical loop is:
-
-1. Measure the real workload: prefill/decode ratio, cache residency, batch distribution, communication time, kernel hotspots.
-2. Change the model or serving policy when the bottleneck is structural.
-3. Change kernels, compiler lowering, layouts, and runtime scheduling when the bottleneck is execution.
-4. Feed the remaining constraints back into hardware and model design.
-
-Tokenomics is the visible metric for that loop. The question is not just whether a model is intelligent. It is how much useful intelligence the system can deliver per dollar, watt, second, and engineer-hour.
-
-## Why this creates more room for infra programmers
-
-In pre-LLM systems, infra optimization often improved a bounded request path: a faster feed ranking call, a cheaper video serving path, a more efficient cache, a better game backend. Those wins mattered, but the per-user unit of work was usually product-paced.
-
-In LLM systems, infra optimization changes what the product can afford to attempt. A lower-cost attention kernel can make longer context feasible. Better KV-cache management can turn a product SLO from impossible to ordinary. Better batching and routing can make agentic workloads affordable. Better compiler lowering can decide which model shapes are practical at all.
-
-That is the central problem of current AI infra: the middle layer has more complexity because both sides are moving. The algorithm side keeps asking for larger dynamic workloads, while the hardware side exposes increasingly specialized constraints. The opportunity is exactly the gap between them.
-
-[Part 3](/2026/07/02/ai-infra-future/) looks at the supply-chain side of that gap: compute, memory, interconnect, edge accelerators, and why the future likely becomes more heterogeneous and more LLM-specific.
+That is why AI infrastructure has more room and more responsibility than the conventional middle layer. It can change not only how cheaply a product runs, but what the product can afford to attempt. [Part 3](/2026/07/02/ai-infra-future/) examines the supply side: compute, memory, communication, and edge hardware, and what their different trajectories imply for the future stack.
 
 ## References
 

@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 900" role="img" aria-labelledby="title desc">
+  <title id="title">GPU economics has three curves</title>
+  <desc id="desc">Three aligned log-scale plots show dense FP16-normalized peak compute, historical launch purchase dollars per peak PFLOP per second, and current Lambda rental dollars per PFLOP-second.</desc>
+  <rect width="960" height="900" fill="#f8fafc"/>
+
+  <text x="52" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="700">GPU economics has three curves</text>
+  <text x="52" y="68" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="13">Dense FP16/BF16 peak compute, release-era acquisition cost, and current cloud rental cost.</text>
+  <text x="52" y="88" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="13">All axes are logarithmic. C870 uses FP32 as a legacy proxy; Rubin specifications are preliminary.</text>
+
+  <rect x="52" y="108" width="856" height="222" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <rect x="52" y="350" width="856" height="222" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+  <rect x="52" y="592" width="856" height="222" rx="8" fill="#ffffff" stroke="#d7dee8"/>
+
+  <g fill="#172033" font-family="Inter, Arial, sans-serif">
+    <text x="80" y="137" font-size="16" font-weight="700">1. Peak compute</text>
+    <text x="80" y="158" fill="#5d6b82" font-size="12">TFLOP/s, dense FP16/BF16 where available</text>
+    <text x="80" y="379" font-size="16" font-weight="700">2. Historical buy cost</text>
+    <text x="80" y="400" fill="#5d6b82" font-size="12">Launch USD per peak PFLOP/s; lower is better</text>
+    <text x="80" y="621" font-size="16" font-weight="700">3. Current rental cost</text>
+    <text x="80" y="642" fill="#5d6b82" font-size="12">On-demand USD per PFLOP-s; lower is better</text>
+  </g>
+
+  <g stroke="#e5ebf3" stroke-width="1">
+    <line x1="100" y1="175" x2="880" y2="175"/>
+    <line x1="100" y1="202" x2="880" y2="202"/>
+    <line x1="100" y1="229" x2="880" y2="229"/>
+    <line x1="100" y1="256" x2="880" y2="256"/>
+    <line x1="100" y1="283" x2="880" y2="283"/>
+    <line x1="100" y1="310" x2="880" y2="310"/>
+
+    <line x1="100" y1="415" x2="880" y2="415"/>
+    <line x1="100" y1="460" x2="880" y2="460"/>
+    <line x1="100" y1="505" x2="880" y2="505"/>
+    <line x1="100" y1="550" x2="880" y2="550"/>
+
+    <line x1="100" y1="655" x2="880" y2="655"/>
+    <line x1="100" y1="709" x2="880" y2="709"/>
+    <line x1="100" y1="749" x2="880" y2="749"/>
+    <line x1="100" y1="790" x2="880" y2="790"/>
+
+    <line x1="100" y1="175" x2="100" y2="310"/>
+    <line x1="305.3" y1="175" x2="305.3" y2="310"/>
+    <line x1="469.5" y1="175" x2="469.5" y2="310"/>
+    <line x1="633.7" y1="175" x2="633.7" y2="310"/>
+    <line x1="797.9" y1="175" x2="797.9" y2="310"/>
+    <line x1="880" y1="175" x2="880" y2="310"/>
+
+    <line x1="100" y1="415" x2="100" y2="550"/>
+    <line x1="305.3" y1="415" x2="305.3" y2="550"/>
+    <line x1="469.5" y1="415" x2="469.5" y2="550"/>
+    <line x1="633.7" y1="415" x2="633.7" y2="550"/>
+    <line x1="797.9" y1="415" x2="797.9" y2="550"/>
+    <line x1="880" y1="415" x2="880" y2="550"/>
+
+    <line x1="100" y1="655" x2="100" y2="790"/>
+    <line x1="305.3" y1="655" x2="305.3" y2="790"/>
+    <line x1="469.5" y1="655" x2="469.5" y2="790"/>
+    <line x1="633.7" y1="655" x2="633.7" y2="790"/>
+    <line x1="797.9" y1="655" x2="797.9" y2="790"/>
+    <line x1="880" y1="655" x2="880" y2="790"/>
+  </g>
+
+  <g stroke="#7b8798" stroke-width="2">
+    <line x1="100" y1="175" x2="100" y2="310"/>
+    <line x1="100" y1="310" x2="880" y2="310"/>
+    <line x1="100" y1="415" x2="100" y2="550"/>
+    <line x1="100" y1="550" x2="880" y2="550"/>
+    <line x1="100" y1="655" x2="100" y2="790"/>
+    <line x1="100" y1="790" x2="880" y2="790"/>
+  </g>
+
+  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="11" text-anchor="end">
+    <text x="90" y="179">10k</text>
+    <text x="90" y="206">1k</text>
+    <text x="90" y="233">100</text>
+    <text x="90" y="260">10</text>
+    <text x="90" y="287">1</text>
+    <text x="90" y="314">0.1</text>
+
+    <text x="90" y="419">10M</text>
+    <text x="90" y="464">1M</text>
+    <text x="90" y="509">100K</text>
+    <text x="90" y="554">10K</text>
+
+    <text x="90" y="659">0.005</text>
+    <text x="90" y="713">0.002</text>
+    <text x="90" y="753">0.001</text>
+    <text x="90" y="794">0.0005</text>
+  </g>
+
+  <g fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="11" text-anchor="middle">
+    <text x="100" y="833">2007</text>
+    <text x="305.3" y="833">2012</text>
+    <text x="469.5" y="833">2016</text>
+    <text x="633.7" y="833">2020</text>
+    <text x="797.9" y="833">2024</text>
+    <text x="880" y="833">2026</text>
+  </g>
+
+  <polyline points="100,290.7 469.5,247.2 510.5,226.4 633.7,215.7 756.8,202.1 797.9,192.5" fill="none" stroke="#d1495b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="797.9" y1="192.5" x2="880" y2="185.7" stroke="#d1495b" stroke-width="4" stroke-dasharray="7 6" stroke-linecap="round"/>
+
+  <g fill="#d1495b" stroke="#ffffff" stroke-width="2">
+    <circle cx="100" cy="290.7" r="5"/>
+    <circle cx="469.5" cy="247.2" r="5"/>
+    <circle cx="510.5" cy="226.4" r="5"/>
+    <circle cx="633.7" cy="215.7" r="5"/>
+    <circle cx="756.8" cy="202.1" r="5"/>
+    <circle cx="797.9" cy="192.5" r="5"/>
+  </g>
+  <circle cx="880" cy="185.7" r="6" fill="#ffffff" stroke="#d1495b" stroke-width="3"/>
+
+  <g fill="#172033" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">
+    <text x="108" y="286">C870 0.518</text>
+    <text x="430" y="241">P100 21.2</text>
+    <text x="518" y="221">V100 125</text>
+    <text x="642" y="211">A100 312</text>
+    <text x="710" y="196">H100 989</text>
+    <text x="770" y="184">B200 2.25k</text>
+    <text x="812" y="174">Rubin 4.0k*</text>
+  </g>
+
+  <polyline points="100,439.3 469.5,465.4 510.5,497.2 633.7,509.4 756.8,526.1 797.9,529.4" fill="none" stroke="#2f80ed" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <g fill="#2f80ed" stroke="#ffffff" stroke-width="2">
+    <circle cx="100" cy="439.3" r="5"/>
+    <circle cx="469.5" cy="465.4" r="5"/>
+    <circle cx="510.5" cy="497.2" r="5"/>
+    <circle cx="633.7" cy="509.4" r="5"/>
+  </g>
+  <g fill="#ffffff" stroke="#2f80ed" stroke-width="3">
+    <circle cx="756.8" cy="526.1" r="5"/>
+    <circle cx="797.9" cy="529.4" r="5"/>
+  </g>
+
+  <g fill="#172033" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">
+    <text x="108" y="434">C870 $2.89M</text>
+    <text x="424" y="458">P100 $761K</text>
+    <text x="518" y="490">V100 $149K</text>
+    <text x="642" y="505">A100 $79.7K</text>
+    <text x="704" y="520">H100 $34.0K</text>
+    <text x="804" y="545">B200 $28.6K</text>
+  </g>
+
+  <polyline points="510.5,716.4 633.7,696.0 756.8,742.6 797.9,760.6" fill="none" stroke="#3c9366" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <g fill="#3c9366" stroke="#ffffff" stroke-width="2">
+    <rect x="505.5" y="711.4" width="10" height="10" rx="1"/>
+    <rect x="628.7" y="691.0" width="10" height="10" rx="1"/>
+    <rect x="751.8" y="737.6" width="10" height="10" rx="1"/>
+    <rect x="792.9" y="755.6" width="10" height="10" rx="1"/>
+  </g>
+
+  <g fill="#172033" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600">
+    <text x="472" y="709">V100 $0.00176</text>
+    <text x="642" y="688">A100 $0.00248</text>
+    <text x="704" y="736">H100 $0.00112</text>
+    <text x="804" y="778">B200 $0.000826</text>
+  </g>
+
+  <text x="52" y="860" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">Buy: launch standalone/system price per accelerator. Rental: Lambda eight-GPU on-demand rate per accelerator-hour, accessed 2026-07-26.</text>
+  <text x="52" y="881" fill="#5d6b82" font-family="Inter, Arial, sans-serif" font-size="12">Both cost plots divide by the same peak compute. Solid buy points are vendor-documented; outlined points are launch-window estimates.</text>
+</svg>

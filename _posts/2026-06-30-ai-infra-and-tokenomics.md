@@ -8,66 +8,36 @@ source_label: "Original outline on Notion"
 excerpt: "A history of AI infrastructure as the implementation bridge between algorithmic workload demand and CPU/GPU/TPU/NPU hardware reality."
 ---
 
-This is the first part of a three-part series on AI infrastructure and token economics. The full series is organized around one claim: **AI infrastructure is the implementation bridge between upstream workload design and underlying hardware reality.** Algorithms decide what work exists. CPUs, GPUs, TPUs, NPUs, memory, and networks decide what work is physically affordable. Infrastructure is the middle layer that makes the two meet.
+This is the first part of a three-part series organized around one claim: **AI infrastructure is the implementation bridge between upstream workload design and underlying hardware reality.**
 
 The series:
 
-1. **History:** from conventional infra to agentic infra, and why the unit of work changed.
+1. **History:** how the unit of work changed from a request into an agent loop.
 2. **Problem:** [why model size, context, output length, and agent request volume scale faster than hardware economics](/2026/07/01/ai-infra-scaling-problem/).
 3. **Future:** [why the next phase points toward heterogeneous computing and more dedicated LLM hardware](/2026/07/02/ai-infra-future/).
 
 ## Infra is the bridge
 
-A useful way to look at AI infrastructure is not as "GPU operations" or "model serving" in isolation. It is the translation layer between workload semantics and hardware constraints:
-
-```text
-algorithm / workload intent -> infrastructure implementation -> hardware execution
-```
-
-The upstream side asks for larger models, longer context, multimodal inputs, retrieval, tool calls, verification, and background agents. The downstream side offers CPUs, GPUs, TPUs, NPUs, HBM, SRAM, PCIe, NVLink, Ethernet, InfiniBand, power budgets, and wafer economics. The infra layer decides how much useful work survives that translation.
-
-That is why the token became a useful accounting unit. Training consumes tokens to create capability. Inference consumes tokens to deliver capability. Agentic workflows consume more tokens to plan, call tools, verify work, and recover from failure. Token cost is therefore not just a pricing metric. It is a full-stack performance metric.
+A model describes *what* computation should happen. Hardware determines *what is physically and economically possible*. Infrastructure translates between them: it chooses model placement, numerical formats, batching, caching, parallelism, kernels, communication, and failure handling.
 
 <figure class="post-figure">
-  <img src="{{ '/assets/ai-infra-token-stack.svg' | relative_url }}" alt="Stack diagram showing algorithm, model, serving, framework, compiler, kernel, accelerator, memory, network, chip design, and manufacturing all contributing to token economics.">
-  <figcaption>The cost and latency of one useful token is the sum of many cross-layer decisions.</figcaption>
+  <img src="{{ '/assets/ai-infra-unified-map.svg' | relative_url }}" alt="Excalidraw systems map showing workload pressures flowing through AI infrastructure placement, compilation, caching, scheduling, runtime, and data movement into compute, memory, communication, and edge hardware constraints, with a feedback loop.">
+  <figcaption>This is the backbone of the series: infrastructure turns workload intent into useful execution, while hardware constraints feed back into model and system design.</figcaption>
 </figure>
+
+The upstream side now asks for larger models, longer context, multimodal inputs, retrieval, tool calls, verification, and background agents. The downstream side offers increasingly specialized CPUs, GPUs, TPUs, NPUs, SRAM, HBM, fabrics, and packaging. Neither side can be designed independently: model choices leak into systems decisions, and hardware constraints leak back into model design.
+
+Tokens are useful for accounting because they cross this boundary. Training spends tokens to create capability. Inference spends tokens to deliver it. Agentic workflows spend additional tokens to plan, call tools, verify results, and recover from failure. The real objective is not the cheapest token in isolation; it is the most useful completed work per dollar, watt, and second.
 
 ## From conventional infra to agentic infra
 
 <figure class="post-figure">
-  <img src="{{ '/assets/infra-evolution-agentic.svg' | relative_url }}" alt="Timeline diagram showing infrastructure evolving from conventional request serving to machine learning jobs, deep learning training steps, LLM tokens, and agentic task loops.">
-  <figcaption>The important shift is the unit of work: infrastructure moves from operating services to scheduling accelerator-heavy token loops that must complete useful tasks.</figcaption>
+  <img src="{{ '/assets/infra-evolution-agentic-excalidraw.svg' | relative_url }}" alt="Excalidraw timeline showing infrastructure evolving from conventional requests through machine-learning experiments, deep-learning training steps, LLM tokens and KV cache, and agentic task loops.">
+  <figcaption>The important shift is the scheduled unit of work: request, experiment, training step, token and KV state, then a goal-driven task loop. Each transition adds autonomy, state, and accelerator intensity.</figcaption>
 </figure>
 
-The useful way to compare infrastructure generations is to ask what the scheduler is really scheduling.
+The scheduler reveals what each generation values. Conventional infrastructure schedules requests and preserves availability. ML infrastructure schedules experiments and preserves reproducibility. Deep-learning infrastructure schedules kernel graphs and keeps accelerators fed. LLM infrastructure schedules tokens and KV-cache blocks while balancing throughput against latency.
 
-| era | unit of work | scarce resource | infra objective |
-| --- | --- | --- | --- |
-| conventional infra | request / transaction | CPU, storage, availability | keep services reliable |
-| ML infra | experiment / tensor job | GPU hours, data pipelines | make iteration reproducible |
-| deep learning infra | training step / kernel graph | accelerator utilization | keep devices fed |
-| LLM infra | token / KV cache block | memory bandwidth, batch slots | optimize prefill/decode economics |
-| agentic infra | task loop / tool call | total tokens, state, retries | complete useful work cheaply |
+Agentic infrastructure schedules something more stateful: a task loop. One user goal can expand into planning, retrieval, model calls, tool execution, tests, retries, and verification. The system may run for hours without the user pacing every step. Its performance target therefore moves beyond tokens per second toward **useful completed work per token**.
 
-Conventional infrastructure mostly optimizes request handling: deployment, isolation, storage, observability, and failure recovery. ML infrastructure moves the unit of work to tensor programs and experiments, so GPU allocation, data loading, checkpoints, and artifact tracking become central.
-
-Deep learning infrastructure makes the accelerator the main computer. The system is only efficient when the input pipeline, graph executor, collective communication, and kernels keep devices busy. LLM infrastructure adds a serving-specific memory problem: KV cache placement, batching, prefill/decode separation, quantization, routing, and latency SLOs.
-
-Agentic infrastructure adds feedback loops. A request can expand into planning, retrieval, tool calls, code execution, test runs, retries, and verification. The performance target is no longer "tokens per second" alone. It is useful completed work per token.
-
-## What changed
-
-The historical shift is not only "more GPUs." It is a change in what the infrastructure system is asked to preserve:
-
-- Conventional infrastructure preserves service availability and request latency.
-- ML infrastructure preserves experiment reproducibility and accelerator allocation.
-- Deep learning infrastructure preserves device utilization across training steps.
-- LLM infrastructure preserves token throughput, KV-cache locality, and latency SLOs.
-- Agentic infrastructure preserves useful task completion across long-running loops.
-
-Each era makes the implementation bridge wider. More of the algorithm leaks into systems decisions, and more of the hardware leaks back into model design.
-
-## Where the rest of the series goes
-
-Part 2 turns this history into the current problem: AI workloads weak-scale because model size, token length, output length, and agent loops all grow. Part 3 looks at the supply side and argues that the future of AI infra is increasingly heterogeneous and LLM-specific.
+That change creates the central problem for [Part 2](/2026/07/01/ai-infra-scaling-problem/): both the work inside one goal and the number of machine-generated requests behind that goal can grow. [Part 3](/2026/07/02/ai-infra-future/) then asks what hardware and infrastructure become necessary when compute, memory, communication, and edge constraints all evolve at different rates.

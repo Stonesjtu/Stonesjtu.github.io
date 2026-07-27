@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620" role="img" aria-labelledby="title desc">
-  <title id="title">Edge AI compute and dollar per compute trend</title>
-  <desc id="desc">Two-panel chart showing advertised edge AI compute rising from sub-TOPS devices in 2014 and 2017 to tens of TOPS by 2026, and advertised dollars per TOPS falling from hundreds of dollars per TOPS to about three dollars per TOPS.</desc>
+  <title id="title">Advertised edge AI capability and cost envelope</title>
+  <desc id="desc">Two-panel chart showing advertised edge AI compute and advertised dollars per TOPS, with a marked change from legacy GPU floating-point metrics to dedicated quantized inference metrics.</desc>
   <defs>
     <style>
       .bg { fill: #fbfaf7; }
@@ -20,7 +20,7 @@
   </defs>
 
   <rect class="bg" width="960" height="620"/>
-  <text class="title" x="74" y="42">Edge AI compute and dollar-per-compute trend</text>
+  <text class="title" x="74" y="42">Advertised edge AI capability and cost envelope</text>
   <text class="subtitle" x="74" y="64">Public buyable edge modules/dev kits; advertised TOPS/TFLOPS are not FP16-normalized.</text>
 
   <rect class="panel" x="62" y="88" width="836" height="218" rx="8"/>
@@ -64,6 +64,9 @@
   <text class="small" x="682" y="106" text-anchor="middle">AI HAT+</text>
   <text class="small" x="729" y="83" text-anchor="middle">Orin</text>
   <text class="small" x="800" y="96" text-anchor="end">HAT+2</text>
+  <line x1="332" y1="92" x2="332" y2="270" stroke="#9b8f7f" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <text class="small" x="340" y="132">metric contract changes:</text>
+  <text class="small" x="340" y="148">FP FLOPs -> INT8/INT4 TOPS</text>
 
   <rect class="panel" x="62" y="334" width="836" height="218" rx="8"/>
   <text class="label" x="590" y="362">Advertised dollars per TOPS</text>
@@ -96,10 +99,10 @@
   <text class="small" x="682" y="536" text-anchor="middle">2024</text>
   <text class="small" x="800" y="536" text-anchor="middle">2026</text>
 
-  <rect class="tag" x="548" y="382" width="250" height="54" rx="6"/>
-  <text class="small" x="564" y="402">Approximate reduction:</text>
-  <text class="label" x="564" y="421">~180x lower USD/TOPS</text>
-  <text class="small" x="564" y="435">from TK1 to AI HAT+ 2</text>
+  <rect class="tag" x="520" y="382" width="278" height="62" rx="6"/>
+  <text class="label" x="536" y="404">Architectural break, not one benchmark</text>
+  <text class="small" x="536" y="423">Later products trade generality for quantized</text>
+  <text class="small" x="536" y="439">inference efficiency and local SRAM reuse.</text>
 
   <text class="small" x="74" y="585">Caveat: this mixes marketed FP TFLOPS and INT8/INT4 TOPS. It is a product-envelope chart, not a strict benchmark across datatypes or operator coverage.</text>
 </svg>
