@@ -5,10 +5,10 @@ topic: "AI infrastructure"
 sequence: 10
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
 source_label: "Original outline on Notion"
-excerpt: "A supply-chain view of future AI infrastructure: heterogeneous computing, dedicated LLM hardware, memory locality, interconnect, and edge/cloud partitioning."
+excerpt: "A supply-chain view of future AI infrastructure: heterogeneous computing, dedicated LLM hardware, memory locality, and interconnect."
 ---
 
-This is the third part of the series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) defined AI infrastructure as the bridge between workloads and hardware. [Part 2](/2026/07/01/ai-infra-scaling-problem/) showed how model work, context, output, and agent loops multiply demand.
+This is the third part of the series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) defined AI infrastructure as the bridge between workloads and hardware. [Part 2](/2026/07/01/ai-infra-scaling-problem/) showed how model work, context, output, and agent loops multiply demand. [Part 4](/2026/07/03/ai-infra-edge-intelligence/) treats edge intelligence as its own hardware, economics, and model-quality problem.
 
 This part looks forward from the supply side. The prediction is simple: **AI infrastructure will become more heterogeneous, and more hardware will be designed around LLM-specific bottlenecks rather than generic FLOPs.**
 
@@ -19,7 +19,7 @@ This part looks forward from the supply side. The prediction is simple: **AI inf
 
 General-purpose GPUs will remain central, but the winning system increasingly looks like a coordinated package: CPUs for orchestration, GPUs for dense math, tensor engines for narrow numerical formats, NPUs for local inference, HBM and SRAM for locality, scale-up fabrics for model parallelism, scale-out networks for cluster scheduling, and software that can place work across all of them.
 
-The evidence falls into four constraints. Compute progress increasingly depends on narrower numerical contracts. Memory determines how much model and context can stay close to arithmetic. Communication determines whether many accelerators behave like one system. Edge hardware makes placement, privacy, and thermal limits part of the same infrastructure problem.
+The evidence falls into three constraints. Compute progress increasingly depends on narrower numerical contracts. Memory determines how much model and context can stay close to arithmetic. Communication determines whether many accelerators behave like one system.
 
 ## 1. Compute becomes specialized
 
@@ -97,8 +97,24 @@ These are infrastructure proxies, not chip MSRPs or workload benchmarks. Dividin
 
 Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
 
-<figure class="post-figure">
-  <img src="{{ '/assets/gpu-compute-buy-rent.svg' | relative_url }}" alt="Three aligned log-scale plots comparing dense FP16-normalized GPU peak compute, launch purchase dollars per peak PFLOP per second, and current cloud rental dollars per PFLOP-second.">
+<figure class="post-figure post-chart">
+  <div class="chart-grid">
+    <section class="chart-panel">
+      <p class="chart-title">Peak compute</p>
+      <p class="chart-subtitle">Dense FP16/BF16 TFLOP/s where available; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="gpu-peak-compute-chart" role="img" aria-label="Interactive logarithmic chart showing peak dense FP16 or BF16 GPU compute from Tesla C870 through preliminary Rubin.">The source data is available in the methodology table above.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Historical buy cost</p>
+      <p class="chart-subtitle">Release-era USD per peak PFLOP/s; lower is better</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="gpu-buy-cost-chart" role="img" aria-label="Interactive logarithmic chart showing release-era acquisition dollars per peak PFLOP per second falling from Tesla C870 through B200.">The source data is available in the methodology table above.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Current rental cost</p>
+      <p class="chart-subtitle">Lambda eight-GPU on-demand USD per PFLOP-second; lower is better</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="gpu-rental-cost-chart" role="img" aria-label="Interactive logarithmic chart comparing current cloud rental dollars per PFLOP-second for V100, A100, H100, and B200.">The source data is available in the methodology table above.</canvas></div>
+    </section>
+  </div>
   <figcaption>Three distinct views share one compute basis. Peak compute uses dense FP16/BF16, except C870's FP32 legacy proxy. Historical buy cost uses release-era standalone or eight-GPU system price divided by GPU count. Current rental cost uses Lambda's eight-GPU on-demand rates accessed July 26, 2026. Lower is better in both cost plots; Rubin has a preliminary compute point but no public cost point.</figcaption>
 </figure>
 
@@ -180,8 +196,12 @@ Huawei LogicFolding is a different scaling axis. Huawei describes it as shorteni
 
 The raw wafer-cost proxy falls less smoothly because advanced wafer prices rise sharply. N2 can fit more arithmetic, but a USD 30,000 wafer can erase much of the dollar-per-ALU gain versus 3nm. Real ALUs also need registers, operand routing, control, clocking, SRAM, verification margin, and yield. Tensor cores improve the economics further by amortizing control and data movement across matrix tiles instead of treating every multiply-add as an isolated scalar unit.
 
-<figure class="post-figure">
-  <img src="{{ '/assets/alu-dollar-cost-trend.svg' | relative_url }}" alt="Line chart showing estimated raw FP16 multiply-add ALU cost per one million units from 45nm through N2 and Intel 18A.">
+<figure class="post-figure post-chart">
+  <section class="chart-panel">
+    <p class="chart-title">Estimated raw FP16 ALU dollar cost</p>
+    <p class="chart-subtitle">USD per one million multiply-plus-add datapaths; logarithmic scale</p>
+    <div class="chart-frame"><canvas id="alu-cost-chart" role="img" aria-label="Interactive logarithmic chart showing the estimated raw cost of one million FP16 multiply-plus-add datapaths from 45 nanometer through N2 and Intel 18A.">The process-node estimates are available in the table above.</canvas></div>
+  </section>
   <figcaption>Logic density keeps shrinking the raw FP16 arithmetic datapath, but wafer prices flatten the dollar-cost curve at leading-edge nodes.</figcaption>
 </figure>
 
@@ -263,8 +283,29 @@ The manufacturing layer is the shared denominator under both compute and SRAM. I
 
 </details>
 
-<figure class="post-figure">
-  <img src="{{ '/assets/memory-manufacturing-trends.svg' | relative_url }}" alt="Four-panel chart showing SRAM cost proxy, commodity DRAM price per GB, HBM price per bandwidth, and wafer price by process node.">
+<figure class="post-figure post-chart">
+  <div class="chart-grid chart-grid--two">
+    <section class="chart-panel">
+      <p class="chart-title">On-chip SRAM cost proxy</p>
+      <p class="chart-subtitle">Raw bitcell USD/MB lower bound</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="sram-cost-chart" role="img" aria-label="Interactive chart showing the raw SRAM bitcell cost proxy across 28 nanometer, 7 nanometer, 5 nanometer, and 3 nanometer or N2-class nodes.">The methodology is available above.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Commodity DRAM price</p>
+      <p class="chart-subtitle">Cheapest listed USD/GB; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="dram-cost-chart" role="img" aria-label="Interactive logarithmic chart showing commodity DRAM dollars per gigabyte falling from 2005 through 2026.">The methodology is available above.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">HBM bandwidth price</p>
+      <p class="chart-subtitle">Modeled USD per TB/s</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="hbm-bandwidth-cost-chart" role="img" aria-label="Interactive chart showing modeled HBM dollars per terabyte per second for HBM2e through projected HBM4.">The methodology is available above.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Advanced wafer price</p>
+      <p class="chart-subtitle">Foundry sale price per 300 mm wafer; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="wafer-price-chart" role="img" aria-label="Interactive logarithmic chart showing approximate advanced wafer prices across 28 nanometer through 3 nanometer.">The methodology is available above.</canvas></div>
+    </section>
+  </div>
   <figcaption>Memory economics explain why AI infra is increasingly about locality: on-chip SRAM density is harder to buy with node shrinks, HBM bandwidth is expensive capacity, commodity DRAM is cheap but far away, and advanced wafer prices keep rising.</figcaption>
 </figure>
 
@@ -347,8 +388,19 @@ For a dollar-per-speed proxy, use switch chassis price divided by front-panel ba
 
 </details>
 
-<figure class="post-figure">
-  <img src="{{ '/assets/interconnect-speed-cost-trend.svg' | relative_url }}" alt="Dual-axis chart showing scale-out switch port speed rising from 10G to 800G while switch dollar per gigabit falls from about 72 dollars per gigabit to about one dollar per gigabit.">
+<figure class="post-figure post-chart">
+  <div class="chart-grid chart-grid--two">
+    <section class="chart-panel">
+      <p class="chart-title">Scale-out port speed</p>
+      <p class="chart-subtitle">Front-panel Gb/s; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="interconnect-speed-chart" role="img" aria-label="Interactive logarithmic chart showing scale-out port speed increasing from 10 gigabits per second in 2008 to 800 gigabits per second in 2026.">The switch data is available in the table above.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Switch cost per bandwidth</p>
+      <p class="chart-subtitle">Chassis-only USD/Gb/s proxy; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="interconnect-cost-chart" role="img" aria-label="Interactive logarithmic chart showing switch dollars per gigabit per second falling from about 72 dollars to about one dollar.">The switch data is available in the table above.</canvas></div>
+    </section>
+  </div>
   <figcaption>Scale-out switch bandwidth improved dramatically over the last two decades, but the system-level network bill does not fall as fast as raw switch dollars per Gb/s because optics, NICs, cables, power, and topology complexity become first-order costs.</figcaption>
 </figure>
 
@@ -356,101 +408,11 @@ The punchline is subtle: network silicon has delivered a large cost-per-bit impr
 
 This is why "chips are slowing down" is not only a FLOP story. It is a locality and communication story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, interconnect bandwidth, synchronization time, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory and network bandwidth do useful work more often.
 
-## 4. Edge makes placement part of infra
+## Edge becomes a separate placement frontier
 
-Edge and mobile NN accelerators sit at the opposite end of the cluster story. A data-center GPU buys throughput by spending HBM, power, cooling, and network. A phone, camera, robot, car sensor, or Raspberry Pi accessory buys usefulness by staying inside a tiny power and memory envelope. The unit of value is often not "maximum tokens per second." It is:
+Edge hardware changes the accounting unit. A phone, AI PC, or robotics box is bounded by shared memory, bandwidth, thermals, battery life, and a product-level price rather than by rack power and HBM alone. Peak TOPS is useful, but it does not tell us how large a model fits, how quickly its weights can be streamed during decoding, or how much benchmark quality survives quantization.
 
-<div class="math-block">
-$$
-\text{edge value}
-\approx
-\frac{\text{useful local decisions}}{\text{watts} \cdot \text{latency} \cdot \text{device cost}}
-$$
-</div>
-
-That is why the accelerator looks different. Mobile NPUs and edge ASICs are optimized for quantized inference, predictable tensor graphs, aggressive SRAM reuse, camera / audio pipelines, privacy, and always-on duty cycles. Apple says M4's Neural Engine reaches 38 TOPS, about 60x the first A11 Neural Engine, while A18 is optimized for large generative models and runs ML models up to 2x faster than A16.[^apple-m4][^apple-a18] Qualcomm's Hexagon NPU page describes a 45 TOPS fused scalar/vector/tensor architecture with shared memory and micro-tile inferencing.[^qualcomm-hexagon] On maker and industrial edge devices, the anchors are smaller but more observable: Google's Edge TPU class devices are around 4 TOPS at 2 W, Raspberry Pi AI HAT+ offers 13 or 26 TOPS at USD 70 or USD 110, AI HAT+ 2 adds a Hailo-10H with 40 INT4 TOPS and 8 GB of local memory at USD 130, and Jetson Orin Nano Super advertises 67 TOPS at USD 249.[^coral-edge-tpu][^raspberry-ai-hat][^raspberry-ai-hat-2][^jetson-orin-nano]
-
-<details class="post-details" markdown="1">
-<summary>Show current edge accelerator examples</summary>
-
-<details class="post-details" markdown="1">
-<summary>Show edge and mobile accelerator tiers</summary>
-
-| edge / mobile tier | public compute anchor | visible constraint | economic reading |
-| --- | ---: | --- | --- |
-| phone / tablet NPU | Apple M4-class: 38 TOPS; A18-class: optimized for on-device generative models | battery, thermal skin temperature, unified memory | best for private, latency-sensitive, short-context tasks |
-| laptop / tablet NPU | Qualcomm Hexagon / AI PC-class: around 45 TOPS | sustained power and shared DRAM bandwidth | good for background assistants, media, small local models |
-| low-power edge ASIC | Edge TPU / Hailo-8L: 4-13 TOPS | 2-3 W class power, narrow compiler target | excellent for fixed vision/audio pipelines |
-| richer edge module | Hailo-8 / Hailo-10H / Orin Nano: 26-67 TOPS | local memory, PCIe lane, software stack, thermal design | enables multi-camera, robotics, VLM, and small LLM workflows |
-| embedded robotics computer | Jetson AGX Orin: up to 275 TOPS at 15-60 W[^jetson-orin] | module cost, enclosure cooling, sensor IO | closer to a compact server than a phone NPU |
-
-</details>
-
-</details>
-
-The trend line for buyable edge hardware is dramatic, but it needs careful labeling. Early Jetson boards advertised GPU floating-point throughput, while later Edge TPU, Hailo, and Orin products advertise quantized neural-network TOPS. The table below therefore uses the public metric each product was sold with and treats it as an **advertised edge-AI compute envelope**, not as a strict FP16-normalized benchmark. The historical anchors combine Jetson TK1/TX1/TX2 public launch material, Intel Movidius Neural Compute Stick launch coverage, Coral Dev Board coverage, Xavier NX launch coverage, Raspberry Pi AI HAT pricing, and Jetson Orin Nano Super pricing.[^jetson-tk1][^jetson-tx1-price][^jetson-tx1-spec][^movidius-ncs][^jetson-tx2-price][^jetson-tx2-spec][^coral-dev-board-price][^xavier-nx-price][^raspberry-ai-hat][^raspberry-ai-hat-2][^jetson-orin-nano]
-
-<details class="post-details" markdown="1">
-<summary>Show historical edge product-envelope data</summary>
-
-<details class="post-details" markdown="1">
-<summary>Show public edge module prices and advertised compute</summary>
-
-| edge device / module | year | advertised compute anchor | public price anchor | advertised dollars per TOPS |
-| --- | ---: | ---: | ---: | ---: |
-| Jetson TK1 dev kit | 2014 | 0.326 TFLOPS | USD 192 | USD 589/TOPS |
-| Jetson TX1 dev kit | 2015 | 1 TFLOPS | USD 599 | USD 599/TOPS |
-| Intel Movidius Neural Compute Stick | 2017 | 0.1 TFLOPS | USD 79 | USD 790/TOPS |
-| Jetson TX2 dev kit | 2017 | 1.33 TFLOPS | USD 599 | USD 450/TOPS |
-| Google Coral Dev Board | 2019 | 4 TOPS | USD 150 | USD 37.5/TOPS |
-| Jetson Xavier NX dev kit | 2020 | 21 TOPS | USD 399 | USD 19/TOPS |
-| Raspberry Pi AI HAT+ | 2024 | 26 TOPS | USD 110 | USD 4.23/TOPS |
-| Jetson Orin Nano Super | 2024 | 67 TOPS | USD 249 | USD 3.72/TOPS |
-| Raspberry Pi AI HAT+ 2 | 2026 | 40 INT4 TOPS | USD 130 | USD 3.25/TOPS |
-
-</details>
-
-</details>
-
-<figure class="post-figure">
-  <img src="{{ '/assets/edge-compute-cost-envelope.svg' | relative_url }}" alt="Two-panel chart showing advertised edge AI compute and dollars per TOPS from 2014 through 2026, with a marked change from legacy floating-point metrics to dedicated quantized inference metrics.">
-  <figcaption>Advertised edge-AI capability rose sharply as products moved from general GPU FLOPs toward dedicated INT8/INT4 inference. The line is directional, not a datatype-normalized benchmark.</figcaption>
-</figure>
-
-The important caveat is that the curve is partly architectural, not only manufacturing progress. A 2014 Jetson TK1 and a 2026 Hailo-based AI HAT+ 2 are not running the same numerical contract. The later devices win by narrowing the workload: quantized inference, compiler-supported operator sets, smaller activation footprints, and local SRAM reuse. That makes them excellent at camera, audio, sensor, and small local-model loops, but much less flexible than a data-center GPU. Edge dollars-per-compute fell because the hardware gave up generality in exchange for useful local inference.
-
-Phone SoCs are harder to put on the same curve because Apple does not sell A-series chips, Qualcomm pricing is negotiated per OEM and volume, and the application processor is bundled with CPU, GPU, ISP, modem interfaces, security, media, and memory controllers. Still, teardown and industry-estimate data give a useful sanity check. Digitimes reported the A16 processor in iPhone 15 at about USD 35 and A18 in iPhone 16 at about USD 45; TechCrunch reported A18 / A18 Pro's 16-core Neural Engine at 35 TOPS; Wccftech reported Snapdragon 8 Gen 3 around USD 200 and Snapdragon 8 Gen 4 / 8 Elite estimates around USD 220-240; Notebookcheck later summarized Snapdragon 8 Elite Gen 5 estimates around USD 240-280, versus about USD 200 for Snapdragon 8 Gen 3.[^iphone16-bom][^apple-a18-tops][^snapdragon-8gen3-tops][^snapdragon-8g4-cost][^snapdragon-8elite-cost][^snapdragon-8elite-gen5-tops] Using those estimates, phone SoC NPU dollars can look competitive with edge modules, but this comparison is not apples-to-apples: a phone SoC is a subsidized internal or high-volume OEM component, while Jetson / Coral / Hailo boards include packaging, carrier hardware, memory, connectors, distribution margin, and developer support.
-
-<details class="post-details" markdown="1">
-<summary>Show phone SoC BOM sanity checks</summary>
-
-<details class="post-details" markdown="1">
-<summary>Show phone SoC price sanity checks</summary>
-
-| phone SoC price sanity check | year | NPU / AI compute anchor | estimated SoC price | implied NPU dollars per TOPS |
-| --- | ---: | ---: | ---: | ---: |
-| Apple A16 | 2022 | 17 TOPS | USD 35 teardown/BOM estimate | USD 2.06/TOPS |
-| Apple A18 | 2024 | 35 TOPS | USD 45 teardown/BOM estimate | USD 1.29/TOPS |
-| Snapdragon 8 Gen 3 | 2023 | about 45 TOPS | about USD 170-200 industry estimate | USD 3.8-4.4/TOPS |
-| Snapdragon 8 Elite / 8 Gen 4 class | 2024 | higher than 8 Gen 3, but vendor reports often use relative gains | about USD 220-240 industry estimate | not comparable without a stable TOPS number |
-| Snapdragon 8 Elite Gen 5 estimate | 2025 | reported around 100 TOPS by industry press | about USD 240-280 industry estimate | USD 2.4-2.8/TOPS |
-
-</details>
-
-</details>
-
-This is the mirror image of scale-out AI infra. In the cloud, weak scaling makes optimization valuable because each user can trigger more tokens, more agents, and longer-running jobs. At the edge, the hard ceiling is local state: how much model, cache, sensor context, and runtime can fit without waking a server or burning the battery. The right design is usually hybrid:
-
-- **Do local inference** when latency, privacy, offline availability, or sensor bandwidth dominates.
-- **Call the cloud** when the task needs broad knowledge, large context, tool orchestration, or high-quality generation.
-- **Split the pipeline** when local models can filter, compress, route, or verify before an expensive cloud call.
-
-<figure class="post-figure">
-  <img src="{{ '/assets/edge-cloud-partition-excalidraw.svg' | relative_url }}" alt="Excalidraw placement map showing an AI runtime routing work between private, latency-sensitive edge inference and cloud systems with larger models, long context, tools, and shared state.">
-  <figcaption>The edge/cloud boundary is a placement decision: keep private, latency-sensitive state local and spend network and cloud compute only where broader capability is worth it.</figcaption>
-</figure>
-
-The important lesson is that edge accelerators do not weaken the AI infra thesis. They extend it. Once inference leaves the data center, infrastructure has to optimize a wider control loop: model size, quantization, compiler lowering, memory layout, thermal policy, network fallback, privacy boundary, and user-visible latency.
+[Part 4 follows this edge intelligence envelope directly](/2026/07/03/ai-infra-edge-intelligence/): how mobile, AI PC, and AI-box hardware evolved; how their product-level dollars per advertised performance changed; how edge-fit language models improved; and what those trends imply for local agents.
 
 ## Prediction: heterogeneity becomes the default
 
@@ -467,7 +429,7 @@ The practical direction is heterogeneous and increasingly LLM-specific:
 - More dedicated tensor formats and matrix engines, because narrow numerical contracts buy more useful math per watt and per dollar.
 - More memory-aware architectures, because context, KV cache, retrieval, and multimodal state make bytes as important as FLOPs.
 - More rack-scale and cluster-scale co-design, because scale-up and scale-out communication now shape model design.
-- More edge/cloud partitioning, because not every inference should cross the network and not every local device can host the whole model.
+- More edge/cloud partitioning, because [not every inference should cross the network and not every local device can host the whole model](/2026/07/03/ai-infra-edge-intelligence/).
 - More compiler/runtime responsibility, because specialized hardware only matters when the software stack can expose locality, regularity, and parallelism.
 
 The teams that win will not only have better models or better hardware. They will have better translation between the two: less work per useful result, better placement for every stage, and higher utilization of every expensive byte and arithmetic lane.
@@ -525,25 +487,7 @@ The teams that win will not only have better models or better hardware. They wil
 [^mellanox-switch-prices]: Router-Switch.com, [NVIDIA Mellanox switches price list](https://www.router-switch.com/mellanox-switches-price.html), accessed 2026-07-04.
 [^sn5610-price]: NADDOD, [NVIDIA SN5610 Spectrum-4 800GbE switch listing](https://www.naddod.com/products/102969.html), accessed 2026-07-04.
 [^sn5610-specs]: NVIDIA Networking Docs, [NVIDIA Spectrum-4 SN5000 specifications](https://docs.nvidia.com/networking/display/sn5000/specifications), accessed 2026-07-04.
-[^apple-m4]: Apple, [Apple introduces M4 chip](https://www.apple.com/newsroom/2024/05/apple-introduces-m4-chip/), 2024.
-[^apple-a18]: Apple, [Apple introduces iPhone 16 and iPhone 16 Plus](https://www.apple.com/newsroom/2024/09/apple-introduces-iphone-16-and-iphone-16-plus/), 2024.
-[^qualcomm-hexagon]: Qualcomm, [Hexagon NPU](https://www.qualcomm.com/processors/hexagon), accessed 2026-07-06.
-[^coral-edge-tpu]: Murata, [AI Accelerator Module featuring the Coral Edge TPU from Google](https://www.murata.com/en-us/products/connectivitymodule/edge-ai/overview/lineup/type1wv), accessed 2026-07-06.
-[^raspberry-ai-hat]: Raspberry Pi, [Introducing the Raspberry Pi AI HAT+ with up to 26 TOPS](https://www.raspberrypi.com/news/raspberry-pi-ai-hat/), 2024.
-[^raspberry-ai-hat-2]: Raspberry Pi, [Introducing the Raspberry Pi AI HAT+ 2](https://www.raspberrypi.com/news/introducing-the-raspberry-pi-ai-hat-plus-2-generative-ai-on-raspberry-pi-5/), 2026.
-[^jetson-orin-nano]: NVIDIA, [Jetson Orin Nano Super Developer Kit](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/), accessed 2026-07-06.
-[^jetson-orin]: NVIDIA, [Jetson AGX Orin series](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/), accessed 2026-07-06.
-[^jetson-tk1]: NVIDIA, [Jetson TK1 platform brief](https://developer.download.nvidia.com/embedded/jetson/TK1/docs/Jetson_platform_brief_May2014.pdf), 2014; NVIDIA Developer Forums, [Jetson TK1 Development Kit Now Available](https://forums.developer.nvidia.com/t/jetson-tk1-development-kit-now-available/32672), 2014.
-[^jetson-tx1-price]: NVIDIA Developer Blog, [NVIDIA Jetson TX1 Supercomputer-on-Module Drives Next Wave of Autonomous Machines](https://developer.nvidia.com/blog/nvidia-jetson-tx1-supercomputer-on-module-drives-next-wave-of-autonomous-machines/), 2015.
-[^jetson-tx1-spec]: NVIDIA Developer, [Jetson TX1 Module](https://developer.nvidia.com/embedded/jetson-tx1), accessed 2026-07-06.
-[^movidius-ncs]: SiliconANGLE, [Intel introduces a USD 79 USB stick for running neural networks](https://siliconangle.com/2017/07/20/intel-introduces-79-usb-stick-running-neural-networks/), 2017.
-[^jetson-tx2-price]: Seeed Studio, [NVIDIA Jetson TX2 Developer Kit](https://www.seeedstudio.com/NVIDIA-Jetson-TX2-Developer-Kit-p-4413.html), accessed 2026-07-06.
-[^jetson-tx2-spec]: NVIDIA, [Jetson TX2 series technical specifications](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-tx2/), accessed 2026-07-06.
-[^coral-dev-board-price]: IEEE Spectrum, [The Coral Dev Board Takes Google's AI to the Edge](https://spectrum.ieee.org/the-coral-dev-board-takes-googles-ai-to-the-edge), 2019.
-[^xavier-nx-price]: LinuxGizmos, [Xavier NX Dev Kit ships as Nvidia adds cloud-native support for all the Jetsons](https://linuxgizmos.com/xavier-nx-dev-kit-ships-as-nvidia-adds-cloud-native-support-for-all-the-jetsons/), 2020.
-[^iphone16-bom]: Digitimes, [iPhone 16 series teardown shows increased costs in certain components](https://www.digitimes.com/news/a20241004PD214/apple-iphone-component-cost-production-profit.html), 2024.
-[^apple-a18-tops]: TechCrunch, [Apple announces its new A18 and A18 Pro iPhone chips](https://techcrunch.com/2024/09/09/apple-announces-its-new-a18-iphone-chip/), 2024.
-[^snapdragon-8gen3-tops]: Moor Insights & Strategy / Forbes, [AI Dominates Qualcomm Snapdragon Summit With New Snapdragon Products](https://www.forbes.com/sites/moorinsights/2023/10/25/ai-dominates-qualcomm-snapdragon-summit-with-new-snapdragon-products/), 2023.
-[^snapdragon-8g4-cost]: Wccftech, [Snapdragon 8 Gen 4 Orders Not Yet Placed By Qualcomm's Partners](https://wccftech.com/snapdragon-8-gen-4-orders-yet-to-be-placed-making-unit-cost-calculation-hard/), 2024.
-[^snapdragon-8elite-cost]: Notebookcheck, [Snapdragon 8 Elite Gen 5 price estimate signals bad news for affordable flagship phones](https://www.notebookcheck.net/Snapdragon-8-Elite-Gen-5-price-estimate-signals-bad-news-for-affordable-flagship-phones.1135980.0.html), 2025.
-[^snapdragon-8elite-gen5-tops]: Jon Peddie Research, [Qualcomm Snapdragon 8 Elite Gen 5](https://www.jonpeddie.com/news/qualcomm-snapdragon-8-elite-gen-5/), 2025.
+
+<script defer src="{{ '/assets/vendor/chart.umd.min.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/chart-theme.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/series-charts.js' | relative_url }}"></script>

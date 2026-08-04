@@ -8,13 +8,14 @@ source_label: "Original outline on Notion"
 excerpt: "A history of AI infrastructure as the implementation bridge between algorithmic workload demand and CPU/GPU/TPU/NPU hardware reality."
 ---
 
-This is the first part of a three-part series organized around one claim: **AI infrastructure is the implementation bridge between upstream workload design and underlying hardware reality.**
+This is the first part of a four-part series organized around one claim: **AI infrastructure is the implementation bridge between upstream workload design and underlying hardware reality.**
 
 The series:
 
 1. **History:** how the unit of work changed from a request into an agent loop.
 2. **Problem:** [why model size, context, output length, and agent request volume scale faster than hardware economics](/2026/07/01/ai-infra-scaling-problem/).
 3. **Future:** [why the next phase points toward heterogeneous computing and more dedicated LLM hardware](/2026/07/02/ai-infra-future/).
+4. **Edge:** [how local hardware economics and small-model progress determine the intelligence that can stay on-device](/2026/07/03/ai-infra-edge-intelligence/).
 
 ## Infra is the bridge
 
