@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[WIP] Why AI infra is fast-moving and challenging - AI-Infra Overview PART-2"
+title: "Why AI infra is fast-moving and challenging - AI-Infra Overview PART-2"
 topic: "AI infrastructure"
 sequence: 9
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
@@ -8,17 +8,11 @@ source_label: "Original outline on Notion"
 excerpt: "Why rapidly evolving models, request volume, context, output, agents, and hardware keep moving the AI infrastructure frontier."
 ---
 
-This is the second part of the series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) followed the unit of work from a request to an agent loop. This part explains why AI infrastructure is fast-moving and challenging: **the workload, hardware, and useful optimization frontier all change at once.** Both the work inside one goal and the number of machine-generated steps behind it can grow.
+This is the second part of the series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) showed how AI infrastructure maps evolving models onto evolving hardware. This part explains why that mapping is fast-moving and challenging: **the workload, hardware, and useful optimization frontier all change at once.** Both the work inside one goal and the number of machine-generated steps behind it can grow.
 
 ## Inference demand still outruns one accelerator
 
-The demand-side gap is visible in inference alone. For a dense Transformer, a useful first-order proxy for one request is active parameters multiplied by processed tokens: \(W_{\text{request}}\propto P_{\text{active}}T\). This intentionally leaves out attention, KV-cache traffic, output decoding, repeated samples, and agent steps; all of those widen the real systems envelope.
-
-Using public model specifications gives an estimated envelope. BERT-Large exposed 340 million parameters and 512-token sequences in 2018.[^bert] GPT-2 increased the model to 1.5 billion parameters in 2019, and GPT-3 reached 175 billion parameters with a 2,048-token context in 2020.[^gpt2][^gpt3] PaLM was a dense 540-billion-parameter model, while Llama 3.1 combined 405 billion parameters with a 128K context window.[^palm][^llama31]
-
-The 2026 open-model frontier changes how that curve should be read. GLM-5.2 has a 753-billion-parameter checkpoint, DeepSeek-V4-Pro reports 1.6 trillion total parameters, and Kimi K3 reports 2.8 trillion.[^glm52][^deepseek-v4][^kimi-k3] All three are sparse MoE models with roughly 40–50 billion parameters active per token and about a one-million-token window. Total parameters therefore describe weight capacity, memory footprint, expert placement, and communication pressure; **active** parameters are the better first-order input to per-token arithmetic.
-
-These are not average production requests; they show how much inference work a single request *can* ask the system to carry. The hardware curve uses NVIDIA's published dense FP16/BF16 figures, with C870 FP32 as a legacy proxy and Rubin marked preliminary.[^gpu-inference-trend]
+<p class="key-insight"><strong>Key insight</strong><span>The public full-context inference envelope has expanded much faster than the dense compute available from one accelerator.</span></p>
 
 <figure class="post-figure post-chart">
   <section class="chart-panel">
@@ -28,6 +22,14 @@ These are not average production requests; they show how much inference work a s
   </section>
   <figcaption>The chart normalizes workload and hardware to 2018. Violet uses total parameters; red uses \(P_{\text{active}}\times T_{\max}\), so sparse MoE models are not charged for every stored expert on every token. The 2026 GLM-5.2, DeepSeek-V4-Pro, and Kimi K3 points are horizontally jittered within the year for readability; GLM and Kimi active-parameter values are architecture-derived estimates. Hardware is one accelerator's dense FP16/BF16 peak, except the C870 FP32 legacy point; Rubin is preliminary. The open-model examples reach about 8,200x the BERT-Large parameter count and roughly 290,000x its full-context work envelope, versus about 32x in preliminary single-GPU compute.</figcaption>
 </figure>
+
+For a dense Transformer, a useful first-order proxy for one request is active parameters multiplied by processed tokens: \(W_{\text{request}}\propto P_{\text{active}}T\). This intentionally leaves out attention, KV-cache traffic, output decoding, repeated samples, and agent steps; all of those widen the real systems envelope.
+
+Using public model specifications gives an estimated envelope. BERT-Large exposed 340 million parameters and 512-token sequences in 2018.[^bert] GPT-2 increased the model to 1.5 billion parameters in 2019, and GPT-3 reached 175 billion parameters with a 2,048-token context in 2020.[^gpt2][^gpt3] PaLM was a dense 540-billion-parameter model, while Llama 3.1 combined 405 billion parameters with a 128K context window.[^palm][^llama31]
+
+The 2026 open-model frontier changes how that curve should be read. GLM-5.2 has a 753-billion-parameter checkpoint, DeepSeek-V4-Pro reports 1.6 trillion total parameters, and Kimi K3 reports 2.8 trillion.[^glm52][^deepseek-v4][^kimi-k3] All three are sparse MoE models with roughly 40–50 billion parameters active per token and about a one-million-token window. Total parameters therefore describe weight capacity, memory footprint, expert placement, and communication pressure; **active** parameters are the better first-order input to per-token arithmetic.
+
+These are not average production requests; they show how much inference work a single request *can* ask the system to carry. The hardware curve uses NVIDIA's published dense FP16/BF16 figures, with C870 FP32 as a legacy proxy and Rubin marked preliminary.[^gpu-inference-trend]
 
 <details class="post-details" markdown="1">
 <summary>Show the normalized inference-demand assumptions</summary>
@@ -53,10 +55,10 @@ This is the space AI infrastructure has to close. It increases effective hardwar
 
 ## The workload multiplies
 
-The difference is not only that an LLM request is larger. It is that the user no longer has to pace every expensive operation:
+<p class="key-insight"><strong>Key insight</strong><span>A traditional application pauses for the next human decision; an agentic application can turn one delegated goal into many machine-paced branches, steps, and retries.</span></p>
 
 <figure class="post-figure">
-  <img src="{{ '/assets/user-agent-loop-excalidraw.svg' | relative_url }}" alt="Excalidraw comparison showing a traditional application waiting for the user after each bounded request, versus an agentic application where one delegated goal launches concurrent model, tool, and verification loops.">
+  <img src="{{ '/assets/user-agent-loop-excalidraw.svg' | relative_url }}?v=20260809b" alt="Excalidraw comparison showing one traditional request returning a result and waiting for another user decision, while one delegated agent goal launches several concurrent model, tool, and verification loops before producing completed work.">
   <figcaption>Traditional workloads return control to the user after each approximately bounded request; the system waits for the user to evaluate the response and make the next decision. For agentic workloads, \(W=A\cdot S\cdot T\cdot q\), where \(W\) is compute work per goal, \(A\) is concurrent agents, \(S\) is model or tool steps per agent, \(T\) is tokens per step, and \(q\) is compute per token. Total cost is \(C=U\cdot G\cdot W\cdot p/\eta\), where \(U\) is active users, \(G\) is goals per user, \(p\) is hardware price per unit compute, and \(\eta\) is full-stack efficiency. Infrastructure lowers cost by increasing \(\eta\) and by reducing the branches, steps, tokens, and data movement required to finish useful work.</figcaption>
 </figure>
 
@@ -66,21 +68,7 @@ Agentic systems remove that pacing limit. One goal can launch several agents. Ea
 
 ## Strong and weak scaling are the systems analogy
 
-The analogy becomes clearer when comparing the control planes. Traditional Dev Infra and ML Infra automate large jobs, but humans usually decide when a build, test, deployment, or experiment begins. Agentic Infra also automates the creation of *new work inside the goal*: the next model call, tool action, retry, verification pass, or concurrent subtask.
-
-| dimension | traditional Dev / ML Infra | current Agentic Infra |
-| --- | --- | --- |
-| trigger | engineer submits a build, test, deployment, or experiment | user delegates a goal once |
-| unit of work | bounded pipeline or predefined job graph | evolving task tree of model calls, tools, and checks |
-| pacing loop | system finishes and waits for human feedback | machine decides and launches the next step |
-| work per trigger | mostly fixed after submission | compounds across agents, steps, tokens, retries, and tools |
-| concurrency | bounded by teams, commits, and planned experiments | many agents and branches can run for one user concurrently |
-| natural limiter | human attention and decision latency | compute budget, policy, quality threshold, and infrastructure capacity |
-| optimization target | turnaround time, reliability, reproducibility, utilization | useful completed work per dollar, watt, second, and user goal |
-
-Traditional Dev/ML demand can still grow substantially, and one training experiment can be enormous. The important bound is the request-generation loop: new jobs usually enter at human speed. Agentic demand can grow much faster because one human decision creates a machine-paced loop. Its work envelope multiplies as \(A\cdot S\cdot T\cdot q\), so increases in autonomy, model size, context, reasoning, and concurrency can produce an exponential-looking demand curve without requiring exponentially more users.
-
-Strong and weak scaling have precise meanings in parallel computing:
+<p class="key-insight"><strong>Key insight</strong><span>Traditional infrastructure is usually asked to finish bounded, human-triggered work faster; agentic products spend added capacity on more work inside each goal.</span></p>
 
 <figure class="post-figure post-chart">
   <div class="chart-grid chart-grid--two">
@@ -97,6 +85,22 @@ Strong and weak scaling have precise meanings in parallel computing:
   </div>
   <figcaption>Strong scaling fixes total work; weak scaling grows total work with resources. AI product demand increasingly resembles the second regime.</figcaption>
 </figure>
+
+The analogy becomes clearer when comparing the control planes. Traditional Dev Infra and ML Infra automate large jobs, but humans usually decide when a build, test, deployment, or experiment begins. Agentic Infra also automates the creation of *new work inside the goal*: the next model call, tool action, retry, verification pass, or concurrent subtask.
+
+| dimension | traditional Dev / ML Infra | current Agentic Infra |
+| --- | --- | --- |
+| trigger | engineer submits a build, test, deployment, or experiment | user delegates a goal once |
+| unit of work | bounded pipeline or predefined job graph | evolving task tree of model calls, tools, and checks |
+| pacing loop | system finishes and waits for human feedback | machine decides and launches the next step |
+| work per trigger | mostly fixed after submission | compounds across agents, steps, tokens, retries, and tools |
+| concurrency | bounded by teams, commits, and planned experiments | many agents and branches can run for one user concurrently |
+| natural limiter | human attention and decision latency | compute budget, policy, quality threshold, and infrastructure capacity |
+| optimization target | turnaround time, reliability, reproducibility, utilization | useful completed work per dollar, watt, second, and user goal |
+
+Traditional Dev/ML demand can still grow substantially, and one training experiment can be enormous. The important bound is the request-generation loop: new jobs usually enter at human speed. Agentic demand can grow much faster because one human decision creates a machine-paced loop. Its work envelope multiplies as \(A\cdot S\cdot T\cdot q\), so increases in autonomy, model size, context, reasoning, and concurrency can produce an exponential-looking demand curve without requiring exponentially more users.
+
+Strong and weak scaling have precise meanings in parallel computing.
 
 For strong scaling, total work \(W\) is fixed and more parallel resources \(P\) reduce completion time:
 
@@ -132,7 +136,7 @@ The bottleneck therefore moves instead of disappearing:
 
 ## Why every efficiency point is magnified
 
-If an optimization leaves a fraction \(r\) of the original unit cost, then:
+<p class="key-insight"><strong>Key insight</strong><span>A fixed percentage improvement saves more absolute money as agents multiply branches, steps, tokens, and compute per token.</span></p>
 
 <div class="math-block">
 $$
@@ -142,7 +146,9 @@ C_{\text{optimized}}=rC,
 $$
 </div>
 
-The percentage is ordinary; the base is not. As \(A\), \(S\), \(T\), and \(q\) grow, the same kernel, compiler, cache, quantization, batching, or routing improvement acts on more work. This is the economic meaning of "the more you buy, the more you save": not that scale makes waste acceptable, but that each percentage point of efficiency converts into a larger absolute saving.
+If an optimization leaves a fraction \(r\) of the original unit cost, the percentage is ordinary; the multiplying workload base is not.
+
+As \(A\), \(S\), \(T\), and \(q\) grow, the same kernel, compiler, cache, quantization, batching, or routing improvement acts on more work. This is the economic meaning of "the more you buy, the more you save": not that scale makes waste acceptable, but that each percentage point of efficiency converts into a larger absolute saving.
 
 Good infrastructure improves both sides of the equation:
 
@@ -150,6 +156,8 @@ Good infrastructure improves both sides of the equation:
 2. Reduce \(W\): finish the goal with fewer tokens, tool calls, retries, or model passes.
 
 ## The AI infra control loop
+
+<p class="key-insight"><strong>Key insight</strong><span>AI infrastructure repeatedly measures the workload, finds the binding hardware constraint, and changes models, kernels, compilers, or scheduling to recover useful capacity.</span></p>
 
 Hardware no longer provides a uniform free lunch. Single-thread performance stopped scaling automatically; dark silicon made power limits explicit; and data movement can cost orders of magnitude more energy than arithmetic.[^sutter][^dark-silicon][^horowitz]
 
@@ -181,4 +189,4 @@ That is why AI infrastructure has more room and more responsibility than the con
 
 <script defer src="{{ '/assets/vendor/chart.umd.min.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/chart-theme.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/series-charts.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/series-charts.js' | relative_url }}?v=20260809f"></script>

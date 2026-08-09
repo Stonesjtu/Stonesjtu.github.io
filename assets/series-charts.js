@@ -138,12 +138,16 @@
             type: "linear",
             min: settings.xMin,
             max: settings.xMax,
+            afterBuildTicks: settings.xYears ? function (axis) {
+              axis.ticks = settings.xYears.map(function (year) { return { value: year }; });
+            } : undefined,
             grid: { display: false },
             border: { color: colors.muted },
             title: { display: Boolean(settings.xTitle), text: settings.xTitle || "" },
             ticks: {
               stepSize: settings.xStep || 1,
-              callback: settings.xTickCallback || function (value) { return String(value); },
+              callback: settings.xYears ? yearTicks(settings.xYears) : (settings.xTickCallback || function (value) { return String(value); }),
+              autoSkip: settings.xYears ? false : settings.xAutoSkip !== false,
               maxRotation: 0
             }
           },
@@ -163,8 +167,69 @@
     });
   }
 
-  function yearTick(value) {
-    return Number.isInteger(Number(value)) ? String(value) : "";
+  function compositionChart(id, labels, values, palette, usdValues) {
+    var canvas = document.getElementById(id);
+    if (!canvas) {
+      return;
+    }
+
+    new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels: ["Cost share"],
+        datasets: labels.map(function (label, index) {
+          return {
+            label: label,
+            data: [values[index]],
+            backgroundColor: palette[index],
+            borderColor: colors.paper,
+            borderWidth: 2,
+            barPercentage: 0.55
+          };
+        })
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { top: 12, right: 4, bottom: 4, left: 4 } },
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { boxWidth: 10, boxHeight: 10, padding: 10 }
+          },
+          tooltip: {
+            backgroundColor: "#273444",
+            padding: 10,
+            callbacks: {
+              label: function (context) {
+                return context.dataset.label + ": " + context.parsed.x.toFixed(1) + "% (" + money(usdValues[context.datasetIndex]) + ")";
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            min: 0,
+            max: 100,
+            grid: { color: colors.grid },
+            border: { display: false },
+            ticks: { callback: function (value) { return value + "%"; } }
+          },
+          y: {
+            stacked: true,
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  function yearTicks(years) {
+    return function (value) {
+      return years.indexOf(Number(value)) >= 0 ? String(value) : "";
+    };
   }
 
   trendChart("inference-demand-gap-chart", {
@@ -175,8 +240,7 @@
     yMax: 1000000,
     xMin: 2006,
     xMax: 2027,
-    xStep: 2,
-    xTickCallback: yearTick,
+    xYears: [2007, 2012, 2016, 2020, 2026],
     pointLabels: true,
     datasets: [
       series("Full-context inference work", colors.red, [
@@ -191,13 +255,13 @@
       ]),
       series("Public total model size", colors.violet, [
         { x: 2018, y: 1, label: "BERT-Large", short: "BERT" },
-        { x: 2019, y: 4.4, label: "GPT-2", short: "GPT-2" },
+        { x: 2019, y: 4.4, label: "GPT-2" },
         { x: 2020, y: 515, label: "GPT-3", short: "GPT-3" },
-        { x: 2022, y: 1588, label: "PaLM", short: "PaLM" },
+        { x: 2022, y: 1588, label: "PaLM" },
         { x: 2024, y: 1191, label: "Llama 3.1 405B", short: "Llama 3.1", dy: 13 },
-        { x: 2025.75, y: 2215, label: "GLM-5.2", short: "GLM", dx: -14 },
-        { x: 2026, y: 4706, label: "DeepSeek-V4-Pro", short: "DSV4", dx: -2 },
-        { x: 2026.25, y: 8235, label: "Kimi K3", short: "Kimi", dx: 15 }
+        { x: 2025.75, y: 2215, label: "GLM-5.2" },
+        { x: 2026, y: 4706, label: "DeepSeek-V4-Pro" },
+        { x: 2026.25, y: 8235, label: "Kimi K3", short: "Kimi", dx: 10 }
       ]),
       series("One accelerator, dense FP16/BF16", colors.blue, [
         { x: 2007, y: 0.00414, label: "Tesla C870 FP32 proxy", short: "C870", align: "left" },
@@ -277,8 +341,7 @@
     yMax: 10000,
     xMin: 2007,
     xMax: 2026.5,
-    xStep: 3,
-    xTickCallback: yearTick,
+    xYears: [2007, 2012, 2016, 2020, 2026],
     legend: false,
     pointLabels: true,
     datasets: [series("Dense FP16/BF16 peak", colors.blue, gpuCompute)]
@@ -291,9 +354,8 @@
     yMin: 10000,
     yMax: 10000000,
     xMin: 2007,
-    xMax: 2024.5,
-    xStep: 3,
-    xTickCallback: yearTick,
+    xMax: 2026.5,
+    xYears: [2007, 2012, 2016, 2020, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,
@@ -315,9 +377,8 @@
     yMin: 0.0005,
     yMax: 0.005,
     xMin: 2017.5,
-    xMax: 2024.5,
-    xStep: 2,
-    xTickCallback: yearTick,
+    xMax: 2026.5,
+    xYears: [2018, 2020, 2022, 2024, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,
@@ -330,6 +391,30 @@
     ])]
   });
 
+  compositionChart(
+    "h20-module-bom-chart",
+    ["SM / ALU compute*", "On-chip SRAM*", "Other die logic*", "HBM3", "CoWoS-S", "Module auxiliary"],
+    [9.08, 2.27, 3.78, 57.88, 16.63, 10.36],
+    [colors.blue, colors.violet, colors.muted, colors.orange, colors.red, colors.green],
+    [236, 59, 98, 1505, 432, 269]
+  );
+
+  compositionChart(
+    "b200-module-bom-chart",
+    ["SM / ALU compute*", "On-chip SRAM*", "Other die logic*", "HBM3E", "Packaging + yield", "Module auxiliary"],
+    [8.46, 2.12, 3.53, 45.45, 32.92, 7.52],
+    [colors.blue, colors.violet, colors.muted, colors.orange, colors.red, colors.green],
+    [540, 135, 225, 2900, 2100, 480]
+  );
+
+  compositionChart(
+    "rubin-rack-bom-chart",
+    ["GPU packages", "Memory", "Communication", "Vera CPUs", "Power + cooling", "Platform + other"],
+    [50.75, 25.65, 9.23, 2.31, 1.90, 10.16],
+    [colors.blue, colors.orange, colors.violet, colors.green, colors.red, colors.muted],
+    [3960000, 2001600, 720000, 180000, 148080, 793468]
+  );
+
   trendChart("alu-cost-chart", {
     unit: "USD per 1M raw datapaths",
     yTitle: "USD per 1M FP16 mul+add datapaths",
@@ -338,8 +423,7 @@
     yMax: 110,
     xMin: 2007,
     xMax: 2026.6,
-    xStep: 3,
-    xTickCallback: yearTick,
+    xYears: [2007, 2010, 2015, 2020, 2023, 2026],
     pointLabels: true,
     datasets: [
       series("TSMC / historical proxy", colors.blue, [
@@ -364,8 +448,8 @@
     yMin: 0.02,
     yMax: 0.07,
     xMin: 2010,
-    xMax: 2024,
-    xStep: 4,
+    xMax: 2026,
+    xYears: [2010, 2014, 2018, 2022, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,
@@ -386,7 +470,7 @@
     yMax: 300,
     xMin: 2005,
     xMax: 2026,
-    xStep: 5,
+    xYears: [2005, 2010, 2015, 2020, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,
@@ -406,7 +490,7 @@
     yMax: 380,
     xMin: 2021,
     xMax: 2026,
-    xStep: 1,
+    xYears: [2021, 2022, 2024, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,
@@ -426,8 +510,8 @@
     yMin: 2000,
     yMax: 30000,
     xMin: 2010,
-    xMax: 2024,
-    xStep: 4,
+    xMax: 2026,
+    xYears: [2010, 2014, 2018, 2022, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,
@@ -448,8 +532,7 @@
     yMax: 1000,
     xMin: 2008,
     xMax: 2026,
-    xStep: 4,
-    xTickCallback: yearTick,
+    xYears: [2008, 2012, 2016, 2020, 2026],
     legend: false,
     pointLabels: true,
     datasets: [series("Port speed", colors.blue, [
@@ -469,8 +552,7 @@
     yMax: 100,
     xMin: 2008,
     xMax: 2026,
-    xStep: 4,
-    xTickCallback: yearTick,
+    xYears: [2008, 2012, 2016, 2020, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,

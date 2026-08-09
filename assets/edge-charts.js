@@ -144,12 +144,15 @@
             type: "linear",
             min: settings.xMin,
             max: settings.xMax,
+            afterBuildTicks: settings.xYears ? function (axis) {
+              axis.ticks = settings.xYears.map(function (year) { return { value: year }; });
+            } : undefined,
             grid: { display: false },
             border: { color: colors.muted },
             ticks: {
               stepSize: settings.xStep || 1,
-              callback: settings.xTickCallback || function (value) { return String(value); },
-              autoSkip: settings.xAutoSkip !== false,
+              callback: settings.xYears ? yearTicks(settings.xYears) : (settings.xTickCallback || function (value) { return String(value); }),
+              autoSkip: settings.xYears ? false : settings.xAutoSkip !== false,
               maxRotation: 0
             }
           },
@@ -200,9 +203,11 @@
 
   var memoryLogTicks = [1, 2, 4, 8, 16, 32, 64, 128];
   var priceLogTicks = [3, 5, 10, 20, 50, 100, 200, 500, 1000, 2000];
-  var wholeYearTick = function (value) {
-    return Number.isInteger(Number(value)) ? String(value) : "";
-  };
+  function yearTicks(years) {
+    return function (value) {
+      return years.indexOf(Number(value)) >= 0 ? String(value) : "";
+    };
+  }
 
   trendChart("edge-box-memory-chart", {
     unit: "GB",
@@ -212,8 +217,7 @@
     yMax: 180,
     xMin: 2013,
     xMax: 2026.5,
-    xStep: 2,
-    xTickCallback: wholeYearTick,
+    xYears: [2014, 2018, 2022, 2024, 2026],
     pointLabels: true,
     yTickCallback: function (value) {
       return memoryLogTicks.indexOf(Number(value)) >= 0 ? value + " GB" : "";
@@ -241,8 +245,7 @@
     yMax: 310,
     xMin: 2013,
     xMax: 2026.5,
-    xStep: 2,
-    xTickCallback: wholeYearTick,
+    xYears: [2014, 2018, 2022, 2024, 2026],
     pointLabels: true,
     datasets: [
       series("NVIDIA", colors.blue, [
@@ -265,8 +268,7 @@
     yMax: 145,
     xMin: 2021,
     xMax: 2026.5,
-    xStep: 1,
-    xTickCallback: wholeYearTick,
+    xYears: [2021, 2023, 2024, 2026],
     pointLabels: true,
     datasets: [
       series("MacBook Pro - Pro", colors.orange, [
@@ -298,8 +300,7 @@
     yMax: 680,
     xMin: 2021,
     xMax: 2026.5,
-    xStep: 1,
-    xTickCallback: wholeYearTick,
+    xYears: [2021, 2023, 2024, 2026],
     pointLabels: true,
     datasets: [
       series("MacBook Pro - Pro", colors.orange, [
@@ -332,8 +333,7 @@
     yMax: 100,
     xMin: 2016.7,
     xMax: 2026.3,
-    xStep: 1,
-    xTickCallback: wholeYearTick,
+    xYears: [2017, 2020, 2023, 2026],
     usePointStyle: false,
     pointLabels: true,
     yTickCallback: function (value) {
@@ -382,6 +382,17 @@
   });
 
   function economicsChart(id, data, xMin, xMax) {
+    var firstYear = Math.ceil(xMin);
+    var lastYear = Math.floor(xMax);
+    var span = lastYear - firstYear;
+    var years = [
+      firstYear,
+      Math.round(firstYear + span / 3),
+      Math.round(firstYear + (2 * span) / 3),
+      lastYear
+    ].filter(function (year, index, list) {
+      return list.indexOf(year) === index;
+    });
     trendChart(id, {
       unit: "",
       yTitle: "USD per performance",
@@ -390,7 +401,7 @@
       yMax: Math.max.apply(null, data.map(function (point) { return point.y; })) * 1.35,
       xMin: xMin,
       xMax: xMax,
-      xStep: 1,
+      xYears: years,
       legend: false,
       pointLabels: true,
       tooltipFormatter: money,
@@ -426,7 +437,7 @@
     yMax: 70,
     xMin: 2022.7,
     xMax: 2025.3,
-    xStep: 1,
+    xYears: [2023, 2024, 2025],
     legend: false,
     pointLabels: true,
     datasets: [

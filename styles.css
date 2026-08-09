@@ -660,6 +660,32 @@ li::marker {
   font-size: 1.02rem;
 }
 
+.post-content .key-insight {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 16px;
+  margin: 0.85rem 0 1.25rem;
+  padding: 14px 16px;
+  border-left: 4px solid #0f766e;
+  border-radius: 0 6px 6px 0;
+  background: #eef8f6;
+  color: #263b3b;
+  line-height: 1.6;
+}
+
+.key-insight strong {
+  color: #0b625c;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 2.1;
+  text-transform: uppercase;
+}
+
+.key-insight span {
+  min-width: 0;
+}
+
 .post-figure {
   margin: 2rem 0;
 }
@@ -718,6 +744,12 @@ li::marker {
 }
 
 .chart-grid--two .chart-panel:nth-child(odd) {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.chart-grid--two .chart-panel--wide {
+  grid-column: 1 / -1;
   padding-left: 0;
   border-left: 0;
 }
@@ -972,6 +1004,16 @@ li::marker {
 
   .post-chart {
     padding: 16px 12px;
+  }
+
+  .post-content .key-insight {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 13px 14px;
+  }
+
+  .key-insight strong {
+    line-height: 1.4;
   }
 
   .chart-grid--two {

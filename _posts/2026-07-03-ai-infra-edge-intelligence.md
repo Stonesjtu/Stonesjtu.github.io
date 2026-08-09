@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[WIP] How intelligent can the edge become? - AI-Infra Overview PART-4"
+title: "How intelligent can the edge become? - AI-Infra Overview PART-4"
 topic: "AI infrastructure"
 sequence: 11
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
@@ -20,6 +20,8 @@ The answer is not a single TOPS number. It is the intersection of four curves:
 4. small-model quality determines how much capability each stored parameter buys.
 
 ## 1. The edge is three different markets
+
+<p class="key-insight"><strong>Key insight</strong><span>Mobile devices, AI PCs, and AI boxes occupy different operating envelopes, so their intelligence must be evaluated against different constraints.</span></p>
 
 "Edge device" hides three distinct products:
 
@@ -53,6 +55,8 @@ $$
 Here \(M\) is memory capacity, \(B_{\text{memory}}\) is sustained memory bandwidth, and \(P_{\text{active}}\) is the parameter count touched per token. These are ceilings, not forecasts: the OS, runtime, activations, KV cache, unsupported operators, and thermal throttling all reduce what a product sustains. Apple has independently shown the same bandwidth-bound behavior for short-sequence Transformers on its Neural Engine.[^apple-ane]
 
 ## 2. Hardware evolved along different metric contracts
+
+<p class="key-insight"><strong>Key insight</strong><span>Memory capacity, memory bandwidth, and neural throughput improved across every edge class, but vendor metrics are only comparable within a shared precision and sparsity contract.</span></p>
 
 <figure class="post-figure post-chart">
   <div class="chart-grid">
@@ -152,6 +156,8 @@ Mobile DRAM capacities are device-level teardown/specification values rather tha
 
 ## 3. Price per performance fell, but only inside each class
 
+<p class="key-insight"><strong>Key insight</strong><span>Edge intelligence became cheaper, but dollars per performance remain meaningful only within the same device class and compute contract.</span></p>
+
 <figure class="post-figure post-chart">
   <div class="chart-grid">
     <section class="chart-panel">
@@ -204,7 +210,7 @@ The iPhone Pro line is used to hold launch price at USD 999 across the FP16 seri
 
 ## 4. Small models are buying more intelligence per parameter
 
-Hardware is only half the edge curve. The other half is model quality at a size that can actually fit.
+<p class="key-insight"><strong>Key insight</strong><span>Small-model quality and quantization are improving the intelligence that fits inside a fixed local memory budget.</span></p>
 
 <figure class="post-figure post-chart">
   <div class="chart-grid chart-grid--two">
@@ -221,6 +227,8 @@ Hardware is only half the edge curve. The other half is model quality at a size 
   </div>
   <figcaption>Left: directional five-shot MMLU progress for 2.7-3.8B models using each vendor's published evaluation. Right: Meta's same-model, same-harness comparison shows that optimized quantization retained 98-101% of BF16 scores across MMLU, GSM8K, and instruction following. Cross-vendor points are evidence of a capability trend, not a leaderboard.</figcaption>
 </figure>
+
+Hardware is only half the edge curve. The other half is model quality at a size that can actually fit.
 
 In late 2023, Microsoft's 2.7B Phi-2 reported 56.7 on five-shot MMLU. Meta's 2024 Llama 3.2 3B BF16 instruction model reported 63.4, and Microsoft's 2025 Phi-4 Mini 3.8B reported 67.3.[^phi2][^llama32][^phi4mini] Evaluation harnesses and training data differ, so the exact slope is uncertain. The broad result is still useful: a roughly 3-4B parameter budget crossed from compact completion model into instruction following, tool use, and materially stronger reasoning.
 
@@ -243,6 +251,8 @@ Scores come from vendor model cards and are not fully standardized across rows. 
 Benchmark quality is also becoming more task-specific. A local model does not need to memorize the entire web to be valuable. It can use private local context, retrieval, deterministic tools, and a cloud escalation path. The important edge benchmark is eventually not MMLU alone; it is successful local task completion under a latency, energy, memory, and privacy budget.
 
 ## 5. Prediction: the edge becomes a hierarchy of agents
+
+<p class="key-insight"><strong>Key insight</strong><span>Edge devices will become the private, low-latency first tier of hierarchical agents, escalating only work that benefits from cloud-scale models and context.</span></p>
 
 The hardware and model curves compound. More memory and bandwidth allow a larger or less aggressively quantized model; better training and distillation increase quality at the same size; quantization returns capacity and speed to the system.
 
@@ -302,4 +312,4 @@ The most important edge-infra work will therefore sit between model and device: 
 
 <script defer src="{{ '/assets/vendor/chart.umd.min.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/chart-theme.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/edge-charts.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/edge-charts.js' | relative_url }}?v=20260809e"></script>
