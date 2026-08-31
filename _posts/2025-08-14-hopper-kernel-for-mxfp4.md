@@ -38,6 +38,13 @@ The interesting part is that the weight operand is stored compactly as MXFP4, th
 
 <p class="key-insight"><strong>Key insight</strong><span>The kernel's speed comes from bit placement: packed FP4 values are arranged so integer masks and shifts create BF16-shaped lanes, while `mul.bf16x2` compensates the BF16 exponent bits and PRMT lifts scale bytes into BF16 exponent fields.</span></p>
 
+<figure class="post-figure mxfp4-inline-diagram">
+  <div class="mxfp4-step-card">
+    <img src="{{ '/assets/mxfp4-overview-pipeline.svg' | relative_url }}" alt="Excalidraw overview diagram showing a vertical reading map for the MXFP4 kernel representation changes." />
+  </div>
+  <figcaption><strong>Kernel overview.</strong> This is a reading map for the MXFP4 part of `matmul_ogs`: 4 FP4 values pack into one `uint16`; one `uint16` unpacks back into FP4 values and then BF16 lanes; one BF16 lane is exponent-bias compensated; MXFP4 scale bits are added into the BF16 exponent field; the scaled BF16 weight is finally consumed with a BF16 activation.</figcaption>
+</figure>
+
 Unpacking FP4 to BF16
 ---
 
@@ -121,9 +128,9 @@ for value 1:
 
 <figure class="post-figure mxfp4-inline-diagram">
   <div class="mxfp4-step-card">
-    <img src="{{ '/assets/mxfp4-step-2-unpacking.svg' | relative_url }}" alt="Excalidraw diagram showing each FP4 value extracted by mask, shift, and OR instructions." />
+    <img src="{{ '/assets/mxfp4-step-2-unpacking.svg' | relative_url }}" alt="Excalidraw diagram showing packed MXFP4 bits unpacked into BF16-shaped lanes." />
   </div>
-  <figcaption><strong>Instruction-by-instruction unpacking.</strong> Values 2, 3, and 4 use mask-friendly paths; value 1 is split into sign, exponent, and mantissa fields before `or.b32` rebuilds a BF16-shaped shell.</figcaption>
+  <figcaption><strong>Unpacking.</strong> Values 2, 3, and 4 use mask-friendly paths; value 1 is split into sign, exponent, and mantissa fields before `or.b32` rebuilds a BF16-shaped shell.</figcaption>
 </figure>
 
 <figure class="post-figure mxfp4-inline-diagram">

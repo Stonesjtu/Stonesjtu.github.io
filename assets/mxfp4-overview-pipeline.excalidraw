@@ -26,17 +26,17 @@
       "versionNonce": 1,
       "isDeleted": false,
       "boundElements": null,
-      "updated": 1788145434044,
+      "updated": 1788156527645,
       "link": null,
       "locked": false,
       "fontSize": 28,
       "fontFamily": 1,
-      "text": "Step 2: unpack FP4 values into BF16-shaped lanes",
-      "rawText": "Step 2: unpack FP4 values into BF16-shaped lanes",
+      "text": "Overview: the MXFP4 kernel steps",
+      "rawText": "Overview: the MXFP4 kernel steps",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Step 2: unpack FP4 values into BF16-shaped lanes"
+      "originalText": "Overview: the MXFP4 kernel steps"
     }
   ],
   "appState": {
@@ -44,6 +44,6 @@
   },
   "files": {},
   "diagramSpec": {
-    "kind": "unpacking"
+    "kind": "overview-pipeline"
   }
 }
