@@ -38,32 +38,6 @@ The interesting part is that the weight operand is stored compactly as MXFP4, th
 
 <p class="key-insight"><strong>Key insight</strong><span>The kernel's speed comes from bit placement: packed FP4 values are arranged so integer masks and shifts create BF16-shaped lanes, while `mul.bf16x2` compensates the BF16 exponent bits and PRMT lifts scale bytes into BF16 exponent fields.</span></p>
 
-<figure class="post-figure mxfp4-step-diagrams">
-  <div class="mxfp4-step-diagram-grid">
-    <div class="mxfp4-step-card">
-      <img src="{{ '/assets/mxfp4-step-1-packing.svg' | relative_url }}" alt="Excalidraw diagram showing four FP4 nibbles packed into the Hopper MXFP4 bit layout." />
-      <p><strong>1. Packing.</strong> Four FP4 nibbles keep their value identity, but their sign, exponent, and mantissa bits are rearranged into the article's packed layout: `S2 S1 M1 S3 E1 E1 S4 E2 | E2 M2 E3 E3 M3 E4 E4 M4`.</p>
-    </div>
-    <div class="mxfp4-step-card">
-      <img src="{{ '/assets/mxfp4-step-2-unpacking.svg' | relative_url }}" alt="Excalidraw diagram showing each FP4 value extracted by mask, shift, and OR instructions." />
-      <p><strong>2. Unpacking.</strong> Values 2, 3, and 4 use mask-friendly paths; value 1 is split into sign, exponent, and mantissa fields before `or.b32` rebuilds a BF16-shaped shell.</p>
-    </div>
-    <div class="mxfp4-step-card">
-      <img src="{{ '/assets/mxfp4-step-3a-exponent-compensation.svg' | relative_url }}" alt="Excalidraw diagram showing 0x7e80 as aligned BF16 bit blocks for exponent compensation after FP4 unpacking." />
-      <p><strong>3a. Exponent compensation.</strong> MXFP4 does not carry a separate bias field here; multiplying by `0x7e80` in each BF16 lane compensates how the compact exponent bits were placed.</p>
-    </div>
-    <div class="mxfp4-step-card">
-      <img src="{{ '/assets/mxfp4-step-3b-scale-application.svg' | relative_url }}" alt="Excalidraw diagram showing scale bytes as bit blocks through PRMT and shift, then one weight lane with sign, exponent, and mantissa bits multiplied by scale s1." />
-      <p><strong>3b. Scale conversion and application.</strong> `prmt.b32` selects the scale bytes and `shl.b32` moves them into BF16 exponent positions; the diagram then uses one `weight * s1` lane to show how the broadcasted scale is applied.</p>
-    </div>
-    <div class="mxfp4-step-card">
-      <img src="{{ '/assets/mxfp4-step-4-fma.svg' | relative_url }}" alt="Excalidraw diagram showing scaled BF16 weight lanes and BF16 activation lanes feeding FMA or tensor-core dot accumulation." />
-      <p><strong>4. FMA.</strong> At this point each 32-bit register holds two BF16 lanes, so packed BF16 math can consume the scaled weights and BF16 activations together.</p>
-    </div>
-  </div>
-  <figcaption>The diagram follows one data path: pack FP4 bits for cheap extraction, unpack them into BF16-shaped lanes, compensate exponent placement, convert MX scale bytes into BF16 scale values, broadcast those scales over the MX block, then feed the scaled BF16 operands into the math instruction.</figcaption>
-</figure>
-
 Unpacking FP4 to BF16
 ---
 
@@ -78,6 +52,13 @@ BF16 is an `E8M7` format, while the FP4 value here is effectively `E2M1`. The al
 That compensation can be implemented as a BF16 multiply by `2 ** 126`, encoded as `0x7e80` in each 16-bit BF16 lane. The mantissa bits keep the same relative position after packing, so the kernel tries to make the unpacking sequence mostly shifts, masks, ors, and BF16 multiply instructions.
 
 The packed layout is deliberately unusual. Four consecutive FP4 values are interleaved so the sign, exponent, and mantissa bits are close to where BF16 wants them:
+
+<figure class="post-figure mxfp4-inline-diagram">
+  <div class="mxfp4-step-card">
+    <img src="{{ '/assets/mxfp4-step-1-packing.svg' | relative_url }}" alt="Excalidraw diagram showing four FP4 nibbles packed into the Hopper MXFP4 bit layout." />
+  </div>
+  <figcaption><strong>Packing layout.</strong> Four FP4 nibbles keep their value identity, but their sign, exponent, and mantissa bits are rearranged into the article's packed layout: `S2 S1 M1 S3 E1 E1 S4 E2 | E2 M2 E3 E3 M3 E4 E4 M4`.</figcaption>
+</figure>
 
 ```python
 # -----------------------------------------------------------------------
@@ -137,6 +118,20 @@ for value 1:
   m1 = (x >> 7) & 0b0000000001000000
   then compensate the BF16 exponent bits with mul.bf16x2
 ```
+
+<figure class="post-figure mxfp4-inline-diagram">
+  <div class="mxfp4-step-card">
+    <img src="{{ '/assets/mxfp4-step-2-unpacking.svg' | relative_url }}" alt="Excalidraw diagram showing each FP4 value extracted by mask, shift, and OR instructions." />
+  </div>
+  <figcaption><strong>Instruction-by-instruction unpacking.</strong> Values 2, 3, and 4 use mask-friendly paths; value 1 is split into sign, exponent, and mantissa fields before `or.b32` rebuilds a BF16-shaped shell.</figcaption>
+</figure>
+
+<figure class="post-figure mxfp4-inline-diagram">
+  <div class="mxfp4-step-card">
+    <img src="{{ '/assets/mxfp4-step-3a-exponent-compensation.svg' | relative_url }}" alt="Excalidraw diagram showing 0x7e80 as aligned BF16 bit blocks for exponent compensation after FP4 unpacking." />
+  </div>
+  <figcaption><strong>Exponent placement compensation.</strong> MXFP4 does not carry a separate bias field here; multiplying by `0x7e80` in each BF16 lane compensates how the compact exponent bits were placed.</figcaption>
+</figure>
 
 On Hopper, `mul.bf16x2` is available directly. The original Triton comment notes that A100 support is still possible by using `fma.bf16x2` with a zero register to emulate the multiply.
 
@@ -208,6 +203,13 @@ prmt 0x7362:
   byte select -> 0, s1, 0, s2
 ```
 
+<figure class="post-figure mxfp4-inline-diagram">
+  <div class="mxfp4-step-card">
+    <img src="{{ '/assets/mxfp4-step-3b-scale-application.svg' | relative_url }}" alt="Excalidraw diagram showing scale bytes as bit blocks through PRMT and shift, then one weight lane with sign, exponent, and mantissa bits multiplied by scale s1." />
+  </div>
+  <figcaption><strong>Scale conversion and application.</strong> `prmt.b32` selects the scale bytes and `shl.b32` moves them into BF16 exponent positions; the diagram then uses one `weight * s1` lane to show how the broadcasted scale is applied.</figcaption>
+</figure>
+
 In Python/Triton form:
 
 ```python
@@ -237,6 +239,13 @@ scale = tl.inline_asm_elementwise(
 After the inline assembly, the scale tensor is expanded, broadcast across each 32-value MX block, reshaped to the unpacked weight tensor, and applied with `x = x * scale`. The diagram keeps the scale application to one representative `weight * s1` lane: the weight is shown as BF16 sign, exponent, and mantissa bits, while `s1` is shown as the BF16 scale value produced by the PRMT-and-shift path.
 
 The high-level idea is consistent across both paths: make the data layout look almost like BF16 before conversion, use Hopper's packed BF16 operations to compensate exponent bits, and use the broadcasted BF16 scale tensor for the final elementwise scaling. That is why the packing looks awkward at first glance; the layout is optimized for the instruction sequence that follows.
+
+<figure class="post-figure mxfp4-inline-diagram">
+  <div class="mxfp4-step-card">
+    <img src="{{ '/assets/mxfp4-step-4-fma.svg' | relative_url }}" alt="Excalidraw diagram showing scaled BF16 weight lanes and BF16 activation lanes feeding FMA or tensor-core dot accumulation." />
+  </div>
+  <figcaption><strong>BF16 math consumption.</strong> After unpacking, exponent compensation, and scaling, each 32-bit register holds two BF16 lanes, so packed BF16 math can consume the scaled weights and BF16 activations together.</figcaption>
+</figure>
 
 References
 ---

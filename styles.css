@@ -718,6 +718,11 @@ li::marker {
   gap: 1rem;
 }
 
+.mxfp4-inline-diagram {
+  display: grid;
+  gap: 0.65rem;
+}
+
 .mxfp4-step-card {
   display: grid;
   gap: 0.55rem;
