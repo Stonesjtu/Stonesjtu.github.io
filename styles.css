@@ -699,6 +699,50 @@ li::marker {
   background: #f8fafc;
 }
 
+.post-figure--scroll {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.post-figure--scroll img {
+  min-width: 760px;
+}
+
+.mxfp4-step-diagrams {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.mxfp4-step-diagram-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.mxfp4-step-card {
+  display: grid;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.mxfp4-step-card img {
+  width: 100%;
+  min-width: 760px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.mxfp4-step-card p {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.mxfp4-step-card strong {
+  color: var(--accent-dark);
+}
 .post-figure figcaption {
   margin-top: 0.7rem;
   color: #607080;

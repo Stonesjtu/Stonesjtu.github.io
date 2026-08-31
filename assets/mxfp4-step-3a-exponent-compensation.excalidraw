@@ -1,0 +1,49 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "id": "diagram-title",
+      "type": "text",
+      "x": 40,
+      "y": 40,
+      "width": 900,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#17212b",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": null,
+      "seed": 1,
+      "version": 1,
+      "versionNonce": 1,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1788145434053,
+      "link": null,
+      "locked": false,
+      "fontSize": 28,
+      "fontFamily": 1,
+      "text": "Step 3a: compensate exponent placement with 0x7e80",
+      "rawText": "Step 3a: compensate exponent placement with 0x7e80",
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Step 3a: compensate exponent placement with 0x7e80"
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#f8fbff"
+  },
+  "files": {},
+  "diagramSpec": {
+    "kind": "exponent-compensation"
+  }
+}

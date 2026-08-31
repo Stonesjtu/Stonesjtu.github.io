@@ -1,0 +1,67 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "id": "diagram-title",
+      "type": "text",
+      "x": 40,
+      "y": 40,
+      "width": 900,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#17212b",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": null,
+      "seed": 1,
+      "version": 1,
+      "versionNonce": 1,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1788145434041,
+      "link": null,
+      "locked": false,
+      "fontSize": 28,
+      "fontFamily": 1,
+      "text": "Step 1: pack four FP4 nibbles into the kernel layout",
+      "rawText": "Step 1: pack four FP4 nibbles into the kernel layout",
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Step 1: pack four FP4 nibbles into the kernel layout"
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#f8fbff"
+  },
+  "files": {},
+  "diagramSpec": {
+    "kind": "packing",
+    "after": [
+      "S2",
+      "S1",
+      "M1",
+      "S3",
+      "E1",
+      "E1",
+      "S4",
+      "E2",
+      "E2",
+      "M2",
+      "E3",
+      "E3",
+      "M3",
+      "E4",
+      "E4",
+      "M4"
+    ]
+  }
+}
