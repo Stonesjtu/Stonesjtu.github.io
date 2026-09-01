@@ -3,6 +3,7 @@ layout: post
 title: "Hopper kernel for MXFP4"
 topic: "GPU kernels"
 sequence: 7
+last_modified_at: 2026-09-01T15:38:52+08:00
 source_url: https://app.notion.com/p/24f2ec4bb1f0806199c1fe74cf9a707b
 source_label: "Original note on Notion"
 excerpt: "Notes on Triton's Hopper MXFP4 matmul path, from packed FP4 unpacking into BF16 to scale conversion with inline PTX."
@@ -42,7 +43,7 @@ The interesting part is that the weight operand is stored compactly as MXFP4, th
   <div class="mxfp4-step-card">
     <img src="{{ '/assets/mxfp4-overview-pipeline.svg' | relative_url }}" alt="Excalidraw overview diagram showing a vertical reading map for the MXFP4 kernel representation changes." />
   </div>
-  <figcaption><strong>Kernel overview.</strong> This is a reading map for the MXFP4 part of `matmul_ogs`: 4 FP4 values pack into one `uint16`; one `uint16` unpacks back into FP4 values and then BF16 lanes; one BF16 lane is exponent-bias compensated; MXFP4 scale bits are added into the BF16 exponent field; the scaled BF16 weight is finally consumed with a BF16 activation.</figcaption>
+  <figcaption><strong>Kernel overview.</strong> This is a reading map for the MXFP4 part of `matmul_ogs`: 4 FP4 values pack into one `uint16`; one `uint16` unpacks into four BF16 lanes; one BF16 lane is exponent-bias compensated; MXFP4 scale bits are added into the BF16 exponent field; the scaled BF16 weight is finally consumed with a BF16 activation.</figcaption>
 </figure>
 
 Unpacking FP4 to BF16
@@ -101,6 +102,13 @@ def _pack_bits(x: torch.Tensor, mx_axis: int):
     return x
 ```
 
+<figure class="post-figure mxfp4-inline-diagram">
+  <div class="mxfp4-step-card">
+    <img src="{{ '/assets/mxfp4-step-2-unpacking.svg' | relative_url }}" alt="Excalidraw diagram showing packed MXFP4 bits unpacked into BF16-shaped lanes." />
+  </div>
+  <figcaption><strong>Unpacking.</strong> Values 2, 3, and 4 use mask-friendly paths; value 1 is split into sign, exponent, and mantissa fields before `or.b32` rebuilds a BF16-shaped shell.</figcaption>
+</figure>
+
 After packing, a `uint32` can be read as two BF16 lanes at a time:
 
 ```text
@@ -125,13 +133,6 @@ for value 1:
   m1 = (x >> 7) & 0b0000000001000000
   then compensate the BF16 exponent bits with mul.bf16x2
 ```
-
-<figure class="post-figure mxfp4-inline-diagram">
-  <div class="mxfp4-step-card">
-    <img src="{{ '/assets/mxfp4-step-2-unpacking.svg' | relative_url }}" alt="Excalidraw diagram showing packed MXFP4 bits unpacked into BF16-shaped lanes." />
-  </div>
-  <figcaption><strong>Unpacking.</strong> Values 2, 3, and 4 use mask-friendly paths; value 1 is split into sign, exponent, and mantissa fields before `or.b32` rebuilds a BF16-shaped shell.</figcaption>
-</figure>
 
 <figure class="post-figure mxfp4-inline-diagram">
   <div class="mxfp4-step-card">
