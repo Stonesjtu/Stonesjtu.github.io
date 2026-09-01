@@ -19,7 +19,7 @@ layout: null
     <id>{{ post.url | absolute_url }}</id>
     <title>{{ post.title | escape }}</title>
     <link href="{{ post.url | absolute_url }}" rel="alternate" />
-    <updated>{{ post.date | date_to_xmlschema }}</updated>
+    <updated>{{ post.last_modified_at | default: post.date | date_to_xmlschema }}</updated>
     <published>{{ post.date | date_to_xmlschema }}</published>
     <summary>{{ post.excerpt | strip_html | normalize_whitespace | escape }}</summary>
   </entry>

@@ -3,6 +3,7 @@ layout: post
 title: "Predicting the future AI infra stack - AI-Infra Overview PART-3"
 topic: "AI infrastructure"
 sequence: 10
+last_modified_at: 2026-08-10T22:25:18+08:00
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
 source_label: "Original outline on Notion"
 excerpt: "A supply-chain view of future AI infrastructure: heterogeneous computing, dedicated LLM hardware, memory locality, and interconnect."

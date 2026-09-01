@@ -3,6 +3,7 @@ layout: post
 title: "From conventional infra to agentic infra - AI-Infra Overview PART-1"
 topic: "AI infrastructure"
 sequence: 8
+last_modified_at: 2026-08-09T23:40:14+08:00
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
 source_label: "Original outline on Notion"
 excerpt: "A history of AI infrastructure through the co-evolution of model execution patterns and CPU/GPU/TPU/NPU hardware."

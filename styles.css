@@ -371,6 +371,13 @@ h3 {
   color: var(--accent-dark);
 }
 
+.compact-links span {
+  display: block;
+  margin-top: 3px;
+  color: #9aa6b2;
+  font-size: 0.78rem;
+}
+
 .tag-cloud,
 .skill-cloud {
   display: flex;

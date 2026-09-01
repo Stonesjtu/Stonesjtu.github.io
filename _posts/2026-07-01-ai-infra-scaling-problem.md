@@ -3,6 +3,7 @@ layout: post
 title: "Why AI infra is fast-moving and challenging - AI-Infra Overview PART-2"
 topic: "AI infrastructure"
 sequence: 9
+last_modified_at: 2026-08-09T23:40:14+08:00
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
 source_label: "Original outline on Notion"
 excerpt: "Why rapidly evolving models, request volume, context, output, agents, and hardware keep moving the AI infrastructure frontier."

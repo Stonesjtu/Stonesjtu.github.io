@@ -44,8 +44,12 @@ description: "Kaiyu Shi's homepage for AI infrastructure, LLM/VLM inference, tra
     <section>
       <h2>Recently Updated</h2>
       <ul class="compact-links">
-        {% for post in recent_posts limit:5 %}
-        <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a></li>
+        {% assign updated_posts = site.posts | sort: 'last_modified_at' | reverse %}
+        {% for post in updated_posts limit:5 %}
+        <li>
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <span>Updated {{ post.last_modified_at | default: post.date | date: "%b %-d, %Y" }}</span>
+        </li>
         {% endfor %}
       </ul>
     </section>

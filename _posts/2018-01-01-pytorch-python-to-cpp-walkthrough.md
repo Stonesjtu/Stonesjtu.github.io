@@ -3,6 +3,7 @@ layout: post
 title: "From Python to C/C++: a PyTorch walk-through"
 topic: "Runtime walkthrough"
 sequence: 1
+last_modified_at: 2026-06-20T13:59:19+08:00
 source_url: https://github.com/Stonesjtu/pytorch-learning/blob/master/walkthrough.md
 excerpt: "Walks through a compact autograd example to show how Variables, Functions, the backward graph, and the imperative engine fit together."
 ---

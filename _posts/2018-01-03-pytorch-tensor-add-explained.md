@@ -3,6 +3,7 @@ layout: post
 title: "Figure out what b.add_(b) has done"
 topic: "Tensor internals"
 sequence: 3
+last_modified_at: 2026-06-20T13:59:19+08:00
 source_url: https://github.com/Stonesjtu/pytorch-learning/blob/master/tensor_add_explained.md
 excerpt: "Traces PyTorch tensor addition from Python bindings through ATen, TH tensor macros, BLAS paths, OpenMP splitting, and AVX2 vector kernels."
 ---

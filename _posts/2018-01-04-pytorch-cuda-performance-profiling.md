@@ -3,6 +3,7 @@ layout: post
 title: "Trace PyTorch CUDA performance bottlenecks"
 topic: "Performance"
 sequence: 4
+last_modified_at: 2026-06-20T13:59:19+08:00
 source_url: https://github.com/Stonesjtu/pytorch-learning/blob/master/profile.md
 excerpt: "Shows a profiling workflow from synchronized Python-level cProfile and line-profiler runs down to nvprof and kernel-level investigation."
 ---

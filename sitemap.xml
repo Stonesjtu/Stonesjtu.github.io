@@ -17,7 +17,7 @@ layout: null
   {% for post in seo_posts %}
   <url>
     <loc>{{ post.url | absolute_url }}</loc>
-    <lastmod>{{ post.date | date_to_xmlschema }}</lastmod>
+    <lastmod>{{ post.last_modified_at | default: post.date | date_to_xmlschema }}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>

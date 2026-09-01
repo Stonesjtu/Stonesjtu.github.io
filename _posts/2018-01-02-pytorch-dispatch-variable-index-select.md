@@ -3,6 +3,7 @@ layout: post
 title: "How PyTorch dispatches Variable.index_select"
 topic: "Dispatch and autograd"
 sequence: 2
+last_modified_at: 2026-06-20T13:59:19+08:00
 source_url: https://github.com/Stonesjtu/pytorch-learning/blob/master/dispatch.md
 excerpt: "Explains how Tensor and Variable calls move through generated bindings, C/C++ backends, CUDA kernels, and derivative definitions."
 ---

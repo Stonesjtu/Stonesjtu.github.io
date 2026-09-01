@@ -3,6 +3,7 @@ layout: post
 title: "Build PyTorch with NCCL2"
 topic: "NCCL"
 sequence: 6
+last_modified_at: 2026-06-20T13:59:19+08:00
 source_url: https://github.com/Stonesjtu/pytorch-learning/blob/master/build_with_nccl.md
 excerpt: "Covers NCCL2 installation, clean PyTorch source builds, multi-GPU all-reduce tests, and network interface troubleshooting."
 ---

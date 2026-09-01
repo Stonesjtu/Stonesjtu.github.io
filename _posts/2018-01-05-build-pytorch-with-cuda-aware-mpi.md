@@ -3,6 +3,7 @@ layout: post
 title: "Build PyTorch with CUDA-aware MPI support"
 topic: "Distributed build"
 sequence: 5
+last_modified_at: 2026-06-20T13:59:19+08:00
 source_url: https://github.com/Stonesjtu/pytorch-learning/blob/master/build-with-mpi.md
 excerpt: "Notes on building OpenMPI with CUDA support, compiling PyTorch against MPI compilers, and checking runtime distributed support."
 ---

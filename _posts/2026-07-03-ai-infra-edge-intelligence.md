@@ -3,6 +3,7 @@ layout: post
 title: "How intelligent can the edge become? - AI-Infra Overview PART-4"
 topic: "AI infrastructure"
 sequence: 11
+last_modified_at: 2026-08-09T23:40:14+08:00
 source_url: https://app.notion.com/p/38d2ec4bb1f0808ea061d11de43d93a6
 source_label: "Original outline on Notion"
 excerpt: "A hardware, economics, and model-quality view of how much intelligence can move into phones, AI PCs, and edge AI boxes."
