@@ -950,6 +950,53 @@ li::marker {
   color: var(--accent-dark);
 }
 
+/* Rouge token colors for fenced code blocks. */
+.post-content .highlight :is(.c, .ch, .cm, .c1, .cs, .cp, .cpf) {
+  color: #a8b2c0;
+}
+
+.post-content .highlight :is(.k, .kc, .kd, .kn, .kp, .kr, .kt) {
+  color: #c9afff;
+}
+
+.post-content .highlight :is(.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .sr, .s1, .ss) {
+  color: #b7df9b;
+}
+
+.post-content .highlight :is(.m, .mb, .mf, .mh, .mi, .il, .mo, .mx) {
+  color: #f8bd96;
+}
+
+.post-content .highlight :is(.na, .nb, .bp, .nc, .nf, .fm, .nn, .nt) {
+  color: #8fcfff;
+}
+
+.post-content .highlight :is(.o, .ow, .nd, .ne) {
+  color: #ff9fad;
+}
+
+.post-content .highlight :is(.nv, .vc, .vg, .vi, .vm, .no) {
+  color: #8edcdb;
+}
+
+.post-content .highlight :is(.err, .gd) {
+  color: #ffd3d3;
+  background: #552b35;
+}
+
+.post-content .highlight .gi {
+  color: #c5f2bc;
+  background: #243e32;
+}
+
+.post-content .highlight .ge {
+  font-style: italic;
+}
+
+.post-content .highlight .gs {
+  font-weight: 700;
+}
+
 .comments {
   margin: 0;
   padding: clamp(24px, 5vw, 38px);
