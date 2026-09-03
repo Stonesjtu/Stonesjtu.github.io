@@ -3,7 +3,7 @@ layout: post
 title: "Apple Silicon AI compute: ANE and GPU"
 topic: "AI infrastructure"
 sequence: 12
-last_modified_at: 2026-09-03T16:16:06+08:00
+last_modified_at: 2026-09-03T16:36:06+08:00
 excerpt: "ANE and GPU hardware, runnable Core ML and MLX examples, and the Metal code behind FP16 GEMM."
 description: "A concise hardware and software-stack map of Apple Silicon AI compute across ANE, GPU, Core ML/Core AI, MPS, Metal, MLX, and Metal tensor operations."
 tags: "Apple Silicon, AI infrastructure, GPU, ANE, Core ML, Metal, MLX"
@@ -250,6 +250,56 @@ Local output:
 
 Each output sums 128 products of one. The shape exercises matrix-matrix multiplication; it does not identify the selected kernel.
 
+## MLX metal_kernel vector add Path
+
+**Write the per-thread computation in Metal; let MLX generate the signature, bind buffers, and launch it.** Here each GPU thread computes one element of `out = a + b`.[^mlx-custom-metal]
+
+```python
+import mlx.core as mx
+
+if not mx.metal.is_available():
+    raise RuntimeError("A Metal GPU is required")
+mx.set_default_device(mx.gpu)
+
+add = mx.fast.metal_kernel(
+    name="vector_add",
+    input_names=["a", "b"],
+    output_names=["out"],
+    source="""
+        uint i = thread_position_in_grid.x;
+        out[i] = a[i] + b[i];
+    """,
+)
+a = mx.arange(256, dtype=mx.float32)
+b = mx.full((256,), 10.0, dtype=mx.float32)
+(c,) = add(
+    inputs=[a, b],
+    grid=(a.size, 1, 1),
+    threadgroup=(128, 1, 1),
+    output_shapes=[a.shape],
+    output_dtypes=[a.dtype],
+)
+mx.eval(c)
+max_error = mx.max(mx.abs(c - (a + b))).item()
+assert max_error == 0.0
+print(mx.device_info()["device_name"])
+print(c.shape, c.dtype)
+print(c[:8].tolist())
+print("max_abs_error:", max_error)
+```
+
+Local output (M1 Pro, MLX 0.32.1):
+
+```text
+Apple M1 Pro
+(256,) mlx.core.float32
+[10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0]
+max_abs_error: 0.0
+```
+
+`source` is Metal code, not Python. `thread_position_in_grid.x` selects indices 0 through 255; `grid` counts **threads**, so this launch has two threadgroups of 128 threads. Each thread loads two FP32 values and writes one; no shared staging or barrier is needed. The grid exactly matches the vector length, so this example needs no bounds guard. This custom kernel bypasses Steel GEMM selection; the next section returns to MLX's built-in matmul path.
+
+## DeepDive into mlx's metal kernel dispatch
 >  Source snapshot: [`3a62199`](https://github.com/ml-explore/mlx/tree/3a6219917e4535575ce5bce2fc2ba27a483a709b). The following blocks are source excerpts, not standalone programs; omitted arguments use `...`.[^mlx-matmul-local]
 
 ### 1. Layer to dispatch
@@ -500,6 +550,7 @@ This is the GPU control surface visible in MLX: dispatch, tiling, launch geometr
 
 ## References
 
+[^mlx-custom-metal]: MLX documentation, [Custom Metal Kernels](https://ml-explore.github.io/mlx/build/html/dev/custom_metal_kernels.html): generated signatures and `dispatchThreads` launch dimensions. Example executed locally with MLX 0.32.1.
 [^a19-pro-spec]: Apple Support, ["iPhone 17 Pro and iPhone 17 Pro Max - Technical Specifications"](https://support.apple.com/en-mt/125090).
 [^m5-max-spec]: Apple, ["Apple debuts M5 Pro and M5 Max to supercharge the most demanding pro workflows"](https://www.apple.com/newsroom/2026/03/apple-debuts-m5-pro-and-m5-max-to-supercharge-the-most-demanding-pro-workflows/).
 [^ane-paper]: Spencer H. Bryngelson, ["Apple Neural Engine: Architecture, Programming, and Performance"](https://arxiv.org/abs/2606.22283v1). Reverse-engineered findings, not a vendor programming specification.
