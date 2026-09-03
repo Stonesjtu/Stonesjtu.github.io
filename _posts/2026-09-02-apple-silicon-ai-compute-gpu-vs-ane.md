@@ -3,7 +3,7 @@ layout: post
 title: "Apple Silicon AI compute: ANE and GPU"
 topic: "AI infrastructure"
 sequence: 12
-last_modified_at: 2026-09-02T19:57:30+08:00
+last_modified_at: 2026-09-03T16:16:06+08:00
 excerpt: "ANE and GPU hardware, runnable Core ML and MLX examples, and the Metal code behind FP16 GEMM."
 description: "A concise hardware and software-stack map of Apple Silicon AI compute across ANE, GPU, Core ML/Core AI, MPS, Metal, MLX, and Metal tensor operations."
 tags: "Apple Silicon, AI infrastructure, GPU, ANE, Core ML, Metal, MLX"
@@ -20,10 +20,9 @@ Both accelerators exist on iPhone and Mac. **The Neural Accelerators inside rece
 | GPU cores | 6 | 40 |
 | Neural Accelerators in GPU | Yes | Yes |
 | ANE cores | 16 | 16 |
-| Unified memory bandwidth | Not stated in cited specs | Up to 614 GB/s |
-| GPU / ANE FP16 TFLOPS | Not stated in cited specs | Not stated in cited specs |
+| Unified memory bandwidth |  77 GB/s (non-official)   | 614 GB/s |
+| GPU / ANE FP16 TFLOPS |  11 TFlops / 19 TFlops (non-official)          | 70 TFlops / 19 TFlops (non-official)    |
 
-Core counts do not establish equal ANE throughput across generations. Nor can unspecified-precision TOPS be treated as FP16 TFLOPS; this table reports specifications, not inferred peaks.
 
 <details>
 <summary>Die views: A19 Pro and M5 Pro</summary>
@@ -47,8 +46,8 @@ Core counts do not establish equal ANE throughput across generations. Nor can un
 
 | Dimension | ANE | GPU |
 | --- | --- | --- |
-| Hardware role | Dedicated neural-network accelerator | Programmable parallel compute engine |
-| Typical use | Supported, power-sensitive inference | Inference, training, custom tensor programs |
+| Hardware role | Dedicated neural-network accelerator | Graphics Rendering + Parallel Computation         |
+| Typical use | Low-power inference | Inference, training, custom tensor programs |
 | Programming unit | Model graph or layer | Tensor op, kernel, layout, command buffer |
 | Public access | Compiler placement through model frameworks | PyTorch MPS, MLX, Metal; also model frameworks |
 | Custom kernels | No public ANE kernel API | Metal kernels |
@@ -137,7 +136,7 @@ var_5 (1, 64) float32
 ios16.linear: planned backend = MLCPUComputeDevice
 ```
 
-For this tiny Linear on the M1 Pro, the plan selects **CPU**, even though ANE is allowed. The compute plan reports each non-constant operation's preferred device under the same policy as inference; placement can differ by device and OS. It is a plan, not a runtime trace.[^coreml-plan] Output names are converter-generated. Core ML Tools also warned that version 8.3 was tested with PyTorch 2.5, not 2.8.
+For this tiny Linear on the M1 Pro, the plan selects **CPU**, even though ANE is allowed.
 
 Now use a larger convolution module: four `Conv2d + ReLU` stages. Run this after the previous block, reusing `run_coreml`:
 
@@ -167,7 +166,9 @@ ios16.conv: planned backend = MLNeuralEngineComputeDevice
 ios16.relu: planned backend = MLNeuralEngineComputeDevice
 ```
 
-On the same M1 Pro and under the same policy, all eight compute operations now prefer **ANE**. Backend placement depends on the workload, not just the `compute_units` setting.
+On the same M1 Pro and under the same policy, all eight compute operations now prefer **ANE**.
+
+Backend placement depends on the workload, not just the `compute_units` setting.
 
 ### GPU path: PyTorch MPS
 
@@ -249,7 +250,7 @@ Local output:
 
 Each output sums 128 products of one. The shape exercises matrix-matrix multiplication; it does not identify the selected kernel.
 
-Source snapshot: [`3a62199`](https://github.com/ml-explore/mlx/tree/3a6219917e4535575ce5bce2fc2ba27a483a709b). The following blocks are source excerpts, not standalone programs; omitted arguments use `...`.[^mlx-matmul-local]
+>  Source snapshot: [`3a62199`](https://github.com/ml-explore/mlx/tree/3a6219917e4535575ce5bce2fc2ba27a483a709b). The following blocks are source excerpts, not standalone programs; omitted arguments use `...`.[^mlx-matmul-local]
 
 ### 1. Layer to dispatch
 
@@ -282,7 +283,9 @@ if (std::min(M, N) == 1) {
 return steel_matmul(...);
 ```
 
-This separates dot products, narrow/wide GEMV cases, and Steel GEMM. Within Steel, a long reduction dimension `K` can select a split-K kernel. The regular NAX path below is one branch, not the implementation for every matrix multiplication.
+This separates dot products, narrow/wide GEMV cases, and Steel GEMM.
+
+Within Steel, a long reduction dimension `K` can select a split-K kernel. The regular NAX path below is one branch, not the implementation for every matrix multiplication.
 
 ### 2. Select a Metal kernel
 
@@ -320,9 +323,11 @@ kname << "steel_gemm_fused_nax_"
 
 The base kernel name encodes transpose flags, dtypes, and tile sizes. Batch, alignment, and epilogue flags further specialize the cached pipeline.
 
+**Without NAX**, regular Steel GEMM uses `steel_gemm_fused_...`. Its initial tile is `bm = 64, bn = 64, bk = 16`, with `wm = wn = 2`; `GEMM_TPARAM_MACRO` then applies device/shape tuning.[^mlx-non-nax]
+
 ### 3. Map tiles to threadgroups
 
-The output tile counts are rounded up, then swizzled for launch:
+The output tile counts are rounded up, then swizzled for launch. Shown here is regular NAX GEMM; the non-NAX variant uses `get_steel_gemm_fused_kernel` for pipeline lookup:
 
 ```cpp
 int tn = (N + bn - 1) / bn;
@@ -335,13 +340,99 @@ tn = tn * tile;
 
 MTL::Size group_dims = MTL::Size(32, wn, wm);
 MTL::Size grid_dims = MTL::Size(tn, tm, batch_size_out);
+
+auto& compute_encoder = metal::get_command_encoder(s);
+auto kernel = get_steel_gemm_fused_nax_kernel(...);
+compute_encoder.set_compute_pipeline_state(kernel);
+compute_encoder.set_input_array(a, 0);
+compute_encoder.set_input_array(b, 1);
+compute_encoder.set_output_array(out, 3);
+compute_encoder.set_bytes(params, 4);
+// Optional bias/epilogue and batch bindings omitted.
+compute_encoder.dispatch_threadgroups(grid_dims, group_dims);
 ```
 
 `swizzle_log` comes from a device/shape heuristic. Each threadgroup has `32 * wn * wm` threads; `GEMMParams` carries sizes, strides, and the swizzle needed to map the launch back to output tiles. Alignment flags select handling for partial tiles.
 
-### 4. Load, multiply, accumulate
+The binding indices match the Metal kernel's `[[buffer(0)]]` input A, `[[buffer(1)]]` input B, `[[buffer(3)]]` output D, and `[[buffer(4)]]` parameters. MLX's dispatch wrapper inserts dependency barriers and records the native Metal dispatch:[^mlx-launch]
+
+```cpp
+void CommandEncoder::dispatch_threadgroups(
+    MTL::Size grid_dims, MTL::Size group_dims) {
+  maybeInsertBarrier();
+  buffer_ops_++;
+  get_command_encoder()->dispatchThreadgroups(grid_dims, group_dims);
+}
+```
+
+This encodes work into a command buffer. MLX submits it with `buffer_->commit()` when it flushes the stream; dispatch itself does not wait for GPU completion.
+
+**Inside the NAX kernel, `wm/wn` partition the output tile, not the reduction dimension.** The JIT passes host values `bm, bn, bk, wm, wn` as template arguments `BM, BN, BK, WM, WN`. Metal supplies `simd_group_id` via `[[simdgroup_index_in_threadgroup]]`; the kernel uses it to select a sub-tile:[^mlx-nax-partition]
+
+```cpp
+// steel_gemm_fused_nax.h: after batch and threadgroup tile offsets.
+constexpr short SM = BM / WM;
+constexpr short SN = BN / WN;
+constexpr short TM = SM / 16;
+constexpr short TN = SN / 16;
+
+const short tm = SM * (simd_group_id / WN);
+const short tn = SN * (simd_group_id % WN);
+
+A += transpose_a ? tm : (tm * params->lda);
+B += transpose_b ? (tn * params->ldb) : tn;
+D += tm * params->ldd + tn;
+
+NAXTile<AccumType, TM, TN> Dtile;
+// gemm_loop<T, SM, SN, ...> accumulates this tile across K.
+```
+
+For `BM = BN = 128` and `WM = WN = 4`, one threadgroup has 16 SIMD-groups (512 threads). Each group computes a `32 x 32` output sub-tile: group 5 starts at `(tm, tn) = (32, 32)` within the threadgroup tile. With `TM = TN = 2`, its accumulator contains a `2 x 2` grid of `16 x 16` fragments. The inner `(16, 32, 16)` operation below is a compute step, not the whole group's tile. Kernel-local `tm/tn` are element offsets, unlike the host's launch tile counts.
+
+### 4. Load, compute, write
+
+**Non-NAX: shared staging, SIMD-group MMA, global store.** The kernel stages input tiles in threadgroup memory before computing:[^mlx-non-nax]
+
+```cpp
+// steel_gemm_fused.h: aligned main loop; offsets and epilogue omitted.
+threadgroup T As[gemm_kernel::tgp_mem_size_a];
+threadgroup T Bs[gemm_kernel::tgp_mem_size_b];
+thread mma_t mma_op(simd_group_id, simd_lane_id);
+thread loader_a_t loader_a(A, params->lda, As, simd_group_id, simd_lane_id);
+thread loader_b_t loader_b(B, params->ldb, Bs, simd_group_id, simd_lane_id);
+
+for (int k = 0; k < gemm_k_iterations; k++) {
+  threadgroup_barrier(mem_flags::mem_threadgroup);
+  loader_a.load_unsafe();
+  loader_b.load_unsafe();
+  threadgroup_barrier(mem_flags::mem_threadgroup);
+  mma_op.mma(As, Bs);
+  loader_a.next();
+  loader_b.next();
+}
+threadgroup_barrier(mem_flags::mem_none);
+return mma_op.store_result(D, params->ldd);
+```
+
+`mma_op.mma` loads fragments from `As`/`Bs` and reaches this primitive in `mma.h`:
+
+```cpp
+METAL_FUNC static constexpr void mma(
+    thread mat_type& D, thread mat_type& A,
+    thread mat_type& B, thread mat_type& C) {
+  simdgroup_multiply_accumulate(D, A, B, C);
+}
+```
+
+Here `mat_type` is `metal::simdgroup_matrix<T, 8, 8>`: each of 32 threads holds two elements per fragment. This is the non-NAX matrix primitive, distinct from the NAX cooperative-tensor operation below.
+
+**NAX: private tiles, cooperative-tensor MMA, global store.**
 
 Inside `steel/gemm/nax.h`, the inner operation uses a `(16, 32, 16)` descriptor at SIMD-group scope. Cooperative tensors hold operand and accumulator fragments distributed across the group:[^mlx-nax-local][^metal-tensors]
+
+> A fragment is 16x16, so 32 threads will hold kElemsPerFrag = 16x16/32 = 8
+>
+> However this kernel is 16x32x16 (M, N, K), so it requires 1 A fragment(tile), 2 B fragments, 2 C fragments
 
 ```cpp
 constexpr auto desc = mpp::tensor_ops::matmul2d_descriptor(
@@ -375,7 +466,37 @@ for (short i = 0; i < kElemsPerFrag; i++) {
 }
 ```
 
-`run` performs the multiply-accumulate using initialized fragments; the final loop copies the accumulator back to MLX's fragment layout. Global-memory loading and output storage happen outside this excerpt. This is the GPU control surface visible in MLX: dispatch, tiling, launch geometry, and matrix primitives. The Metal compiler still owns instruction lowering.
+`run` performs the multiply-accumulate using initialized fragments; the final loop copies the accumulator back to MLX's fragment layout.
+
+**`Cn0[i] = ct_c[i]` copies a private fragment, not an output buffer.** In this helper, `Cn0`/`Cn1` are declared `thread dtype_frag_t<CType>&`; `A` and `Bn0`/`Bn1` are `const thread` references. `dtype_frag_t<U>` is a vector of eight elements per thread.[^mlx-nax-local]
+
+| Storage in the source | Example | Meaning |
+| --- | --- | --- |
+| `thread` | Inner `A`, `Bn0`, `Cn0` fragments | Per-thread private values, normally register-resident |
+| `threadgroup` | Non-NAX `As` / `Bs` | Shared scratchpad for threads in one threadgroup |
+| `device` | Outer kernel `A` / `B` / `D` pointers | Global input/output buffers |
+
+The inner fragment named `A` is not the outer kernel's `device` pointer named `A`. `thread` does not guarantee physical register allocation: the compiler can spill. Likewise, a `device` access can hit cache rather than DRAM.[^metal-memory]
+
+The regular NAX path loads from device buffers directly into private tiles, then stores the completed tile through the output device pointer. These excerpts show the missing input/output boundary:[^mlx-nax-memory]
+
+```cpp
+// gemm_nax.h: aligned input loads inside the reduction loop.
+// A and B are const device T*.
+Atile.load(A + A_offset, lda);
+Btile.load(B + B_offset, ldb);
+tile_matmad_nax(
+    Dtile, Atile, metal::bool_constant<transpose_a>{},
+    Btile, metal::bool_constant<transpose_b>{});
+
+// steel_gemm_fused_nax.h: after gemm_loop and any epilogue.
+// D is device T*; partial output tiles use store_safe instead.
+Dtile.store(D, int(params->ldd));
+```
+
+So the regular non-NAX path explicitly stages through `threadgroup` memory, while this NAX path does not use that staging step. In both, fragment assignment and global-buffer storage are separate operations.
+
+This is the GPU control surface visible in MLX: dispatch, tiling, launch geometry, and matrix primitives. The Metal compiler still owns instruction lowering.
 
 ## References
 
@@ -389,5 +510,10 @@ for (short i = 0; i < kElemsPerFrag; i++) {
 [^mlx-linear]: MLX, [`Linear.__call__`](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/python/mlx/nn/layers/linear.py#L65-L70).
 [^mlx-matmul-local]: MLX, [`Matmul::eval_gpu`](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/matmul.cpp#L1504-L1572), [Steel dispatch](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/matmul.cpp#L911-L1013), and [regular NAX kernel setup](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/matmul.cpp#L205-L317).
 [^mlx-device]: MLX, [`is_nax_available()`](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/device.cpp#L947-L966).
-[^mlx-nax-local]: MLX, [`nax.h` cooperative-tensor multiply-accumulate](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/nax.h#L401-L455).
+[^mlx-nax-local]: MLX, [`nax.h` fragment types](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/nax.h#L27-L43) and [cooperative-tensor multiply-accumulate](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/nax.h#L386-L455).
+[^mlx-non-nax]: MLX, [regular non-NAX dispatch](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/matmul.cpp#L343-L507), [`steel_gemm_fused.h` aligned loop](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/kernels/steel_gemm_fused.h#L170-L204), and [`mma.h` SIMD-group primitive](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/mma.h#L177-L206).
+[^mlx-launch]: MLX, [Metal dispatch](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/device.cpp#L408-L414), [command-buffer submission](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/device.cpp#L516-L558), and [stream finalization](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/eval.cpp#L71-L77).
+[^mlx-nax-partition]: MLX, [JIT template arguments](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/jit_kernels.cpp#L1084-L1116) and [NAX SIMD-group tile mapping](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/kernels/steel_gemm_fused_nax.h#L150-L202).
+[^mlx-nax-memory]: MLX, [`gemm_loop` device loads](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/gemm_nax.h#L25-L93) and [NAX output store](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/kernels/steel_gemm_fused_nax.h#L178-L213).
+[^metal-memory]: Apple, ["Learn performance best practices for Metal shaders"](https://developer.apple.com/videos/play/tech-talks/111373/), address spaces and caching; [Metal Shading Language Specification](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf), address-space semantics.
 [^metal-tensors]: Apple, [Metal Shading Language Specification](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf), tensor operations; see also ["Optimize custom machine learning operations with Metal tensors"](https://developer.apple.com/videos/play/wwdc2026/330/). The linked specification is updated by Apple; MLX excerpts above are pinned to a commit.
