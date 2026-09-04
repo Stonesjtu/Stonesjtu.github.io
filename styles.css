@@ -622,7 +622,7 @@ li::marker {
 }
 
 .post-page {
-  max-width: 920px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: clamp(32px, 5vw, 58px) clamp(22px, 4vw, 48px) 64px;
 }
@@ -640,7 +640,7 @@ li::marker {
 }
 
 .post-hero h1 {
-  max-width: 760px;
+  max-width: 100%;
   margin: 0 0 16px;
   color: #1f2933;
   font-size: clamp(2rem, 6vw, 3.4rem);
@@ -665,6 +665,7 @@ li::marker {
   padding: clamp(24px, 5vw, 38px);
   color: #344150;
   font-size: 1.02rem;
+  overflow-wrap: anywhere;
 }
 
 .post-content .key-insight {
