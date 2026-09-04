@@ -8,6 +8,7 @@ excerpt: "3-bit weight storage with MXFP8 compute at 3.375 bits per weight."
 
 ## Key Insights
 
+- Optimized for LLM decoding
 - Stored in 3bit packed format, do LUT dequantize on the fly, calculated in MXFP8
 - Weight only 3-bit, 3.375 bits-per-weight, 20% gains from mxfp4
 - **N=8, K=64** forms a block, sharing one codebook (8 entries of FP8 codeword)
