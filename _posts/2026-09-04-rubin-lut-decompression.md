@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Rubin LUT decompression"
+title: "Rubin 3-Bit LUT Decompression"
 topic: "GPU architecture"
 date: 2026-09-04
-excerpt: "Notes on packed 3-bit weights, LUT decompression for MXFP8, quantization granularity, and codebook storage on Rubin."
+excerpt: "3-bit weight storage with MXFP8 compute at 3.375 bits per weight."
 ---
 
 ## Key Insights
