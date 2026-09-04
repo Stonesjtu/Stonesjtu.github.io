@@ -698,10 +698,15 @@ li::marker {
   margin: 2rem 0;
 }
 
-.post-figure img {
+.post-content img {
   display: block;
-  width: 100%;
+  max-width: min(100%, 800px);
   height: auto;
+  margin-inline: auto;
+}
+
+.post-figure img {
+  width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #f8fafc;
@@ -757,6 +762,8 @@ li::marker {
   color: var(--accent-dark);
 }
 .post-figure figcaption {
+  max-width: 800px;
+  margin-inline: auto;
   margin-top: 0.7rem;
   color: #607080;
   font-size: 0.9rem;
