@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <title>Kaiyu Shi — abstract stone mark</title>
+  <rect width="512" height="512" rx="120" fill="#0C4239"/>
+  <path d="M112 112H336L288 208H112V112Z" fill="#F7F5EE"/>
+  <path d="M224 240H400V400H176L224 304V240Z" fill="#F7F5EE"/>
+  <path d="M352 112H400V160H328L352 112Z" fill="#C49A45"/>
+</svg>
