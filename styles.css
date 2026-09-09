@@ -770,6 +770,18 @@ li::marker {
   line-height: 1.6;
 }
 
+.post-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.post-compare-grid .post-figure {
+  min-width: 0;
+  margin: 0;
+}
+
 .post-chart {
   padding: 20px;
   border: 1px solid var(--line);
@@ -918,6 +930,33 @@ li::marker {
   background: #f4f7fb;
   color: #1f2933;
   font-weight: 760;
+}
+
+.tock-badge {
+  display: inline-block;
+  padding: 0.16rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 750;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.tock-badge--cpu {
+  border-color: #f3c79d;
+  background: #fff2e5;
+  color: #9a4b08;
+}
+
+.tock-badge--gpu {
+  border-color: #b9cff8;
+  background: #edf4ff;
+  color: #2457a7;
+}
+
+.gpu-family-label {
+  white-space: nowrap;
 }
 
 .math-block {
@@ -1128,6 +1167,10 @@ li::marker {
   }
 
   .chart-grid--two {
+    grid-template-columns: 1fr;
+  }
+
+  .post-compare-grid {
     grid-template-columns: 1fr;
   }
 

@@ -3,7 +3,7 @@ layout: post
 title: "Apple Silicon AI compute: ANE and GPU"
 topic: "AI infrastructure"
 sequence: 12
-last_modified_at: 2026-09-03T16:36:06+08:00
+last_modified_at: 2026-09-09T19:08:15+08:00
 excerpt: "ANE and GPU hardware, runnable Core ML and MLX examples, and the Metal code behind FP16 GEMM."
 description: "A concise hardware and software-stack map of Apple Silicon AI compute across ANE, GPU, Core ML/Core AI, MPS, Metal, MLX, and Metal tensor operations."
 tags: "Apple Silicon, AI infrastructure, GPU, ANE, Core ML, Metal, MLX"
@@ -21,8 +21,10 @@ Both accelerators exist on iPhone and Mac. **The Neural Accelerators inside rece
 | Neural Accelerators in GPU | Yes | Yes |
 | ANE cores | 16 | 16 |
 | Unified memory bandwidth |  77 GB/s (non-official)   | 614 GB/s |
-| GPU / ANE FP16 TFLOPS |  11 TFlops / 19 TFlops (non-official)          | 70 TFlops / 19 TFlops (non-official)    |
+| GPU FP16 throughput | 11 TFLOPS (non-official) | 70 TFLOPS (non-official) |
+| ANE throughput | FP16: 19 TFLOPS (non-official) | **FP16: 25 TFLOPS / INT8: 50 TOPS (measured)** |
 
+The M5 Max ANE numbers are local measurements, not Apple-published peak specifications.[^m5-max-ane-measured]
 
 <details>
 <summary>Die views: A19 Pro and M5 Pro</summary>
@@ -553,6 +555,7 @@ This is the GPU control surface visible in MLX: dispatch, tiling, launch geometr
 [^mlx-custom-metal]: MLX documentation, [Custom Metal Kernels](https://ml-explore.github.io/mlx/build/html/dev/custom_metal_kernels.html): generated signatures and `dispatchThreads` launch dimensions. Example executed locally with MLX 0.32.1.
 [^a19-pro-spec]: Apple Support, ["iPhone 17 Pro and iPhone 17 Pro Max - Technical Specifications"](https://support.apple.com/en-mt/125090).
 [^m5-max-spec]: Apple, ["Apple debuts M5 Pro and M5 Max to supercharge the most demanding pro workflows"](https://www.apple.com/newsroom/2026/03/apple-debuts-m5-pro-and-m5-max-to-supercharge-the-most-demanding-pro-workflows/).
+[^m5-max-ane-measured]: Kaiyu Shi, local M5 Max ANE throughput measurement, September 9, 2026: 25 TFLOPS at FP16 and 50 TOPS at INT8; measured results rather than Apple-published peak specifications.
 [^ane-paper]: Spencer H. Bryngelson, ["Apple Neural Engine: Architecture, Programming, and Performance"](https://arxiv.org/abs/2606.22283v1). Reverse-engineered findings, not a vendor programming specification.
 [^core-ai]: Apple Developer, ["Meet Core AI"](https://developer.apple.com/videos/play/wwdc2026/324/), WWDC26: on-device inference across CPU, GPU, and Neural Engine, with new runtime and export APIs.
 [^coreml-compute-units]: Apple coremltools documentation, ["Load and Convert Model Workflow"](https://apple.github.io/coremltools/docs-guides/source/load-and-convert-model.html).
