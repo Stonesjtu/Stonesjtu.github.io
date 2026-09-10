@@ -11,6 +11,13 @@ layout: default
       <p class="post-excerpt">{{ page.excerpt | strip_html }}</p>
     </header>
 
+    <aside class="post-outline" aria-label="Article outline" hidden>
+      <details class="outline-disclosure">
+        <summary>On this page</summary>
+        <nav aria-label="On this page"><ol class="outline-list"></ol></nav>
+      </details>
+    </aside>
+
     <div class="post-content">
       {{ content }}
     </div>
@@ -18,3 +25,4 @@ layout: default
     {% include comments.html %}
   </article>
 </main>
+<script src="{{ '/assets/post-outline.js' | relative_url }}?v=20260910" defer></script>
