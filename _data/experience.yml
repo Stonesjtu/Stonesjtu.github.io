@@ -1,55 +1,36 @@
 - scope: ByteDance, Doubao Mobile Assistant Team
   tags: AI Infrastructure Engineer · Oct 2024-Present
-  title: Build large-model training, serving, and inference infrastructure across mobile and cloud
+  title: Large-model serving and training infrastructure
   points:
-    - Work on AI infrastructure for Doubao mobile assistant, covering serving, inference, and training systems on both mobile-side and cloud-side paths.
-    - Own cloud LLM/VLM inference deployment and optimization for Doubao mobile assistant, improving latency, throughput, and inference cost.
-    - Drive GUI Agent model deployment, service launch, and performance and cost optimization for production assistant workloads.
-    - Build and integrate large-model training stacks, including VeOmni and verl on Ascend 910B.
-    - Coordinate across algorithm, inference, infrastructure, and heterogeneous-compute teams to turn model validation into reliable online services.
+    - Deploy and optimize cloud LLM/VLM inference for Doubao mobile assistant, including GUI Agent services, with a focus on latency, throughput, and cost.
+    - Build and integrate large-model training infrastructure with VeOmni and verl on Ascend 910B.
 - scope: NIO, Shanghai
   tags: AI Compiler System - Staff Engineer · Apr 2023-Oct 2024
-  title: Worked on AI compiler and NPU operator optimization for in-house DSA hardware
+  title: AI compilers and NPU performance
   points:
-    - Analyzed product neural networks and translated model requirements into operator and compiler-stack development plans.
-    - Identify performance hotspots and define optimization opportunities across operators, code generation, and compiler behavior.
-    - Developed and tuned high-performance NPU operators including element-wise, NMS, and attention kernels.
-    - Built acceleration-library primitives comparable to CUB, including scan, reduce, and sort.
-    - Contributed to operator fusion, automatic compilation, code generation, and chip bring-up validation.
+    - Developed and tuned NPU kernels for in-house DSA hardware, including attention and NMS, plus scan, reduce, and sort primitives.
+    - Translated model bottlenecks into compiler optimizations; contributed to operator fusion, code generation, and chip bring-up validation.
 - scope: AISpeech, Shanghai
   tags: Speech Chip Algorithm Engineer · 2020-Apr 2023
-  title: Built edge speech-chip inference, compiler, quantization, and signal-processing systems
+  title: Edge inference and speech-chip systems
   points:
-    - Developed a C99-compatible graph inference engine for low-cost edge chips and ASIC accelerators such as NPUs.
-    - Built ONNX frontend parsing, graph optimization, backend code generation, and micro-kernel tiling search.
-    - Defined NPU operators and specs for GEMM, Conv2D, activation, unified memory, layout, RNN support, memory planning, and hardware consistency validation.
-    - Worked on polyhedral dataflow and schedule search, hardware behavior cost modeling, and feature-layout modeling in Interstellar.
-    - Led acoustic model miniaturization for wakeup and recognition workloads under RAM and compute constraints.
-    - Built single-channel keyword speech enhancement and streaming multi-channel MVDR beamforming based on tfmask.
-    - Led QAT tooling for 16-bit, 8-bit, 4-bit, and 1-bit quantization with flexible mixed precision, deployed across multiple edge businesses.
+    - Built a C99-compatible inference engine and ONNX compiler pipeline for edge chips, covering graph optimization, code generation, and NPU operator and memory planning.
+    - Developed compact speech models and mixed-precision QAT tooling (16/8/4/1-bit) for constrained devices, with deployment across multiple edge businesses.
 - scope: AISpeech, Suzhou
   tags: Algorithm Engineer · 2019-2020
-  title: Led PyTorch distributed training and GPU inference acceleration for speech models
+  title: Distributed speech training and GPU inference
   points:
-    - Led development and rollout of a new PyTorch-based distributed training toolchain, upgrading internal speech workflows from Kaldi.
-    - Improved training speed by 2x, reduced memory use by 5x, and lowered relative WER by 5% to 10%.
-    - Supported CE, CTC, MMI, and LAS training criteria with multi-task, multi-view, and teacher-student recipes.
-    - Stabilized training for ASR, TTS, and wakeup models across internal business use cases.
-    - Accelerated TFServing-based GPU inference, reducing NNLM latency by 5x and improving end-to-end ASR RTF by 25x.
-    - Optimized CPU-GPU heterogeneous operators and increased concurrency by 2.5x.
+    - Migrated speech training from Kaldi to a PyTorch distributed stack, delivering 2× training speed, one-fifth the memory use, and 5–10% lower relative WER.
+    - Optimized GPU inference and CPU–GPU operators, cutting NNLM latency to one-fifth, improving end-to-end ASR RTF by 25×, and increasing concurrency by 2.5×.
 - scope: Microsoft Research, Seattle
   tags: Intern · Spring 2019
-  title: Researched memory-efficient pipeline model-parallel DNN training
+  title: Memory-efficient pipeline parallelism
   points:
-    - Worked on vertical model splitting and pipeline training for very large models.
-    - Reduced communication pressure by shifting pipeline exchange from weights toward activations.
-    - Used layered weight stashing to address high memory use in PipeDream-style training.
-    - Combined the lower memory footprint of GPipe with PipeDream's bubble-free execution characteristics.
+    - Researched pipeline model-parallel training for large DNNs, using activation exchange to reduce communication pressure.
+    - Explored layered weight stashing to reduce memory use in PipeDream-style training while retaining pipeline utilization.
 - scope: AISpeech, Suzhou
   tags: Algorithm Intern · 2018-2019
-  title: Built distributed training for large-scale neural network language models
+  title: Large-scale language model training
   points:
-    - Developed a PyTorch-based distributed training system for large neural network language models.
-    - Used Block Momentum to reduce distributed communication overhead.
-    - Applied NCE training to accelerate very-large-vocabulary language model training.
-    - Trained on 80 GB of text data in three days.
+    - Built distributed NNLM training in PyTorch, using Block Momentum to reduce communication overhead and NCE to accelerate large-vocabulary training.
+    - Trained on 80 GB of text in three days.
