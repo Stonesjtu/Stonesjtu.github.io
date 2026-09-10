@@ -6,9 +6,9 @@
     {% include seo.html %}
     <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml" sizes="any" />
     <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}?v=20260909-gpu-peak" />
-    {% if page.home %}<link rel="stylesheet" href="{{ '/assets/home.css' | relative_url }}?v=20260910" />{% endif %}
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}?v=20260910-unified" />
   </head>
-  <body{% if page.home %} class="home-layout"{% endif %}>
+  <body class="site-layout">
     <div class="app-shell">
       <aside class="sidebar" aria-label="Site profile and navigation">
         <a class="avatar-link" href="{{ '/' | relative_url }}" aria-label="{{ site.title }} home">
