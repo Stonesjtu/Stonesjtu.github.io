@@ -1,68 +1,33 @@
 ---
 layout: default
 title: Home
+home: true
 description: "Kaiyu Shi's homepage for AI infrastructure, LLM/VLM inference, training stacks, mobile AI, compiler systems, and PyTorch systems notes."
 ---
 
-<main class="page-grid home-page" id="top">
-  <div class="primary-column">
-    <section class="home-intro" aria-labelledby="hero-title">
-      <h1 id="hero-title">Kaiyu Shi</h1>
-      <p class="career-objective">{{ site.career_objective }}</p>
-      <p class="hero-lede">
-        {{ site.brief_intro }} {{ site.critical_action }}
-      </p>
-      <div class="hero-actions" aria-label="Page shortcuts">
-        <a class="button primary" href="#writing">Read blog posts</a>
-        <a class="button secondary" href="{{ '/about/' | relative_url }}">About</a>
-      </div>
-    </section>
+<main class="home-page" id="top">
+  <header class="home-intro">
+    <h1>Systems Notes</h1>
+    <p>Notes on AI infrastructure, compilers, and the hardware that runs models.</p>
+  </header>
 
-    <section class="posts-section" id="writing" aria-labelledby="writing-title">
-      <div>
-        <h2 id="writing-title">Systems Notes</h2>
-      </div>
+  <section class="posts-section" id="writing" aria-labelledby="writing-title">
+    <div class="writing-heading">
+      <h2 id="writing-title">Writing</h2>
+      <span>{{ site.posts | size }} articles · Newest first</span>
+    </div>
+    <div class="post-list">
       {% assign recent_posts = site.posts | sort: 'date' | reverse %}
-      <div class="post-list">
       {% for post in recent_posts %}
-        <article class="post-preview">
-          <h3>
-            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          </h3>
-          <p>{{ post.excerpt | strip_html }}</p>
-          <div class="post-preview-meta">
-            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
-            {% if post.topic %}<span>{{ post.topic }}</span>{% endif %}
-          </div>
-        </article>
+      <article class="post-preview">
+        <div class="post-preview-meta">
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+          {% if post.topic %}<span>{{ post.topic }}</span>{% endif %}
+        </div>
+        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+        <p>{{ post.excerpt | strip_html }}</p>
+      </article>
       {% endfor %}
-      </div>
-    </section>
-  </div>
-
-  <aside class="right-panel" aria-label="Recently updated and topics">
-    <section>
-      <h2>Recently Updated</h2>
-      <ul class="compact-links">
-        {% assign updated_posts = site.posts | sort: 'last_modified_at' | reverse %}
-        {% for post in updated_posts limit:5 %}
-        <li>
-          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          <span>Updated {{ post.last_modified_at | default: post.date | date: "%b %-d, %Y" }}</span>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-    <section>
-      <h2>Topics</h2>
-      <div class="tag-cloud">
-        {% assign topics = site.posts | map: 'topic' | uniq %}
-        {% for topic in topics %}
-        {% if topic %}
-        <span>{{ topic }}</span>
-        {% endif %}
-        {% endfor %}
-      </div>
-    </section>
-  </aside>
+    </div>
+  </section>
 </main>

@@ -6,8 +6,9 @@
     {% include seo.html %}
     <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml" sizes="any" />
     <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}?v=20260909-gpu-peak" />
+    {% if page.home %}<link rel="stylesheet" href="{{ '/assets/home.css' | relative_url }}?v=20260910" />{% endif %}
   </head>
-  <body>
+  <body{% if page.home %} class="home-layout"{% endif %}>
     <div class="app-shell">
       <aside class="sidebar" aria-label="Site profile and navigation">
         <a class="avatar-link" href="{{ '/' | relative_url }}" aria-label="{{ site.title }} home">
@@ -16,8 +17,7 @@
         <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
         <p class="site-tagline">AI Infrastructure Engineer</p>
         <nav class="site-nav" aria-label="Primary navigation">
-          <a href="{{ '/' | relative_url }}">Home</a>
-          <a href="{{ '/#writing' | relative_url }}">Blog</a>
+          <a href="{{ '/' | relative_url }}">Writing</a>
           <a href="{{ '/about/' | relative_url }}">About</a>
         </nav>
         <div class="sidebar-links" aria-label="Profile links">
@@ -28,7 +28,7 @@
 
       <div class="content-shell">
         <header class="topbar">
-          <a href="{{ '/' | relative_url }}">Home</a>
+          <a href="{{ '/' | relative_url }}">Writing</a>
           <span>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</span>
         </header>
 
