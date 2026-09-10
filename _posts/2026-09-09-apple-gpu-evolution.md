@@ -3,7 +3,7 @@ layout: post
 title: "Apple GPU Evolution"
 topic: "GPU architecture"
 date: 2026-09-09
-last_modified_at: 2026-09-10T17:03:00+08:00
+last_modified_at: 2026-09-10T17:14:00+08:00
 excerpt: "Apple GPU evolution from Dynamic Caching to Neural Accelerators, with an MLX Metal GEMM source walkthrough."
 ---
 
@@ -115,6 +115,22 @@ M5 and A19 place dedicated matrix-multiplication hardware inside every shader co
 > NAX changes prompt processing far more than token generation.
 
 The cleanest complete comparison in the `llama.cpp` reports uses the same 40-core M5 Max and Llama 2 7B workload: `pp512`, `tg128`, and full GPU offload. The legacy result is the mean of two independent `8e672ef` submissions, which agree within 1.4%; the NAX result is the accepted `c1d0e7a` Tensor API submission.[^llamacpp-m5-max]
+
+<figure class="post-figure post-chart">
+  <div class="chart-grid chart-grid--two">
+    <section class="chart-panel">
+      <p class="chart-title">Prefill throughput</p>
+      <p class="chart-subtitle">Prompt processing, batch size 512</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="nax-prefill-chart" role="img" aria-label="Grouped bar chart comparing M5 Max prefill throughput with legacy Metal and the NAX Tensor API for F16, Q8_0, and Q4_0. NAX is approximately three times faster for all three formats.">The exact throughput values are available in the table below.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Decode throughput</p>
+      <p class="chart-subtitle">Token generation, batch size 1</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="nax-decode-chart" role="img" aria-label="Grouped bar chart comparing M5 Max decode throughput with legacy Metal and the NAX Tensor API for F16, Q8_0, and Q4_0. Decode changes range from a slight regression to a 16 percent improvement.">The exact throughput values are available in the table below.</canvas></div>
+    </section>
+  </div>
+  <figcaption><strong>M5 Max llama.cpp throughput.</strong> NAX raises compute-bound prefill by about 3x across F16, Q8_0, and Q4_0, while memory-bound single-token decode remains close to the legacy path. Labels above the green bars show the with-NAX / without-NAX ratio.</figcaption>
+</figure>
 
 | Phase | Format | Without NAX, legacy Metal (t/s) | With NAX, Tensor API (t/s) | Speedup |
 | --- | --- | ---: | ---: | ---: |
@@ -467,3 +483,7 @@ GPU trace replay isolates work for cost graphs, counters, register use, divergen
 [^metal-tensors]: Apple, [Metal Shading Language Specification](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf), tensor operations; see also ["Optimize custom machine learning operations with Metal tensors"](https://developer.apple.com/videos/play/wwdc2026/330/). The linked specification is updated by Apple; MLX excerpts above are pinned to a commit.
 [^m-series]: HubWeb, [Apple M-series specification comparison](https://hubweb.cn/apple-silicon/chip-m/): secondary comparison source for M-series generation data.
 [^ane-execution]: Apple Neural Engine: A Complete Guide, [Execution model](https://ane-guide.readthedocs.io/en/latest/part-1-machine/02-execution-model.html): reverse-engineered ANE execution context; not an Apple specification.
+
+<script defer src="{{ '/assets/vendor/chart.umd.min.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/chart-theme.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/apple-gpu-charts.js' | relative_url }}?v=20260910a"></script>
