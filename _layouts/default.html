@@ -6,7 +6,7 @@
     {% include seo.html %}
     <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml" sizes="any" />
     <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}?v=20260909-gpu-peak" />
-    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}?v=20260910-unified" />
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}?v=20260912-apple-about" />
   </head>
   <body class="site-layout">
     <div class="app-shell">
@@ -17,8 +17,8 @@
         <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
         <p class="site-tagline">AI Infrastructure Engineer</p>
         <nav class="site-nav" aria-label="Primary navigation">
-          <a href="{{ '/' | relative_url }}">Writing</a>
-          <a href="{{ '/about/' | relative_url }}">About</a>
+          <a href="{{ '/' | relative_url }}"{% if page.url != "/about/" %} data-active="true"{% endif %}>Writing</a>
+          <a href="{{ '/about/' | relative_url }}"{% if page.url == "/about/" %} aria-current="page"{% endif %}>About</a>
         </nav>
         <div class="sidebar-links" aria-label="Profile links">
           <a href="https://github.com/{{ site.github_username }}" target="_blank" rel="noreferrer">GitHub</a>
