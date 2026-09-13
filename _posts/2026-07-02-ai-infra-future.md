@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Predicting the future AI infra stack - AI-Infra Overview PART-3"
+description: "A supply-chain view of future AI infrastructure: heterogeneous compute, LLM-specific hardware, memory locality, and high-bandwidth interconnects."
 topic: "AI infrastructure"
 sequence: 10
 last_modified_at: 2026-08-10T22:25:18+08:00

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Figure out what b.add_(b) has done"
+description: "Follow PyTorch tensor addition from Python and ATen through BLAS, OpenMP, and AVX2 kernels, with a bandwidth-based performance explanation."
 topic: "Tensor internals"
 sequence: 3
 last_modified_at: 2026-06-20T13:59:19+08:00

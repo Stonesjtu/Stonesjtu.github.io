@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Trace PyTorch CUDA performance bottlenecks"
+description: "A practical PyTorch CUDA profiling workflow, from synchronized Python cProfile and line-profiler runs to nvprof and kernel-level analysis."
 topic: "Performance"
 sequence: 4
 last_modified_at: 2026-06-20T13:59:19+08:00

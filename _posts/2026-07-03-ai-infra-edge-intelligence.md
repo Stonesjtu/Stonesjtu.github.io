@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "How intelligent can the edge become? - AI-Infra Overview PART-4"
+description: "How memory, bandwidth, power, economics, accelerator support, and small-model quality shape AI capability on phones, AI PCs, and edge boxes."
 topic: "AI infrastructure"
 sequence: 11
 last_modified_at: 2026-08-09T23:40:14+08:00

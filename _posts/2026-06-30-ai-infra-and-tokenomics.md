@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "From conventional infra to agentic infra - AI-Infra Overview PART-1"
+description: "How AI infrastructure evolved with model execution patterns and specialized CPU, GPU, TPU, and NPU hardware under real service objectives."
 topic: "AI infrastructure"
 sequence: 8
 last_modified_at: 2026-08-09T23:40:14+08:00

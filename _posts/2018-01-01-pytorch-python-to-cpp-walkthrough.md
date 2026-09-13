@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "From Python to C/C++: a PyTorch walk-through"
+description: "A compact walkthrough of early PyTorch autograd, tracing Variables, Functions, the backward graph, and the imperative execution engine."
 topic: "Runtime walkthrough"
 sequence: 1
 last_modified_at: 2026-06-20T13:59:19+08:00

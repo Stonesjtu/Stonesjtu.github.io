@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Apple GPU Evolution"
+description: "Apple GPU evolution from Dynamic Caching to Neural Accelerators, including Apple Silicon architecture, MLX Metal GEMM, and TensorOps."
 topic: "GPU architecture"
 date: 2026-09-09
 last_modified_at: 2026-09-10T17:14:00+08:00

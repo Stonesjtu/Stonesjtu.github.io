@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Why AI infra is fast-moving and challenging - AI-Infra Overview PART-2"
+description: "Why model size, context, output length, agent loops, and hardware change together, widening the AI infrastructure optimization frontier."
 topic: "AI infrastructure"
 sequence: 9
 last_modified_at: 2026-08-09T23:40:14+08:00

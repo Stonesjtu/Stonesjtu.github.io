@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Build PyTorch with CUDA-aware MPI support"
+description: "Build OpenMPI with CUDA support, compile PyTorch against MPI compilers, and verify distributed runtime support for GPU-aware communication."
 topic: "Distributed build"
 sequence: 5
 last_modified_at: 2026-06-20T13:59:19+08:00

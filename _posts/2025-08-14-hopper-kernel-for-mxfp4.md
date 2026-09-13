@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Hopper kernel for MXFP4"
+description: "A Triton Hopper MXFP4 matmul walkthrough covering packed FP4 weights, LUT and scale unpacking, BF16 conversion, and inline PTX."
 topic: "GPU kernels"
 sequence: 7
 last_modified_at: 2026-09-01T15:38:52+08:00

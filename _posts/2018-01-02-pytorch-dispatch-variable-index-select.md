@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "How PyTorch dispatches Variable.index_select"
+description: "Trace an early PyTorch index_select call from Python bindings through ATen and C/C++ backends to CUDA kernels and autograd definitions."
 topic: "Dispatch and autograd"
 sequence: 2
 last_modified_at: 2026-06-20T13:59:19+08:00

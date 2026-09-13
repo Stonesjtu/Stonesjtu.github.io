@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Build PyTorch with NCCL2"
+description: "Install NCCL2, build PyTorch for multi-GPU communication, run all-reduce tests, and troubleshoot CUDA and network interface setup."
 topic: "NCCL"
 sequence: 6
 last_modified_at: 2026-06-20T13:59:19+08:00
