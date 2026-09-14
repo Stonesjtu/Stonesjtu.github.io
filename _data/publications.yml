@@ -1,4 +1,22 @@
+- text: "Wang, Haoming, Haoyang Zou, Huatong Song, et al. UI-TARS-2 Technical Report: Advancing GUI Agent with Multi-Turn Reinforcement Learning. arXiv:2509.02544, 2025."
+  category: paper
+- text: "Shi, Kaiyu, Jinzhou Sun, Shuo Wang, and Feng Xue. Assembly methods, disassembly methods, devices and storage media. Chinese Patent CN116088864B, 2026."
+  category: patent
+- text: "Sun, Jinzhou, Kaiyu Shi, Shuo Wang, and Feng Xue. Neural network model compilation method, device and storage medium. Chinese Patent Application Publication CN116225445A, 2023."
+  category: patent
+- text: "Wang, Shuo, Kaiyu Shi, Jinzhou Sun, and Feng Xue. Performance simulation method, electronic device and storage medium. Chinese Patent Application Publication CN116432573A, 2023."
+  category: patent
 - text: "Narayanan, D., Phanishayee, A., Shi, K., Chen, X., & Zaharia, M. Memory-efficient pipeline-parallel DNN training. International Conference on Machine Learning, 2021."
+  category: paper
 - text: "Shi, Kaiyu, and Kai Yu. Structured Word Embedding for Low Memory Neural Network Language Model. Interspeech, 2018."
+  category: paper
 - text: "Yu, Kai, Rao Ma, Kaiyu Shi, and Qi Liu. Neural network language model compression with product quantization and soft binarization. IEEE/ACM Transactions on Audio, Speech, and Language Processing, 2020."
+  category: paper
 - text: "Shi, Kaiyu, Xuan Liu, and Yanmin Qian. Speech Emotion Recognition Based on SVM and GMM-HMM Hybrid System. NCMMSC, 2017."
+  category: paper
+- text: "Yu, Kai, Kaiyu Shi, Da Zheng, et al. Man-machine mixed interaction system and method based on audio. Chinese Patent CN106409283B, 2020."
+  category: patent
+- text: "Yu, Kai, Xuan Liu, Di Cao, and Kaiyu Shi. Language model compression method and system. Chinese Patent Application Publication CN108874754A, 2018."
+  category: patent
+- text: "Yu, Kai, and Kaiyu Shi. Compression method and system for neural network language model. Chinese Patent Application Publication CN108415888A, 2018."
+  category: patent

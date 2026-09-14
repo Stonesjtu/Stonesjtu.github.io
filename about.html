@@ -100,7 +100,25 @@ description: "About Kaiyu Shi, an AI infrastructure engineer working on Doubao m
     <div class="publications no-top-rule">
       <ol>
         {% for item in site.data.publications %}
+        {% if item.category == 'paper' %}
         <li>{{ item.text }}</li>
+        {% endif %}
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
+  <section class="content-card credentials" aria-labelledby="patents-title">
+    <div class="section-heading">
+      <p class="eyebrow">Research</p>
+      <h2 id="patents-title">Patents</h2>
+    </div>
+    <div class="publications no-top-rule">
+      <ol>
+        {% for item in site.data.publications %}
+        {% if item.category == 'patent' %}
+        <li>{{ item.text }}</li>
+        {% endif %}
         {% endfor %}
       </ol>
     </div>
