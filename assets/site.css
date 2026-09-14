@@ -132,6 +132,85 @@
   font-size: 1.02rem;
 }
 
+.home-page .current-focus {
+  margin: 0 0 48px;
+}
+
+.home-page .current-focus-heading {
+  margin-bottom: 16px;
+}
+
+.home-page .current-focus-heading .eyebrow {
+  margin-bottom: 6px;
+}
+
+.home-page .current-focus-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.home-page .focus-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.home-page .focus-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 208px;
+  padding: 22px;
+  color: inherit;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid rgba(60, 60, 67, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(35, 44, 54, 0.05);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.home-page .focus-item:hover {
+  border-color: rgba(0, 113, 227, 0.3);
+  box-shadow: 0 12px 30px rgba(35, 44, 54, 0.1);
+  transform: translateY(-2px);
+}
+
+.home-page .focus-item span {
+  display: block;
+  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.home-page .focus-item strong {
+  display: block;
+  min-height: 2.56em;
+  font-size: 1.08rem;
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+}
+
+.home-page .focus-item p {
+  margin: 12px 0 18px;
+  color: #59636b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.home-page .focus-item .focus-item-action {
+  margin: auto 0 0;
+  color: var(--accent-dark);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .home-page .writing-heading {
   display: flex;
   flex-wrap: wrap;
@@ -785,6 +864,22 @@
 
   .home-page .home-intro {
     padding-bottom: 30px;
+  }
+
+  .home-page .current-focus {
+    margin-bottom: 34px;
+  }
+
+  .home-page .focus-list {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page .focus-item {
+    min-height: 0;
+  }
+
+  .home-page .focus-item strong {
+    min-height: 0;
   }
 
   .home-page .post-preview h3 {
