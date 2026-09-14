@@ -403,10 +403,6 @@
   line-height: 1.6;
 }
 
-.site-layout .contact {
-  padding-bottom: 20px;
-}
-
 .site-layout .skill-cloud {
   gap: 8px 20px;
 }
@@ -674,11 +670,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-}
-
-.site-layout .contact {
-  grid-template-columns: 1fr;
-  gap: 12px;
 }
 
 @media (max-width: 920px) {
