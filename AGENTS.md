@@ -10,6 +10,17 @@ technical writing about AI infrastructure, compilers, accelerators, and systems.
 - Within a major section, prefer this reading order: title, one-sentence key insight,
   diagram/plot/formula/table, then detailed explanation, methodology, and caveats.
   Let readers see the argument before asking them to parse its derivation.
+- Treat author-provided source documents as read-only, including uploaded notes
+  and linked Notion sources. Complete `// AGENT` requests, corrections, and
+  adaptations in a separate blog draft, not in the original document. Modify or
+  synchronize a source only when the author explicitly asks to edit that source;
+  a request to make a blog post or complete annotations is not such permission.
+- When adapting an author's document, preserve the content and section order
+  outside explicit `// AGENT` annotations. Complete only the annotated requests;
+  make only necessary blog-format adaptations elsewhere (metadata, asset paths,
+  figure wrappers, and reference formatting). Do not add independent analysis,
+  caveats, corrections, or new sections without approval. Discuss suggested
+  technical or editorial changes with the author after generating the draft.
 - Frame AI infrastructure around one durable job: run a model on hardware under a
   service objective. Explain the model execution pattern, the hardware constraints,
   and the infrastructure mapping between them.
@@ -32,6 +43,11 @@ technical writing about AI infrastructure, compilers, accelerators, and systems.
 - Clearly label estimates, proxies, mixed-precision comparisons, and forecast data.
 - Cite claims close to the supporting text and define chart methodology in the
   caption or nearby prose.
+- Match the reference style of existing recent posts by default, without asking
+  the author to repeat this requirement: use inline Kramdown footnotes
+  (`[^source-id]`) and collect their definitions under a final `## References`
+  heading. Include the author or organization, linked source title, and relevant
+  version, date, or evidence scope; reuse a footnote for repeated citations.
 - When changing a metric, update the data, axis direction, title, caption, alt text,
   and surrounding argument together.
 

@@ -203,7 +203,8 @@
             padding: 10,
             callbacks: {
               label: function (context) {
-                return context.dataset.label + ": " + context.parsed.x.toFixed(1) + "% (" + money(usdValues[context.datasetIndex]) + ")";
+                var label = context.dataset.label + ": " + context.parsed.x.toFixed(1) + "%";
+                return usdValues ? label + " (" + money(usdValues[context.datasetIndex]) + ")" : label;
               }
             }
           }
@@ -393,23 +394,47 @@
 
   compositionChart(
     "h20-module-bom-chart",
-    ["SM / ALU compute*", "On-chip SRAM*", "Other die logic*", "HBM3", "CoWoS-S", "Module auxiliary"],
-    [9.08, 2.27, 3.78, 57.88, 16.63, 10.36],
-    [colors.blue, colors.violet, colors.muted, colors.orange, colors.red, colors.green],
-    [236, 59, 98, 1505, 432, 269]
+    ["Logic die", "HBM3", "CoWoS-S", "Module auxiliary"],
+    [15.12, 57.91, 16.62, 10.35],
+    [colors.blue, colors.orange, colors.red, colors.green],
+    [393, 1505, 432, 269]
   );
 
   compositionChart(
     "b200-module-bom-chart",
-    ["SM / ALU compute*", "On-chip SRAM*", "Other die logic*", "HBM3E", "Packaging + yield", "Module auxiliary"],
-    [8.46, 2.12, 3.53, 45.45, 32.92, 7.52],
-    [colors.blue, colors.violet, colors.muted, colors.orange, colors.red, colors.green],
-    [540, 135, 225, 2900, 2100, 480]
+    ["Logic dies", "HBM3E", "Packaging + yield", "Module auxiliary"],
+    [14.11, 45.45, 32.92, 7.52],
+    [colors.blue, colors.orange, colors.red, colors.green],
+    [900, 2900, 2100, 480]
+  );
+
+  compositionChart(
+    "h20-logic-floorplan-chart",
+    ["SM regions*", "Standalone L2*", "Memory + link I/O*", "Other uncore*"],
+    [59.89, 8.85, 11.79, 19.47],
+    [colors.blue, colors.violet, colors.red, colors.muted],
+    null
+  );
+
+  compositionChart(
+    "b200-logic-floorplan-chart",
+    ["GPC / SM regions*", "Standalone L2*", "HBM controllers*", "Link + host I/O*", "Other uncore*"],
+    [39.75, 14.33, 11.20, 20.90, 13.82],
+    [colors.blue, colors.violet, colors.gold, colors.red, colors.muted],
+    null
+  );
+
+  compositionChart(
+    "rubin-logic-floorplan-chart",
+    ["GPC / SM regions*", "Standalone L2*", "HBM controllers*", "Link + host I/O*", "Other uncore*"],
+    [29.33, 8.87, 14.15, 27.34, 20.31],
+    [colors.blue, colors.violet, colors.gold, colors.red, colors.muted],
+    null
   );
 
   compositionChart(
     "rubin-rack-bom-chart",
-    ["GPU packages", "Memory", "Communication", "Vera CPUs", "Power + cooling", "Platform + other"],
+    ["Rubin GPU line (ex-memory)", "Memory", "Communication", "Vera CPUs", "Power + cooling", "Platform + other"],
     [50.75, 25.65, 9.23, 2.31, 1.90, 10.16],
     [colors.blue, colors.orange, colors.violet, colors.green, colors.red, colors.muted],
     [3960000, 2001600, 720000, 180000, 148080, 793468]
@@ -462,24 +487,23 @@
     ])]
   });
 
-  trendChart("dram-cost-chart", {
+  trendChart("hbm-capacity-cost-chart", {
     unit: "USD/GB",
-    yTitle: "Cheapest DRAM USD/GB",
-    logarithmic: true,
-    yMin: 1,
-    yMax: 300,
-    xMin: 2005,
+    yTitle: "Modeled HBM USD/GB",
+    yMin: 4,
+    yMax: 20,
+    xMin: 2021,
     xMax: 2026,
-    xYears: [2005, 2010, 2015, 2020, 2026],
+    xYears: [2021, 2022, 2024, 2026],
     legend: false,
     pointLabels: true,
     tooltipFormatter: money,
-    yTickCallback: logarithmicMoney,
-    datasets: [series("Commodity DRAM", colors.green, [
-      { x: 2005, y: 185, label: "2005", short: "$185" },
-      { x: 2010, y: 12.2, label: "2010", short: "$12.2" },
-      { x: 2020, y: 3.0, label: "2020", short: "$3.0" },
-      { x: 2026, y: 3.45, label: "2026", short: "$3.45" }
+    yTickCallback: money,
+    datasets: [series("HBM capacity cost", colors.green, [
+      { x: 2021, y: 6, label: "HBM2e", short: "HBM2e" },
+      { x: 2022, y: 9, label: "HBM3", short: "HBM3" },
+      { x: 2024, y: 18, label: "HBM3e", short: "HBM3e" },
+      { x: 2026, y: 16.5, label: "HBM4 projection", short: "HBM4" }
     ])]
   });
 

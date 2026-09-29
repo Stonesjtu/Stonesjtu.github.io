@@ -12,7 +12,9 @@ excerpt: "A supply-chain view of future AI infrastructure: heterogeneous computi
 
 This is the third part of the series. [Part 1](/2026/06/30/ai-infra-and-tokenomics/) defined AI infrastructure as the implementation layer that maps models onto hardware under a service objective. [Part 2](/2026/07/01/ai-infra-scaling-problem/) showed how model work, context, output, and agent loops multiply demand. [Part 4](/2026/07/03/ai-infra-edge-intelligence/) treats edge intelligence as its own hardware, economics, and model-quality problem.
 
-This part looks forward from the supply side. The prediction is simple: **AI infrastructure will become more heterogeneous, and more hardware will be designed around LLM-specific bottlenecks rather than generic FLOPs.**
+This part looks forward from the supply side.
+
+<p class="key-insight"><strong>Key insight</strong><span>AI infrastructure will become more heterogeneous, and more hardware will be designed around LLM-specific bottlenecks rather than generic FLOPs.</span></p>
 
 <figure class="post-figure">
   <img src="{{ '/assets/ai-infra-unified-map.svg' | relative_url }}?v=20260809" alt="Excalidraw framework titled AI Infra connects Model to Hardware. Model computation, state, and execution mode flow through infrastructure compilation, placement, caching, scheduling, and operations onto hardware compute engines, memory hierarchy, topology, and power under a service objective.">
@@ -25,7 +27,28 @@ The evidence falls into three constraints. Compute progress increasingly depends
 
 ## 1. Compute becomes specialized
 
-<p class="key-insight"><strong>Key insight</strong><span>Future compute gains increasingly come from narrower numerical contracts and workload-specific engines, not transistor shrink alone.</span></p>
+<p class="key-insight"><strong>Key insight</strong><span>Peak dense compute keeps rising and dollars per peak compute keep falling, but the gains increasingly come from narrower numerical contracts and workload-specific engines rather than transistor shrink alone.</span></p>
+
+<figure class="post-figure post-chart">
+  <div class="chart-grid">
+    <section class="chart-panel">
+      <p class="chart-title">Peak compute</p>
+      <p class="chart-subtitle">Dense FP16/BF16 TFLOP/s where available; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="gpu-peak-compute-chart" role="img" aria-label="Interactive logarithmic chart showing peak dense FP16 or BF16 GPU compute from Tesla C870 through preliminary Rubin.">The source data is available in the methodology table below.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Historical buy cost</p>
+      <p class="chart-subtitle">Release-era USD per peak PFLOP/s; lower is better</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="gpu-buy-cost-chart" role="img" aria-label="Interactive logarithmic chart showing release-era acquisition dollars per peak PFLOP per second falling from Tesla C870 through B200.">The source data is available in the methodology table below.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Current rental cost</p>
+      <p class="chart-subtitle">Lambda eight-GPU on-demand USD per PFLOP-second; lower is better</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="gpu-rental-cost-chart" role="img" aria-label="Interactive logarithmic chart comparing current cloud rental dollars per PFLOP-second for V100, A100, H100, and B200.">The source data is available in the methodology table below.</canvas></div>
+    </section>
+  </div>
+  <figcaption>Three distinct views share one compute basis. Peak compute uses dense FP16/BF16, except C870's FP32 legacy proxy. Historical buy cost uses release-era standalone or eight-GPU system price divided by GPU count. Current rental cost uses Lambda's eight-GPU on-demand rates accessed July 26, 2026. Lower is better in both cost plots; Rubin has a preliminary compute point but no public cost point.</figcaption>
+</figure>
 
 ### Peak math is conditional
 
@@ -47,7 +70,7 @@ Blackwell continues the shift. NVIDIA's DGX B200 system lists 144 PFLOP/s FP4 Te
 
 These figures are not an apples-to-apples speedup curve. The datatype, sparsity mode, memory system, and programming model all changed. That is the important part. GPU progress came from changing the numerical contract: CUDA, SIMT execution, HBM, NVLink, tensor cores, TF32, BF16, FP8, FP4, sparsity, and compiler/runtime support made model structure visible to hardware.
 
-### Three views of GPU economics
+### What the three curves measure
 
 <details class="post-details" markdown="1">
 <summary>Show normalization method and GPU price data</summary>
@@ -101,98 +124,140 @@ These are infrastructure proxies, not chip MSRPs or workload benchmarks. Dividin
 
 Epoch AI's broader historical work reaches the same qualitative conclusion: GPU FLOP/s per dollar doubled roughly every 2.5 years across 2006-2021, and its newer AI hardware trend page estimates AI chip performance per dollar improving by about 37% per year across 2012-2025.[^gpu-price-performance][^epoch-ai-trends] Our World in Data republishes the same broad compute-per-dollar series as an interactive chart, adjusted for inflation.[^owid-gpu-price-performance]
 
+### A rack-to-die BOM proxy shows where the dollars moved
+
+<p class="key-insight"><strong>Key insight</strong><span>Read accelerator economics from the outside in. The rack first pays for GPUs, memory, communication, CPUs, power, and cooling; only then does it make sense to ask what sits inside one accelerator module and one logic die.</span></p>
+
 <figure class="post-figure post-chart">
-  <div class="chart-grid">
-    <section class="chart-panel">
-      <p class="chart-title">Peak compute</p>
-      <p class="chart-subtitle">Dense FP16/BF16 TFLOP/s where available; logarithmic scale</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="gpu-peak-compute-chart" role="img" aria-label="Interactive logarithmic chart showing peak dense FP16 or BF16 GPU compute from Tesla C870 through preliminary Rubin.">The source data is available in the methodology table above.</canvas></div>
-    </section>
-    <section class="chart-panel">
-      <p class="chart-title">Historical buy cost</p>
-      <p class="chart-subtitle">Release-era USD per peak PFLOP/s; lower is better</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="gpu-buy-cost-chart" role="img" aria-label="Interactive logarithmic chart showing release-era acquisition dollars per peak PFLOP per second falling from Tesla C870 through B200.">The source data is available in the methodology table above.</canvas></div>
-    </section>
-    <section class="chart-panel">
-      <p class="chart-title">Current rental cost</p>
-      <p class="chart-subtitle">Lambda eight-GPU on-demand USD per PFLOP-second; lower is better</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="gpu-rental-cost-chart" role="img" aria-label="Interactive logarithmic chart comparing current cloud rental dollars per PFLOP-second for V100, A100, H100, and B200.">The source data is available in the methodology table above.</canvas></div>
-    </section>
-  </div>
-  <figcaption>Three distinct views share one compute basis. Peak compute uses dense FP16/BF16, except C870's FP32 legacy proxy. Historical buy cost uses release-era standalone or eight-GPU system price divided by GPU count. Current rental cost uses Lambda's eight-GPU on-demand rates accessed July 26, 2026. Lower is better in both cost plots; Rubin has a preliminary compute point but no public cost point.</figcaption>
+  <section class="chart-panel">
+    <p class="chart-title">Rubin VR200 NVL72 rack</p>
+    <p class="chart-subtitle">Analyst procurement BOM proxy; about USD 7.8M</p>
+    <div class="chart-frame"><canvas id="rubin-rack-bom-chart" role="img" aria-label="One hundred percent stacked bar chart showing the estimated Vera Rubin VR200 NVL72 rack cost share across the Rubin GPU line excluding separately accounted memory, memory including HBM4, communication, CPUs, power and cooling, and the remaining platform.">The estimated breakdown is available in the table below.</canvas></div>
+  </section>
+  <figcaption>The analyst table accounts for GPU and memory separately. Its USD 3.96M Rubin GPU line therefore excludes the separately reported USD 2.00M memory line, which aggregates HBM4, Vera CPU LPDDR5X/SoCAMM, and rack storage. This accounting boundary differs from the physical GPU package, where HBM4 sits beside the logic dies.</figcaption>
 </figure>
 
-### A BOM proxy shows where the dollars moved
+A 2026 Morgan Stanley estimate puts VR200 NVL72 at USD 7.80 million: USD 3.96 million for the `GPU` line, USD 2.00 million for the separate `Memory` line, USD 720,000 for NVLink Switch and other networking chips, USD 180,000 for Vera CPUs, and the remainder for cooling, power, boards, substrates, passives, assembly, and other platform content.[^rubin-rack-bom] The memory discussion explicitly includes Rubin HBM4 alongside Vera LPDDR5X/SoCAMM and NAND storage, so the GPU line must not be read as a complete HBM-inclusive physical package. The resulting top-level ratio is **GPU line excluding separately accounted memory 50.7%, memory 25.7%, communication 9.2%, CPUs 2.3%, and platform/power/cooling 12.1%**. NVIDIA's public topology confirms why communication has its own bill: an NVL72 domain contains 18 compute trays, nine NVLink Switch trays, and 72 GPUs.[^gb200-rack-topology]
 
-<p class="key-insight"><strong>Key insight</strong><span>Arithmetic is only a small attributed share of accelerator manufacturing cost. H20 makes the memory tax especially visible: its 96 GB HBM subsystem likely represents well over half of module cost.</span></p>
+#### Accelerator packages: HBM and packaging dominate
+
+<p class="key-insight"><strong>Key insight</strong><span>Inside an accelerator module, the logic die is not the majority cost. HBM and advanced packaging together account for roughly three quarters of both the H20 and B200 manufacturing proxies.</span></p>
 
 <figure class="post-figure post-chart">
   <div class="chart-grid chart-grid--two">
     <section class="chart-panel">
       <p class="chart-title">H20 accelerator module</p>
       <p class="chart-subtitle">Estimated manufacturing proxy; about USD 2.6K</p>
-      <div class="chart-frame"><canvas id="h20-module-bom-chart" role="img" aria-label="One hundred percent stacked bar chart estimating the H20 accelerator module manufacturing cost share across attributed compute logic, attributed on-chip SRAM, other die logic, HBM3, CoWoS packaging, and auxiliary module components.">The estimated breakdown is available in the table below.</canvas></div>
+      <div class="chart-frame"><canvas id="h20-module-bom-chart" role="img" aria-label="One hundred percent stacked bar chart estimating H20 accelerator module manufacturing cost across the logic die, HBM3, CoWoS packaging, and auxiliary module components.">The estimated breakdown is available in the table below.</canvas></div>
     </section>
     <section class="chart-panel">
       <p class="chart-title">B200 accelerator module</p>
-      <p class="chart-subtitle">Estimated manufacturing cost share; about USD 6.4K</p>
-      <div class="chart-frame"><canvas id="b200-module-bom-chart" role="img" aria-label="One hundred percent stacked bar chart estimating the B200 accelerator module manufacturing cost share across attributed compute logic, attributed on-chip SRAM, other die logic, HBM3E, advanced packaging and yield loss, and auxiliary module components.">The estimated breakdown is available in the table below.</canvas></div>
-    </section>
-    <section class="chart-panel chart-panel--wide">
-      <p class="chart-title">Rubin VR200 NVL72 rack</p>
-      <p class="chart-subtitle">Analyst procurement BOM proxy; about USD 7.8M</p>
-      <div class="chart-frame"><canvas id="rubin-rack-bom-chart" role="img" aria-label="One hundred percent stacked bar chart showing the estimated Vera Rubin VR200 NVL72 rack cost share across GPU packages, memory, communication, CPUs, power and cooling, and the remaining platform.">The estimated breakdown is available in the table below.</canvas></div>
+      <p class="chart-subtitle">Estimated manufacturing proxy; about USD 6.4K</p>
+      <div class="chart-frame"><canvas id="b200-module-bom-chart" role="img" aria-label="One hundred percent stacked bar chart estimating B200 accelerator module manufacturing cost across logic dies, HBM3E, advanced packaging and yield loss, and auxiliary module components.">The estimated breakdown is available in the table below.</canvas></div>
     </section>
   </div>
-  <figcaption>H20 is a shipment-normalized estimate: Epoch AI's median Q3-Q4 2024 component spend is divided by the roughly one million 2024 H20 shipments reported by Reuters. A +/-20% range covers production timing and unit-count uncertainty. H20 and B200 logic cost is allocated 60% to SM and arithmetic structures, 15% to on-chip SRAM, and 25% to other logic; this is an illustrative floorplan proxy, not a teardown. Rubin uses a different denominator: a forward rack procurement estimate whose memory line includes HBM4, Vera CPU memory, and storage. Do not compare its rack share directly with module manufacturing shares.</figcaption>
+  <figcaption>These package-level views deliberately keep logic as one line item. H20 is shipment-normalized from Epoch AI component spend; B200 uses Epoch AI's modeled central component estimates. They estimate manufacturing inputs rather than sale price.</figcaption>
 </figure>
 
-The H20 is the most directly relevant case for inference fleets using it today. Epoch AI's component dataset assigns roughly USD 2.59 billion of median logic, CoWoS, HBM, and auxiliary spend to H20 production in Q3-Q4 2024. Reuters reported that NVIDIA shipped approximately one million H20s in 2024, implying a rough **USD 2,600 manufacturing cost per module**, with a deliberately broad USD 2,100-3,100 sensitivity range.[^h20-bom-proxy] On this basis, HBM contributes about **57.9%**, CoWoS packaging **16.6%**, all logic **15.1%**, and module auxiliary components **10.4%**.
+The H20 proxy divides approximately USD 2.59 billion of Q3-Q4 2024 component spend by roughly one million 2024 shipments, implying about **USD 2,600 per module**, with a broad USD 2,100-3,100 sensitivity range.[^h20-bom-proxy] Its top-level split is **57.9% HBM3, 16.6% CoWoS-S, 15.1% logic, and 10.4% auxiliary components**. This fits the product's role: H20 retains 96 GB of HBM3 and about 4 TB/s of bandwidth while its exported compute configuration is far below H100.[^h20-spec] Its roughly USD 12,000-15,000 2024 sale price additionally reflected margin, software value, channel costs, and market conditions.[^h20-price]
 
-The important operational point is that H20 is memory-rich but compute-restricted: it carries 96 GB of HBM3 and about 4 TB/s of memory bandwidth, while its exported compute configuration is far below H100.[^h20-spec] Applying the same illustrative 60/15/25 logic-area allocation attributes about **9.1% of module cost to SM/ALU structures** and **2.3% to on-chip SRAM**. Those are manufacturing allocations, not utilization: disabled or restricted compute structures still consume die area and wafer cost. The module sold for roughly USD 12,000-15,000 in 2024, so procurement price also includes NVIDIA margin, channel margin, software value, and market conditions rather than mapping directly to BOM.[^h20-price]
+Epoch AI estimates a B200 module at roughly USD 5,700-7,300, centered near **USD 6,400**. Its central inputs are USD 2,900 for 192 GB of physically packaged HBM3E, USD 1,100 for CoWoS-L, USD 900 for two logic dies, USD 1,000 for packaging yield loss, and USD 480 for power delivery, PCB, assembly, and testing.[^b200-bom] The top-level split is therefore **45.5% HBM3E, 32.9% packaging and yield, 14.1% logic, and 7.5% auxiliary components**. Shipping B200 specifications expose 180 GB as usable memory; the model prices the physical 192 GB capacity.
 
-Epoch AI estimates a B200 module at roughly USD 5,700-7,300, centered near USD 6,400. Its central component estimates are USD 2,900 for 192 GB of physically packaged HBM3E, USD 1,100 for CoWoS-L packaging, USD 900 for two logic dies, USD 1,000 for packaging yield loss, and USD 480 for module power delivery, PCB, assembly, and testing.[^b200-bom] Shipping B200 specifications expose 180 GB as usable GPU memory; the BOM model prices the physical HBM capacity. The component midpoints sum to USD 6,380, close to the model's rounded headline.
+#### Logic dies: a floorplan explains the logic line
 
-The die itself is not sold as separate ALU and SRAM line items. The left chart therefore applies a deliberately round area allocation to the USD 900 logic-die cost. Under the 60/15/25 midpoint, arithmetic and SM structures contribute about **8.5% of module manufacturing cost**, on-chip SRAM about **2.1%**, and other die logic about **3.5%**. A broad 50-70% compute and 10-20% SRAM sensitivity moves those first two shares only to roughly 7-10% and 1.4-2.8%. The exact floorplan is undisclosed; the architectural anchor is that B200 exposes about 126 MB of shared L2 plus large per-SM register and local-memory structures.[^b200-memory]
+<p class="key-insight"><strong>Key insight</strong><span>A logic die is not an ALU slab. Compute regions share silicon with local SRAM and control, while cache, memory controllers, die-to-die links, NVLink, PCIe, and fabric consume substantial visible area.</span></p>
 
-At rack scale, a 2026 Morgan Stanley estimate puts VR200 NVL72 at USD 7.80 million: USD 3.96 million for 72 Rubin GPUs, USD 2.00 million for memory, USD 720,000 for NVLink Switch and other networking chips, USD 180,000 for Vera CPUs, and the remainder for cooling, power, boards, substrates, passives, assembly, and other platform content.[^rubin-rack-bom] That gives the quick rack-level ratio: **GPU packages 50.7%, memory 25.7%, communication 9.2%, CPUs 2.3%, and platform/power/cooling 12.1%.** NVIDIA's public topology confirms the physical reason communication has its own bill: an NVL72 domain contains 18 compute trays, nine NVLink Switch trays, and 72 GPUs.[^gb200-rack-topology]
+<figure class="post-figure post-chart">
+  <div class="chart-grid chart-grid--two">
+    <section class="chart-panel">
+      <p class="chart-title">Hopper GH100 logic</p>
+      <p class="chart-subtitle">Physical-model area share</p>
+      <div class="chart-frame"><canvas id="h20-logic-floorplan-chart" role="img" aria-label="One hundred percent stacked bar chart estimating GH100 logic-die area across SM regions, standalone L2, memory and link I/O, and other uncore.">The floorplan shares are available in the table below.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Blackwell logic</p>
+      <p class="chart-subtitle">Pixel-area share of NVIDIA's annotated die image</p>
+      <div class="chart-frame"><canvas id="b200-logic-floorplan-chart" role="img" aria-label="One hundred percent stacked bar chart measuring Blackwell logic area across GPC and SM regions, standalone L2, HBM controllers, link and host I/O, and other uncore.">The floorplan shares are available in the table below.</canvas></div>
+    </section>
+    <section class="chart-panel chart-panel--wide">
+      <p class="chart-title">Rubin logic</p>
+      <p class="chart-subtitle">Pixel-area share of NVIDIA's annotated die image</p>
+      <div class="chart-frame"><canvas id="rubin-logic-floorplan-chart" role="img" aria-label="One hundred percent stacked bar chart measuring Rubin logic area across GPC and SM regions, standalone L2, HBM controllers, link and host I/O, and other uncore.">The floorplan shares are available in the table below.</canvas></div>
+    </section>
+  </div>
+  <figcaption>These are area proxies, not transistor-level teardowns. GH100 uses an open physical power-delivery model. Blackwell and Rubin trace NVIDIA's labeled die-image boundaries with roughly +/-2 percentage-point sensitivity. Every SM or GPC region includes arithmetic, Tensor Cores, registers, local SRAM, schedulers, and control.</figcaption>
+</figure>
+
+For GH100, the model assigns approximately **59.9% to complete SM regions, 8.9% to standalone L2, 11.8% to memory and link I/O, and 19.5% to other fabric and uncore**.[^gh100-floorplan] Applying those shares to H20's USD 393 logic line attributes about USD 235, USD 35, USD 46, and USD 77 respectively. Disabled or restricted execution units still occupy physical die area and incur wafer cost.
+
+For Blackwell, tracing NVIDIA's annotated dual-reticle image gives approximately **39.8% GPC/SM regions, 14.3% standalone L2, 11.2% HBM controllers, 20.9% NV-HBI/NVLink/PCIe regions, and 13.8% other uncore**.[^blackwell-floorplan] Applied only to B200's USD 900 logic line, those areas attribute about USD 358, USD 129, USD 101, USD 188, and USD 124. B200 also exposes about 126 MB of shared L2 plus large per-SM register, tensor-memory, and local-memory structures.[^b200-memory]
+
+Rubin's official annotated image gives approximately **29.3% GPC/SM regions, 8.9% standalone L2, 14.2% HBM controllers, 27.3% NV-HBI/NVLink/PCIe regions, and 20.3% other uncore**.[^rubin-floorplan] No disclosed bare-die cost exists. Mechanically applying area to the analyst's USD 55K GPU line would produce USD 16.1K, USD 4.9K, USD 7.8K, USD 15.0K, and USD 11.2K, but those are only attribution values. The analyst accounts for HBM4 elsewhere, while the GPU line may still include logic packaging, test, margin, and commercial value.
 
 <details class="post-details" markdown="1">
-<summary>Show the BOM proxy and sensitivity assumptions</summary>
+<summary>Show the rack, package, and die attribution tables</summary>
 
 | view | attributed category | USD proxy | share | confidence |
 | --- | --- | ---: | ---: | --- |
-| H20 module | SM / ALU / tensor compute | USD 236 | 9.1% | low; 60% of logic-cost assumption |
-| H20 module | on-chip SRAM | USD 59 | 2.3% | low; 15% of logic-cost assumption |
-| H20 module | other die logic and I/O | USD 98 | 3.8% | low; residual 25% of logic cost |
+| Rubin VR200 NVL72 rack | Rubin GPU line, excluding separately accounted memory | USD 3,960,000 | 50.7% of rack | analyst procurement estimate; not an HBM-inclusive package cost |
+| Rubin VR200 NVL72 rack | memory: HBM4, CPU memory, and storage | USD 2,001,600 | 25.7% of rack | analyst aggregate; not HBM-only |
+| Rubin VR200 NVL72 rack | NVLink Switch plus other networking chips | USD 720,000 | 9.2% of rack | sum of two analyst line items |
+| Rubin VR200 NVL72 rack | Vera CPUs | USD 180,000 | 2.3% of rack | analyst procurement estimate |
+| Rubin VR200 NVL72 rack | power and cooling | USD 148,080 | 1.9% of rack | sum of two analyst line items |
+| Rubin VR200 NVL72 rack | boards, substrate, passives, assembly, and other | USD 793,468 | 10.2% of rack | residual from reported total |
+| H20 module | logic die | USD 393 | 15.1% of module | low; shipment-normalized logic-cost line |
 | H20 module | 96 GB HBM3 | USD 1,505 | 57.9% | medium; shipment-normalized component model |
 | H20 module | CoWoS-S packaging | USD 432 | 16.6% | medium; shipment-normalized component model |
 | H20 module | module auxiliary components | USD 269 | 10.4% | medium; shipment-normalized component model |
-| B200 module | SM / ALU / tensor compute | USD 540 | 8.5% | low; 60% of logic-die cost assumption |
-| B200 module | on-chip SRAM | USD 135 | 2.1% | low; 15% of logic-die cost assumption |
-| B200 module | other die logic and I/O | USD 225 | 3.5% | low; residual 25% of logic-die cost |
+| B200 module | two logic dies | USD 900 | 14.1% of module | modeled component estimate |
 | B200 module | 192 GB physical HBM3E; 180 GB exposed | USD 2,900 | 45.5% | modeled component estimate |
 | B200 module | CoWoS-L plus package yield loss | USD 2,100 | 32.9% | modeled component estimate |
 | B200 module | module auxiliary components | USD 480 | 7.5% | modeled component estimate |
-| Rubin VR200 NVL72 | 72 GPU packages | USD 3,960,000 | 50.7% | analyst procurement estimate |
-| Rubin VR200 NVL72 | memory: HBM4, CPU memory, and storage | USD 2,001,600 | 25.7% | analyst aggregate; not HBM-only |
-| Rubin VR200 NVL72 | NVLink Switch plus other networking chips | USD 720,000 | 9.2% | sum of two analyst line items |
-| Rubin VR200 NVL72 | Vera CPUs | USD 180,000 | 2.3% | analyst procurement estimate |
-| Rubin VR200 NVL72 | power and cooling | USD 148,080 | 1.9% | sum of two analyst line items |
-| Rubin VR200 NVL72 | boards, substrate, passives, assembly, and other | USD 793,468 | 10.2% | residual from reported total |
+| H20 logic line | complete SM regions | USD 235 | 59.9% of logic; 9.1% of module | low; modeled bounding regions, not ALU-only |
+| H20 logic line | standalone L2 region | USD 35 | 8.9% of logic; 1.34% of module | low; modeled 72 mm2 bounding region |
+| H20 logic line | memory-controller plus NVLink / PCIe I/O regions | USD 46 | 11.8% of logic; 1.78% of module | low; modeled dimensions, with 12-controller scaling |
+| H20 logic line | other fabric and uncore | USD 77 | 19.5% of logic; 2.94% of module | low; residual die area |
+| B200 logic line | complete GPC / SM regions | USD 358 | 39.8% of logic; 5.6% of module | low-medium; diagram-measured area |
+| B200 logic line | standalone L2 regions | USD 129 | 14.3% of logic; 2.0% of module | low-medium; diagram-measured area |
+| B200 logic line | HBM controller regions | USD 101 | 11.2% of logic; 1.6% of module | low-medium; diagram-measured area |
+| B200 logic line | NV-HBI, NVLink, and host-I/O regions | USD 188 | 20.9% of logic; 3.0% of module | low-medium; diagram-measured area |
+| B200 logic line | other fabric and uncore | USD 124 | 13.8% of logic; 1.9% of module | low; residual diagram area |
+| Rubin GPU line attribution | complete GPC / SM regions | USD 16.1K per GPU | 29.3% of GPU line | low; excludes separately accounted memory; not cost |
+| Rubin GPU line attribution | standalone L2 regions | USD 4.9K per GPU | 8.9% of GPU line | low; excludes separately accounted memory; not cost |
+| Rubin GPU line attribution | HBM controller regions | USD 7.8K per GPU | 14.2% of GPU line | low; excludes separately accounted memory; not cost |
+| Rubin GPU line attribution | NV-HBI, NVLink, and host-I/O regions | USD 15.0K per GPU | 27.3% of GPU line | low; excludes separately accounted memory; not cost |
+| Rubin GPU line attribution | other fabric and uncore | USD 11.2K per GPU | 20.3% of GPU line | low; residual area attribution; not cost |
 
-These are neither NVIDIA's internal costs nor retail margins. The H20 estimate additionally mixes a component-production timeline with a shipment denominator, so treat its USD values as an order-of-magnitude allocation rather than accounting data. The module views exclude R&D, software, networking, and server infrastructure. The Rubin view is a forward-looking customer procurement estimate reported from a circulating analyst table; specifications, memory contracts, and final system pricing can move materially.
+Read the rows at their stated level. Rack rows are procurement estimates, module rows are manufacturing proxies, and die rows are area attributions within a disclosed logic-cost line or the analyst's memory-exclusive Rubin GPU line. They are neither NVIDIA's internal costs nor retail margins. Diagram tracing measures labeled bounding regions, not transistor occupancy, and cannot separate SRAM from arithmetic inside an SM. TechInsights sells measured GH100 and B200 floorplan analyses, but the block-utilization tables are not public.[^gh100-floorplan][^blackwell-floorplan]
 
 </details>
 
-### ALU manufacturing: narrow math buys more lanes
+### Die logic cost: arithmetic density versus wafer price
 
-The ALU-level version of the story is simpler. Arithmetic got cheaper because accelerators stopped treating every operation as a wide general-purpose floating-point operation.
+<p class="key-insight"><strong>Key insight</strong><span>FP16 arithmetic occupies far less silicon than it did at 45nm, but rising leading-edge wafer prices make dollars per ALU fall more slowly than area per ALU.</span></p>
+
+<figure class="post-figure post-chart">
+  <div class="chart-grid chart-grid--two">
+    <section class="chart-panel">
+      <p class="chart-title">Estimated raw FP16 ALU cost</p>
+      <p class="chart-subtitle">USD per one million multiply-plus-add datapaths; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="alu-cost-chart" role="img" aria-label="Interactive logarithmic chart showing the estimated raw cost of one million FP16 multiply-plus-add datapaths from 45 nanometer through N2 and Intel 18A.">The process-node estimates are available below.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Advanced wafer price</p>
+      <p class="chart-subtitle">Foundry sale price per 300 mm wafer; logarithmic scale</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="wafer-price-chart" role="img" aria-label="Interactive logarithmic chart showing approximate advanced wafer prices across 28 nanometer through 3 nanometer.">The methodology is available below.</canvas></div>
+    </section>
+  </div>
+  <figcaption>The same node shrink that fits more FP16 datapaths also raises the price of the wafer carrying them. The left chart combines both effects as a lower-bound manufacturing proxy, not a tensor-core or finished-GPU cost.</figcaption>
+</figure>
+
+The physical hierarchy starts inside the logic die. A normalized FP16 multiply-plus-add datapath shrinks from about 3,000 um2 at 45nm to roughly 206 um2 at 7nm and 87 um2 at 3nm. Lower precision and matrix engines can push useful compute density further, but only when software and the memory system keep those lanes fed.[^horowitz][^alu-area-cost]
 
 <details class="post-details" markdown="1">
-<summary>Show the FP16 ALU area-cost model</summary>
+<summary>Show the logic-cost model and process anchors</summary>
 
-A lower-bound manufacturing proxy is:
+The chart uses one deliberately narrow proxy:
 
 <div class="math-block">
 $$
@@ -204,280 +269,170 @@ $$
 $$
 </div>
 
-Using Horowitz's 45nm operation-area table and a 45nm 300mm wafer cost of about USD 2,000, the raw area-cost difference is already large before considering power, routing, register files, schedulers, or tensor-core reuse.[^horowitz][^alu-area-cost][^cmos-cost]
+The 45nm baseline adds Horowitz's published 16-bit FP add and multiply areas. Later rows scale that same logical datapath with public logic-density estimates and public wafer-price anchors.[^horowitz][^cmos-cost][^logic-density-28-7][^process-density-5nm][^process-density-3nm][^next-node-density][^cset-wafer-cost][^wafer-pricing][^n2-wafer-price]
 
-<details class="post-details" markdown="1">
-<summary>Show the 45nm operation-area baseline</summary>
+| node | era | estimated FP16 mul+add area | raw cost per 1M units |
+| --- | ---: | ---: | ---: |
+| 45nm | 2007 | 3,000 um2 | USD 85 |
+| 28nm | 2010 | 1,225 um2 | USD 52 |
+| 16nm | 2015 | 649 um2 | USD 37 |
+| 7nm | 2018 | 206 um2 | USD 27 |
+| 5nm | 2020 | 136 um2 | USD 33 |
+| 3nm | 2024 | 87 um2 | USD 24 |
+| N2 estimate | 2026 | 60 um2 | USD 25 |
+| Intel 18A estimate | 2026 | 79 um2 | USD 33 |
 
-| operation at 45nm | area | units per mm2 | raw cost per 1M units | area advantage |
-| --- | ---: | ---: | ---: | ---: |
-| 16-bit FP add | 1,360 um2 | 735 | USD 38 | 3.1x vs FP32 add |
-| 32-bit FP add | 4,184 um2 | 239 | USD 118 | baseline |
-| 16-bit FP multiply | 1,640 um2 | 610 | USD 46 | 4.7x vs FP32 multiply |
-| 32-bit FP multiply | 7,700 um2 | 130 | USD 218 | baseline |
+SMIC N+1 through N+3 form a separate 7nm-class branch: teardowns show continued density improvement, but public wafer prices are insufficient for a comparable dollar estimate.[^smic-n1-n2][^smic-n3] Huawei LogicFolding is also excluded because it increases package-footprint density through active-die stacking rather than defining a directly comparable planar node.[^huawei-logic-folding]
 
-</details>
-
-This is the silicon reason lower-precision tensor paths can improve compute per dollar. If a workload tolerates FP16, BF16, FP8, FP4, sparsity, or structured matrix engines, the chip can spend the same die area on many more arithmetic lanes. The catch is that those lanes only become useful when the model, compiler, kernels, and memory system keep them fed.
-
-For a rough 20-year shrinkage estimate, take the 45nm 16-bit FP add plus 16-bit FP multiply area as the baseline:
-
-<div class="math-block">
-$$
-A_{\text{FP16 mul+add},45\text{nm}}
-\approx
-1{,}360 + 1{,}640
-= 3{,}000\ \mu m^2
-$$
-</div>
-
-Then scale that logical datapath by public logic-density estimates. This is not a real vendor tensor-core layout. It is a normalized "same logic, denser process" estimate. The density anchors use 28/16/7nm TSMC comparisons, 5nm process-node density data, 3nm process-node density data, and next-node N2 / 18A estimates. Wafer prices reuse the same public wafer-price anchors used above; the next-node row uses a USD 30,000 wafer proxy from public 2nm pricing reports.[^logic-density-28-7][^process-density-5nm][^process-density-3nm][^next-node-density][^cset-wafer-cost][^wafer-pricing][^n2-wafer-price]
-
-N+1, N+2, and N+3 are **SMIC**, not TSMC, process names. They form a separate 7nm-class branch confirmed through product teardowns. Public N+1 density is not sufficiently documented for this model. For N+2, I infer about 92.9 MTr/mm2 from SemiAnalysis measurements showing N+3's cell height and contacted-gate pitch each shrinking 9.5% from N+2. N+3 itself measures 113.4 MTr/mm2.[^smic-n1-n2][^smic-n3]
-
-<details class="post-details" markdown="1">
-<summary>Show the process-node ALU model</summary>
-
-| node | era | logic-density reference | estimated FP16 mul+add area | area shrink vs 45nm | units per mm2 | raw cost per 1M units |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 45nm | 2007 | 6.25 MTr/mm2 baseline | 3,000 um2 | 1.0x | 333 | USD 85 |
-| 28nm | 2010 | 15.3 MTr/mm2 | 1,225 um2 | 2.4x | 816 | USD 52 |
-| 16nm | 2015 | 28.9 MTr/mm2 | 649 um2 | 4.6x | 1,541 | USD 37 |
-| 7nm | 2018 | 91.2 MTr/mm2 | 206 um2 | 14.6x | 4,864 | USD 27 |
-| 5nm | 2020 | 138.2 MTr/mm2 | 136 um2 | 22.1x | 7,371 | USD 33 |
-| SMIC N+1, 7nm-class | 2021-2022 | teardown confirmed; density not used | not modeled | not modeled | not modeled | wafer price not public |
-| SMIC N+2, 7nm-class | 2023 | about 92.9 MTr/mm2, inferred | 202 um2 | 14.9x | 4,955 | wafer price not public |
-| 3nm | 2024 | 216 MTr/mm2 | 87 um2 | 34.6x | 11,520 | USD 24 |
-| SMIC N+3, 7nm-class | 2025 | 113.4 MTr/mm2, teardown | 165 um2 | 18.1x | 6,048 | wafer price not public |
-| N2 estimate | 2026 | 313 MTr/mm2 | 60 um2 | 50.1x | 16,693 | USD 25 |
-| 18A estimate | 2026 | 238 MTr/mm2 | 79 um2 | 38.1x | 12,693 | USD 33 |
-| Huawei LogicFolding roadmap | 2026 onward | 3D/package-footprint density; not a node | not comparable | not comparable | not comparable | not modeled |
+This proxy omits yield, routing, registers, control, clocking, SRAM, verification, and packaging. It should therefore be read as the direction of raw logic economics, not as an ALU allocation within a commercial GPU.
 
 </details>
 
-</details>
+## 2. Memory cost: on-die SRAM to package HBM
 
-The area trend is the important signal: a 16-bit floating-point multiply-plus-add datapath that is about 3,000 um2 at 45nm becomes an order of magnitude smaller by 7nm, roughly 35x smaller by 3nm, and about 50x smaller at an N2-style next node under a pure logic-density scaling model. SMIC's N+1 to N+3 branch shows how DUV multi-patterning and design-technology co-optimization can keep improving a 7nm-class platform, but SemiAnalysis finds that N+3 pays for its TSMC N6-class density in process complexity, efficiency, and control.[^smic-n3]
-
-Huawei LogicFolding is a different scaling axis. Huawei describes it as shortening critical-path wiring, increasing density, and reaching its first commercial Kirin implementation in fall 2026; SemiAnalysis characterizes the approach as stacking active logic and recovering density through advanced packaging.[^huawei-logic-folding][^smic-n3] It should not be converted into a smaller planar ALU area: package-footprint density can rise by stacking active layers even when each underlying die remains on a less-dense process.
-
-The raw wafer-cost proxy falls less smoothly because advanced wafer prices rise sharply. N2 can fit more arithmetic, but a USD 30,000 wafer can erase much of the dollar-per-ALU gain versus 3nm. Real ALUs also need registers, operand routing, control, clocking, SRAM, verification margin, and yield. Tensor cores improve the economics further by amortizing control and data movement across matrix tiles instead of treating every multiply-add as an isolated scalar unit.
+<p class="key-insight"><strong>Key insight</strong><span>Moving outward from the die buys capacity, but costs latency and energy; HBM buys back bandwidth at a high package-level price.</span></p>
 
 <figure class="post-figure post-chart">
-  <section class="chart-panel">
-    <p class="chart-title">Estimated raw FP16 ALU dollar cost</p>
-    <p class="chart-subtitle">USD per one million multiply-plus-add datapaths; logarithmic scale</p>
-    <div class="chart-frame"><canvas id="alu-cost-chart" role="img" aria-label="Interactive logarithmic chart showing the estimated raw cost of one million FP16 multiply-plus-add datapaths from 45 nanometer through N2 and Intel 18A.">The process-node estimates are available in the table above.</canvas></div>
-  </section>
-  <figcaption>Logic density keeps shrinking the raw FP16 arithmetic datapath, but wafer prices flatten the dollar-cost curve at leading-edge nodes.</figcaption>
+  <div class="chart-grid chart-grid--two">
+    <section class="chart-panel">
+      <p class="chart-title">On-die SRAM cost proxy</p>
+      <p class="chart-subtitle">Raw bitcell USD/MB lower bound</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="sram-cost-chart" role="img" aria-label="Interactive chart showing the raw SRAM bitcell cost proxy across 28 nanometer, 7 nanometer, 5 nanometer, and 3 nanometer or N2-class nodes.">The methodology is available below.</canvas></div>
+    </section>
+    <section class="chart-panel">
+      <p class="chart-title">Package HBM capacity price</p>
+      <p class="chart-subtitle">Modeled USD/GB; HBM4 is projected</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="hbm-capacity-cost-chart" role="img" aria-label="Interactive chart showing modeled HBM dollars per gigabyte for HBM2e, HBM3, HBM3e, and projected HBM4.">The methodology is available below.</canvas></div>
+    </section>
+    <section class="chart-panel chart-panel--wide">
+      <p class="chart-title">Package HBM bandwidth price</p>
+      <p class="chart-subtitle">Modeled USD per TB/s</p>
+      <div class="chart-frame chart-frame--compact"><canvas id="hbm-bandwidth-cost-chart" role="img" aria-label="Interactive chart showing modeled HBM dollars per terabyte per second for HBM2e through projected HBM4.">The methodology is available below.</canvas></div>
+    </section>
+  </div>
+  <figcaption>The hierarchy has two different price units: on-die SRAM is constrained by silicon area per MB, while package HBM is purchased for both GB of capacity and TB/s of bandwidth.</figcaption>
 </figure>
 
-## 2. Memory sets the working set
-
-<p class="key-insight"><strong>Key insight</strong><span>Model and context capacity are constrained by where bytes live, how quickly they move, and how much each level of the memory hierarchy costs.</span></p>
-
-Memory and manufacturing show the same pattern. Compute can keep rising, but every token also needs bytes close to the math unit. The difficult part is that each level of memory optimizes a different constraint: on-chip SRAM is fast but area-expensive, HBM is bandwidth-rich but package-expensive, commodity DRAM is capacity-rich but far away, and advanced wafers are no longer getting cheap fast enough to hide the tradeoff.
+On-die SRAM keeps reused data closest to the arithmetic, but each additional MB consumes expensive logic area. HBM holds far more model state and KV cache, yet it adds stacked memory, interposers, controllers, and package complexity. AI infrastructure bridges the two with tiling, fusion, quantization, paging, and cache placement.
 
 <details class="post-details" markdown="1">
-<summary>Show SRAM, HBM, DRAM, and wafer methodology</summary>
+<summary>Show the SRAM and HBM methodology</summary>
 
-### On-chip SRAM: fast bytes are area-limited
+### On-die SRAM cost
 
-For on-chip SRAM, there is no public spot price per MB. A useful lower-bound proxy is:
+Because SRAM has no public spot price, the chart uses a lower bound:
 
 <div class="math-block">
 $$
 \text{raw SRAM cost per MB}
 \approx
-\text{SRAM bitcell area per MB}
+\text{bitcell area per MB}
 \times
 \text{wafer price per mm}^2
 $$
 </div>
 
-This ignores periphery, redundancy, yield, cache tags, routing, and design cost, so it is not a product cost. It is still useful because it shows why cache capacity is no longer free. TSMC reported a 0.127 um2 28nm 6T SRAM cell in 2009; public 5nm and 2nm SRAM reports put high-density bitcells around 0.021 um2; CSET estimated 7nm and 5nm wafer sale prices at USD 9,346 and USD 16,988 respectively; public 2026 wafer-price roundups put TSMC 3nm around USD 19,500.[^tsmc-28nm-sram][^tsmc-5nm-sram][^tsmc-2nm-sram][^cset-wafer-cost][^wafer-pricing]
+| node | SRAM bitcell | wafer price used | raw SRAM cost proxy |
+| --- | ---: | ---: | ---: |
+| 28nm | 0.127 um2 | USD 3,000 | USD 0.045/MB |
+| 7nm | 0.027 um2 | USD 9,346 | USD 0.030/MB |
+| 5nm | 0.021 um2 | USD 16,988 | USD 0.042/MB |
+| 3nm / 2nm-class | 0.021 um2 | USD 19,500 | USD 0.049/MB |
 
-<details class="post-details" markdown="1">
-<summary>Show the SRAM area-cost proxy</summary>
+The proxy excludes periphery, redundancy, cache tags, routing, and yield. It nevertheless captures the post-7nm tension: SRAM cells shrink slowly while wafer prices rise.[^tsmc-28nm-sram][^tsmc-5nm-sram][^tsmc-2nm-sram][^cset-wafer-cost][^wafer-pricing] GPU designers respond by spending more die area on reuse: L2 grew from about 4 MB on P100 to 40 MB on A100, 50 MB on H100, and roughly 126 MB in public B200 analysis.[^a100][^h100][^chips-b200-cache]
 
-| node | SRAM bitcell | wafer price used | raw MB area | raw SRAM cost proxy |
-| --- | ---: | ---: | ---: | ---: |
-| 28nm | 0.127 um2 | USD 3,000 | 1.065 mm2/MB | USD 0.045/MB |
-| 7nm | 0.027 um2 | USD 9,346 | 0.226 mm2/MB | USD 0.030/MB |
-| 5nm | 0.021 um2 | USD 16,988 | 0.176 mm2/MB | USD 0.042/MB |
-| 3nm / 2nm-class | 0.021 um2 | USD 19,500 | 0.176 mm2/MB | USD 0.049/MB |
+### Package HBM cost
 
-</details>
+HBM is expensive capacity purchased for proximity and bandwidth. Modeled prices rise from about USD 6/GB for HBM2e to USD 18/GB at the HBM3e peak, with projected HBM4 around USD 16.5/GB. The corresponding bandwidth proxy ranges from about USD 209 to USD 352 per TB/s.[^stanford-memory-prices][^rambus-hbm]
 
-The punchline is not that SRAM got worse in absolute density. It got much denser. The punchline is that after 7nm, bitcell shrink is small while wafer cost keeps rising. That means larger on-chip caches require more deliberate architectural justification: more L2, more shared memory, tensor memory, larger register files, and better reuse have to earn their silicon area.
+| GPU | HBM | capacity | bandwidth |
+| --- | --- | ---: | ---: |
+| P100 | HBM2 | 16 GB | 720 GB/s |
+| A100 | HBM2 / HBM2e | 40-80 GB | 1,555-2,039 GB/s |
+| H100 | HBM3 | 80 GB | over 3 TB/s |
+| B200 | HBM3e | 180 GB | 7.7 TB/s |
+| Rubin | HBM4 | 288 GB | 22 TB/s |
 
-NVIDIA GPU caches show the architectural response. P100 had about 4 MB of L2, V100 6 MB, A100 40 MB, H100 50 MB, and public B200 analysis reports about 126 MB of total L2.[^a100][^h100][^chips-b200-cache] More on-chip SRAM is being used because going to HBM is expensive in energy and latency, but the amount is still tiny compared with model state and KV cache.
-
-### Off-chip memory: capacity and bandwidth diverge
-
-Off-chip memory has split into two worlds. Commodity DRAM remains the capacity workhorse, but its price-per-GB improvement slowed sharply after 2010. Stanford DAM's compiled memory-price dataset shows cheapest DRAM falling from about USD 185/GB in 2005 to USD 12.2/GB in 2010, then only to USD 3.0/GB by 2020 and about USD 3.45/GB in July 2026.[^stanford-memory-prices] HBM moves in the other direction: it is not cheap capacity, it is purchased bandwidth close to the accelerator. Rambus summarizes HBM's speed evolution from 128 GB/s per HBM device to 2.048 TB/s for HBM4, while Stanford DAM's modeled HBM data puts HBM2e around USD 6/GB and HBM3e peak around USD 18/GB.[^rambus-hbm][^stanford-memory-prices]
-
-Vera Rubin makes the next step concrete. NVIDIA's preliminary specification assigns each Rubin GPU 288 GB of HBM4 with 22 TB/s of memory bandwidth. That is 1.6x B200's 180 GB capacity and about 2.9x its 7.7 TB/s bandwidth. At NVL72 scale, 72 Rubin GPUs aggregate to 20.7 TB of HBM4 and 1,580 TB/s of memory bandwidth.[^vera-rubin-spec]
-
-<details class="post-details" markdown="1">
-<summary>Show off-chip capacity and bandwidth anchors</summary>
-
-| off-chip memory trend | representative anchors |
-| --- | --- |
-| GPU HBM generation | P100/V100: HBM2; A100 40GB: HBM2; A100 80GB: HBM2e; H100: HBM3; B200: HBM3e; Rubin: HBM4[^p100][^v100][^a100][^h100][^b200-lenovo][^vera-rubin-spec] |
-| GPU HBM capacity | P100: 16 GB; V100: 16 GB; A100: 40 GB; H100: 80 GB; B200: 180 GB; Rubin: 288 GB[^p100][^v100][^a100][^h100][^b200-lenovo][^vera-rubin-spec] |
-| GPU HBM bandwidth | P100: 720 GB/s; V100: 900 GB/s; A100: 1,555 GB/s; H100: over 3 TB/s; B200: 7.7 TB/s; Rubin: 22 TB/s[^p100][^v100][^a100][^h100][^b200-lenovo][^vera-rubin-spec] |
-| Vera Rubin NVL72 aggregate | 20.7 TB HBM4 capacity and 1,580 TB/s memory bandwidth across 72 Rubin GPUs[^vera-rubin-spec] |
-| commodity DRAM price/capacity | about USD 185/GB in 2005, USD 12.2/GB in 2010, USD 3.0/GB in 2020, and USD 3.45/GB in July 2026[^stanford-memory-prices] |
-| HBM price/capacity | HBM2e around USD 6/GB, HBM3 around USD 9/GB, HBM3e peak around USD 18/GB, HBM4 projected around USD 16.5/GB[^stanford-memory-prices] |
-| HBM price/bandwidth | HBM2e around USD 209 per TB/s, HBM3 around USD 264 per TB/s, HBM3e peak around USD 352 per TB/s, HBM4 projected around USD 297 per TB/s[^stanford-memory-prices] |
+At NVL72 scale, Rubin aggregates 20.7 TB of HBM4 capacity and 1,580 TB/s of memory bandwidth across 72 GPUs.[^p100][^a100][^h100][^b200-lenovo][^vera-rubin-spec]
 
 </details>
 
-### Manufacturing: wafer cost pushes back
+## 3. Communication cost: package to rack to cluster
 
-The manufacturing layer is the shared denominator under both compute and SRAM. If each wafer gets more expensive, every large die, cache expansion, interposer choice, and yield loss has a higher dollar impact.
+<p class="key-insight"><strong>Key insight</strong><span>Every step away from the die expands the compute domain, but adds more latency, contention, topology, and equipment cost.</span></p>
 
-<details class="post-details" markdown="1">
-<summary>Show advanced wafer-price anchors</summary>
-
-| process node | approximate era | wafer price anchor | why it matters |
-| --- | ---: | ---: | --- |
-| 28nm | 2010 | USD 3,000 | cheap enough that SRAM scaling still translated into lower raw MB cost |
-| 7nm | 2018 | USD 9,346 | density improved, but wafer price more than tripled |
-| 5nm | 2020 | USD 16,988 | raw SRAM cost proxy rose again despite smaller cells |
-| 3nm | 2024 | USD 19,500 | wafer price keeps rising while SRAM bitcell shrink slows |
-
-</details>
-
-</details>
-
-<figure class="post-figure post-chart">
-  <div class="chart-grid chart-grid--two">
-    <section class="chart-panel">
-      <p class="chart-title">On-chip SRAM cost proxy</p>
-      <p class="chart-subtitle">Raw bitcell USD/MB lower bound</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="sram-cost-chart" role="img" aria-label="Interactive chart showing the raw SRAM bitcell cost proxy across 28 nanometer, 7 nanometer, 5 nanometer, and 3 nanometer or N2-class nodes.">The methodology is available above.</canvas></div>
-    </section>
-    <section class="chart-panel">
-      <p class="chart-title">Commodity DRAM price</p>
-      <p class="chart-subtitle">Cheapest listed USD/GB; logarithmic scale</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="dram-cost-chart" role="img" aria-label="Interactive logarithmic chart showing commodity DRAM dollars per gigabyte falling from 2005 through 2026.">The methodology is available above.</canvas></div>
-    </section>
-    <section class="chart-panel">
-      <p class="chart-title">HBM bandwidth price</p>
-      <p class="chart-subtitle">Modeled USD per TB/s</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="hbm-bandwidth-cost-chart" role="img" aria-label="Interactive chart showing modeled HBM dollars per terabyte per second for HBM2e through projected HBM4.">The methodology is available above.</canvas></div>
-    </section>
-    <section class="chart-panel">
-      <p class="chart-title">Advanced wafer price</p>
-      <p class="chart-subtitle">Foundry sale price per 300 mm wafer; logarithmic scale</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="wafer-price-chart" role="img" aria-label="Interactive logarithmic chart showing approximate advanced wafer prices across 28 nanometer through 3 nanometer.">The methodology is available above.</canvas></div>
-    </section>
-  </div>
-  <figcaption>Memory economics explain why AI infra is increasingly about locality: on-chip SRAM density is harder to buy with node shrinks, HBM bandwidth is expensive capacity, commodity DRAM is cheap but far away, and advanced wafer prices keep rising.</figcaption>
+<figure class="post-figure">
+  <img src="{{ '/assets/scale-up-scale-out-excalidraw.svg' | relative_url }}" alt="Excalidraw topology showing package links connecting GPU dies, NVLink and NVSwitch connecting GPUs within rack-scale domains, and Ethernet or InfiniBand connecting racks into a cluster.">
+  <figcaption>Read the hierarchy from near to far: package links join dies, scale-up links make a box or rack behave like one machine, and scale-out fabric connects many rack-scale machines.</figcaption>
 </figure>
 
-## 3. Communication becomes topology
+| physical level | representative link | cost and performance unit |
+| --- | --- | --- |
+| package | NV-HBI and die-to-die fabric | die area, package complexity, bytes/s per edge |
+| rack scale-up | NVLink and NVSwitch | bandwidth per GPU or rack-scale domain |
+| cluster scale-out | Ethernet and InfiniBand | ports, optics, NICs, cables, and USD/Gb/s |
 
-<p class="key-insight"><strong>Key insight</strong><span>Once a model outgrows one accelerator, interconnect topology becomes part of the computer and part of model performance.</span></p>
-
-The next bottleneck appears when one accelerator is not enough. Scaling out turns compute into a distributed system problem: GPUs must exchange gradients, activations, KV cache state, expert routes, pipeline bubbles, and scheduling metadata. A useful first-order model is the latency-bandwidth model:
+The software-visible communication cost can be approximated with one latency-bandwidth model:
 
 <div class="math-block">
 $$
 T_{\text{comm}}
 \approx
-\alpha \cdot n_{\text{messages}}
+\alpha n_{\text{messages}}
 +
 \frac{\text{bytes moved}}{B_{\text{effective}}}
 $$
 </div>
 
-Here `alpha` is the per-message latency cost and `B_effective` is achieved communication bandwidth after topology, protocol, contention, and collective implementation overhead. That term matters because modern training and inference are full of collectives:
+Here `alpha` is latency per message and `B_effective` is achieved bandwidth after topology, protocol, contention, and collective overhead. Tensor parallelism, MoE routing, and disaggregated serving increase either the message count, the bytes moved, or both. NVIDIA's scale-up bandwidth per GPU rises from 900 GB/s on Hopper to 1.8 TB/s on Blackwell and 3.6 TB/s on Rubin; NVL72 aggregate bandwidth rises from 130 TB/s to 260 TB/s between Blackwell and Rubin.[^nvlink][^hgx-rubin]
 
-<details class="post-details" markdown="1">
-<summary>Show parallelism and scale-up bandwidth anchors</summary>
+### Cluster fabric cost: dollars per bandwidth
 
-<details class="post-details" markdown="1">
-<summary>Show communication pressure by parallelism pattern</summary>
-
-| parallelism pattern | communication pressure |
-| --- | --- |
-| data parallel | gradient all-reduce or reduce-scatter / all-gather |
-| tensor parallel | activation all-reduce and all-gather inside layers |
-| pipeline parallel | boundary activations and pipeline bubbles |
-| expert parallel / MoE | token dispatch and all-to-all routing |
-| disaggregated serving | KV cache movement, prefill/decode handoff, remote memory access |
-
-</details>
-
-Interconnect bandwidth is improving aggressively because this tax is now first-order. NVIDIA lists NVLink bandwidth per GPU rising from 900 GB/s on Hopper to 1.8 TB/s on Blackwell and 3.6 TB/s on Rubin; its NVLink Switch table lists NVL72 aggregate bandwidth rising from 130 TB/s on Blackwell to 260 TB/s on Rubin.[^nvlink] NVIDIA's HGX Rubin page makes the same point at the system level: higher token throughput is tied not only to more NVFP4 compute, but also to more HBM bandwidth and more NVLink Switch bandwidth.[^hgx-rubin]
-
-<details class="post-details" markdown="1">
-<summary>Show Hopper, Blackwell, and Rubin scale-up anchors</summary>
-
-| system generation | interconnect anchor | why it matters |
-| --- | ---: | --- |
-| Hopper | 900 GB/s NVLink per GPU | scale-up communication becomes part of model throughput |
-| Blackwell | 1.8 TB/s NVLink per GPU; 130 TB/s NVL72 aggregate | larger rack-scale GPU domains for model parallelism |
-| Rubin | 3.6 TB/s NVLink per GPU; 260 TB/s NVL72 aggregate | communication bandwidth has to scale with MoE, long context, and agentic inference |
-
-</details>
-
-</details>
-
-There are two different network curves hiding behind the same word "interconnect":
-
-- **Scale-up** is the tightly coupled GPU domain inside a box or rack. NVLink / NVSwitch bandwidth is not sold like a generic switch port; it is bundled into GPU systems, board design, power delivery, and thermal design. The useful public metric is bandwidth per GPU or per rack-scale domain.
-- **Scale-out** is the cluster fabric across nodes and racks. Ethernet and InfiniBand have visible port speeds, switch radix, optics, cables, NICs, and sometimes observable street prices. This is where a rough dollar-per-Gb/s proxy is possible.
-
-<figure class="post-figure">
-  <img src="{{ '/assets/scale-up-scale-out-excalidraw.svg' | relative_url }}" alt="Excalidraw topology showing GPUs connected by NVSwitch inside two rack-scale domains, with the domains joined by an Ethernet or InfiniBand scale-out fabric.">
-  <figcaption>Scale-up tries to make accelerators behave like one machine; scale-out connects many machines while exposing more latency, topology, and software-visible coordination.</figcaption>
-</figure>
-
-The speed curve is steep. InfiniBand moved from 4x QDR at 32 Gb/s in the late 2000s, to EDR 100 Gb/s, HDR 200 Gb/s, NDR 400 Gb/s, and XDR 800 Gb/s. Ethernet followed the same broad shape: 40/100GbE was standardized in 2010, 200/400GbE in 2017, and 800GbE in 2024.[^infiniband-rates][^ethernet-100g][^ethernet-400g][^ethernet-800g] NVIDIA's current Quantum-X800 documentation lists 72-port and 144-port XDR systems at 800 Gb/s per port, up to 115.2 Tb/s of maximum throughput for the 4U system.[^quantum-x800]
-
-<details class="post-details" markdown="1">
-<summary>Show scale-out price methodology and switch data</summary>
-
-For a dollar-per-speed proxy, use switch chassis price divided by front-panel bandwidth. This is not total cluster networking cost. It excludes optics, cables, NICs, support contracts, power, rack layout, and topology oversubscription. It is still useful because it shows the direction of the switching layer itself. The anchors below combine a legacy Cisco 10GbE price-list snapshot, public Mellanox / NVIDIA InfiniBand switch listings, and current SN5610 800GbE listing/spec data.[^nexus-price][^mellanox-switch-prices][^sn5610-price][^sn5610-specs]
-
-<details class="post-details" markdown="1">
-<summary>Show scale-out switch price anchors</summary>
-
-| scale-out switch proxy | approximate era | ports x port speed | public price anchor | switch dollars per Gb/s |
-| --- | ---: | ---: | ---: | ---: |
-| Cisco Nexus 5020 10GbE | 2008 | 40 x 10 Gb/s | USD 28,770 list-price snapshot | USD 72/Gb/s |
-| Mellanox SB7800 EDR | 2015 | 36 x 100 Gb/s | USD 10,259 channel listing | USD 2.85/Gb/s |
-| Mellanox QM8700 HDR | 2018 | 40 x 200 Gb/s | USD 18,740 channel listing | USD 2.34/Gb/s |
-| NVIDIA QM9700 NDR | 2022 | 64 x 400 Gb/s | USD 32,870 channel listing | USD 1.28/Gb/s |
-| NVIDIA SN5610 800GbE | 2026 | 64 x 800 Gb/s | USD 51,999 channel listing | USD 1.02/Gb/s |
-
-</details>
-
-</details>
+<p class="key-insight"><strong>Key insight</strong><span>Switch bandwidth became much cheaper, but AI systems spend the gain on larger communication domains and more distributed inference.</span></p>
 
 <figure class="post-figure post-chart">
   <div class="chart-grid chart-grid--two">
     <section class="chart-panel">
       <p class="chart-title">Scale-out port speed</p>
       <p class="chart-subtitle">Front-panel Gb/s; logarithmic scale</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="interconnect-speed-chart" role="img" aria-label="Interactive logarithmic chart showing scale-out port speed increasing from 10 gigabits per second in 2008 to 800 gigabits per second in 2026.">The switch data is available in the table above.</canvas></div>
+      <div class="chart-frame chart-frame--compact"><canvas id="interconnect-speed-chart" role="img" aria-label="Interactive logarithmic chart showing scale-out port speed increasing from 10 gigabits per second in 2008 to 800 gigabits per second in 2026.">The switch data is available below.</canvas></div>
     </section>
     <section class="chart-panel">
       <p class="chart-title">Switch cost per bandwidth</p>
       <p class="chart-subtitle">Chassis-only USD/Gb/s proxy; logarithmic scale</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="interconnect-cost-chart" role="img" aria-label="Interactive logarithmic chart showing switch dollars per gigabit per second falling from about 72 dollars to about one dollar.">The switch data is available in the table above.</canvas></div>
+      <div class="chart-frame chart-frame--compact"><canvas id="interconnect-cost-chart" role="img" aria-label="Interactive logarithmic chart showing switch dollars per gigabit per second falling from about 72 dollars to about one dollar.">The switch data is available below.</canvas></div>
     </section>
   </div>
-  <figcaption>Scale-out switch bandwidth improved dramatically over the last two decades, but the system-level network bill does not fall as fast as raw switch dollars per Gb/s because optics, NICs, cables, power, and topology complexity become first-order costs.</figcaption>
+  <figcaption>Port speed rose from tens to hundreds of Gb/s while chassis-only cost fell from about USD 72 to USD 1 per Gb/s. This proxy excludes optics, NICs, cables, support, power, and topology overhead.</figcaption>
 </figure>
 
-The punchline is subtle: network silicon has delivered a large cost-per-bit improvement, but AI clusters keep spending the savings. Higher port speed enables larger all-reduce domains, more tensor-parallel shards, more MoE all-to-all traffic, and more disaggregated serving. The value of better AI infrastructure is therefore not just "buy faster switches." It is reducing bytes moved, placing bytes closer to compute, overlapping collectives with kernels, and choosing parallelism plans that turn expensive network bandwidth into useful tokens.
+InfiniBand progressed from QDR through EDR, HDR, NDR, and XDR; Ethernet moved from 40/100GbE to 200/400GbE and then 800GbE.[^infiniband-rates][^ethernet-100g][^ethernet-400g][^ethernet-800g] Faster links do not automatically lower the cluster network bill: larger collective domains, expert routing, and KV-cache movement consume the added bandwidth.
 
-This is why "chips are slowing down" is not only a FLOP story. It is a locality and communication story. When model weights, activations, KV cache, and tool-use context grow, the system pays for bytes in several currencies: SRAM area, HBM dollars, HBM bandwidth, interconnect bandwidth, synchronization time, package complexity, wafer cost, and energy. Good AI infrastructure wins by spending fewer bytes, reusing them closer to compute, and making expensive memory and network bandwidth do useful work more often.
+<details class="post-details" markdown="1">
+<summary>Show communication workloads and switch-price anchors</summary>
+
+| workload pattern | dominant communication |
+| --- | --- |
+| tensor parallel | activation all-reduce and all-gather |
+| pipeline parallel | boundary activations and pipeline bubbles |
+| expert parallel / MoE | token dispatch and all-to-all routing |
+| disaggregated serving | KV-cache movement and prefill/decode handoff |
+
+The scale-out price proxy divides public switch chassis price by front-panel bandwidth. It measures the switching layer, not a complete network.[^nexus-price][^mellanox-switch-prices][^sn5610-price][^sn5610-specs]
+
+| switch proxy | era | ports x speed | price anchor | USD/Gb/s |
+| --- | ---: | ---: | ---: | ---: |
+| Cisco Nexus 5020 | 2008 | 40 x 10 Gb/s | USD 28,770 | USD 72 |
+| Mellanox SB7800 EDR | 2015 | 36 x 100 Gb/s | USD 10,259 | USD 2.85 |
+| Mellanox QM8700 HDR | 2018 | 40 x 200 Gb/s | USD 18,740 | USD 2.34 |
+| NVIDIA QM9700 NDR | 2022 | 64 x 400 Gb/s | USD 32,870 | USD 1.28 |
+| NVIDIA SN5610 800GbE | 2026 | 64 x 800 Gb/s | USD 51,999 | USD 1.02 |
+
+NVIDIA's Quantum-X800 documentation lists 72-port and 144-port XDR systems at 800 Gb/s per port, reaching 115.2 Tb/s for the 4U system.[^quantum-x800]
+
+</details>
+
+Across all three levels, infrastructure creates value by moving fewer bytes, keeping reusable state near compute, overlapping communication with kernels, and choosing a parallelism plan that converts costly bandwidth into useful tokens.
 
 ## Edge becomes a separate placement frontier
 
@@ -531,10 +486,13 @@ The teams that win will not only have better models or better hardware. They wil
 [^lambda-pricing]: Lambda, [GPU Instances](https://lambda.ai/instances), eight-GPU on-demand price per GPU-hour, accessed 2026-07-26.
 [^h20-bom-proxy]: Epoch AI, [AI Chip Components dataset and methodology](https://epoch.ai/data/ai-chip-components-documentation), accessed 2026-08-09. The median H20 rows for Q3 and Q4 2024 sum to approximately USD 392 million logic, USD 431 million CoWoS, USD 1.500 billion HBM, and USD 268 million auxiliary spend. Epoch AI's [AI Chip Sales methodology](https://epoch.ai/data/ai-chip-sales-documentation/methodology) cites approximately one million H20 shipments in 2024. Dividing component spend by shipments gives the article's USD 2.6K module proxy; the production and shipment periods are not perfectly matched.
 [^h20-spec]: NVIDIA documentation identifies the [H20 SXM5 as a 96 GB Hopper GPU](https://docs.nvidia.com/ai-enterprise/release-8/latest/infra-software/vgpu/reference/hopper.html). [Contemporary H20 product reporting](https://www.tomshardware.com/tech-industry/artificial-intelligence/nvidia-to-make-12-billion-selling-ai-gpus-to-china) lists 96 GB of HBM3, 4.0 TB/s of memory bandwidth, and 296 FP8 TFLOP/s.
+[^gh100-floorplan]: NVIDIA's [Hopper architecture description](https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/) specifies an 814 mm2 full GH100 die with 144 SMs, 60 MB L2, 12 memory controllers, NVLink, and PCIe. Anasim's open [H100 full-chip power-delivery model](https://www.anasim.com/articles/pdn-resonance-h100-analysis) represents 144 SM regions at 1.84 x 1.84 mm each, two L2 regions at 12 x 3 mm each, ten enabled memory-controller regions at 1 x 3.5 mm each, NVLink at 27.5 x 1.2 mm, and PCIe at 21 x 1 mm. This article scales the controller region from ten to the full design's twelve. The resulting allocation is approximately 59.9%, 8.8%, 11.8%, and 19.5% of die area for SM regions, L2, named I/O, and residual uncore. These are engineering-model bounding regions, not measured transistor utilization. TechInsights confirms that its paid [GH100 digital floorplan analysis](https://www.techinsights.com/zh-cn/node/51295) contains measured functional-block sizes and die-utilization percentages, but does not publish the table on the accessible page.
 [^h20-price]: Yelin Mo and Brenda Goh, Reuters, ["Nvidia's new China-focused AI chip set to be sold at similar price to Huawei product"](https://m.uk.investing.com/news/stock-market-news/exclusivenvidias-new-chinafocused-ai-chip-set-to-be-sold-at-similar-price-to-huawei-product-3319402), 2024. NVIDIA distributor pricing was reported at USD 12,000-15,000 per card; later pricing varied with demand and export restrictions.
 [^b200-bom]: Venkat Somala, Epoch AI, ["NVIDIA's B200 costs around USD 6,400 to produce, with memory accounting for half"](https://epoch.ai/data-insights/b200-cost-breakdown), 2025. The model uses public reporting, analyst estimates, company disclosures, and Monte Carlo ranges; it estimates variable manufacturing cost rather than server price or NVIDIA's full cost structure.
 [^b200-memory]: Cornell Virtual Workshop, ["GPU Memory Levels"](https://cvw.cac.cornell.edu/gpu-architecture/gpu-memory/memory_levels), accessed 2026-08-09, summarizing B200's 126 MB L2, 256 KB register file per SM, and 256 KB unified L1/shared memory per SM. The article's cost allocation is an explicit proxy, not Cornell's estimate.
-[^rubin-rack-bom]: Anton Shilov, Tom's Hardware, ["Nvidia's memory costs soar 485%, latest AI systems now cost USD 7.8 million to build"](https://www.tomshardware.com/tech-industry/artificial-intelligence/nvidias-memory-costs-soar-485-percent-latest-ai-systems-now-cost-usd7-8-million-to-build-memory-now-comprises-25-percent-of-the-total-cost-rubin-gpus-a-mere-usd50-000-apiece), 2026; [full line-item transcription of the circulated Morgan Stanley table](https://log.eurekapu.com/vr200-nvl72-bom-memory-cost/), 2026. This is a forward-looking analyst procurement estimate, not a public NVIDIA BOM or independently verified teardown.
+[^blackwell-floorplan]: NVIDIA's [annotated Blackwell Ultra dual-reticle image and architecture description](https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra/) show eight GPCs, distributed L2, HBM controllers, NV-HBI, NVLink, NVLink-C2C, and PCIe. Cornell's [Blackwell chip diagram notes](https://cvw.cac.cornell.edu/gpu-architecture/horizon-gpus-blackwell-b200/blackwell_chip) state that the B200 and B300 layouts are practically identical. The percentages here trace the labeled white boundaries against the complete dual-die rectangle; moving ambiguous boundaries by several pixels changes major categories by roughly +/-2 percentage points. TechInsights confirms a physical [B200 processor floorplan analysis](https://www.techinsights.com/blog/nvidia-blackwell-b200-processor-floorplan-analysis), but its detailed block table is not public.
+[^rubin-floorplan]: NVIDIA's July 2026 [Rubin GPU architecture article](https://developer.nvidia.com/blog/inside-nvidia-rubin-gpu-architecture-powering-the-era-of-agentic-ai/) identifies two reticle-limited dies, 336 billion transistors, 224 SMs, 896 Tensor Cores, 288 GB HBM4, and the labeled GPC, L2, HBM-controller, NV-HBI, NVLink, NVLink-C2C, and PCIe regions used here. The percentages trace the white boundaries in NVIDIA's Figure 2 against the complete two-die rectangle, with roughly +/-2 percentage-point boundary sensitivity. They are image-area measurements, not a teardown or transistor-level floorplan.
+[^rubin-rack-bom]: Anton Shilov, Tom's Hardware, ["Nvidia's memory costs soar 485%, latest AI systems now cost USD 7.8 million to build"](https://www.tomshardware.com/tech-industry/artificial-intelligence/nvidias-memory-costs-soar-485-percent-latest-ai-systems-now-cost-usd7-8-million-to-build-memory-now-comprises-25-percent-of-the-total-cost-rubin-gpus-a-mere-usd50-000-apiece), 2026; [full line-item transcription of the circulated Morgan Stanley table](https://log.eurekapu.com/vr200-nvl72-bom-memory-cost/), 2026. The source table lists `GPU` and `Memory` separately, while the accompanying analysis attributes the memory line to HBM4, Vera LPDDR5X/SoCAMM, and NAND. This is a forward-looking analyst procurement estimate, not a public NVIDIA BOM or independently verified teardown.
 [^gb200-rack-topology]: NVIDIA, ["Understanding Your Grace-Blackwell Systems"](https://docs.nvidia.com/multi-node-nvlink-systems/multi-node-tuning-guide/system.html), documenting the NVL72 reference configuration with 18 compute trays, nine NVLink Switch trays, and 72 GPUs. Rubin pricing is not inferred from this source; it is used only as the rack-topology anchor.
 [^gpu-price-performance]: Jaime Sevilla and Pablo Villalobos, [Trends in GPU Price-Performance](https://epoch.ai/publications/trends-in-gpu-price-performance), Epoch AI, 2022.
 [^epoch-ai-trends]: Epoch AI, [Trends in Artificial Intelligence: AI Hardware](https://epoch.ai/trends), accessed 2026-07-02.
@@ -572,4 +530,4 @@ The teams that win will not only have better models or better hardware. They wil
 
 <script defer src="{{ '/assets/vendor/chart.umd.min.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/chart-theme.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/series-charts.js' | relative_url }}?v=20260809i"></script>
+<script defer src="{{ '/assets/series-charts.js' | relative_url }}?v=20260810e"></script>
