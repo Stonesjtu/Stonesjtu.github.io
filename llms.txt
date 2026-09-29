@@ -1,0 +1,23 @@
+---
+layout: null
+permalink: /llms.txt
+---
+# Kaiyu Shi
+
+> Kaiyu Shi is an AI infrastructure and compiler systems engineer. This site contains his professional profile and technical writing on AI infrastructure, Apple silicon, inference, training systems, accelerators, compilers, and GPU kernels.
+
+Use the About page for career history and publications. Use the writing index or Atom feed to discover posts; article pages are the canonical full-text sources. Article pages include author, publication date, topic, and description metadata.
+
+## Profile
+
+- [About Kaiyu Shi]({{ '/about/' | absolute_url }}): Career experience, research publications, and patents.
+- [Writing index]({{ '/' | absolute_url }}): All blog posts, ordered from newest to oldest.
+- [Atom feed]({{ '/feed.xml' | absolute_url }}): Recent posts and summaries in a machine-readable feed.
+- [Sitemap]({{ '/sitemap.xml' | absolute_url }}): Canonical URLs for the site's pages and posts.
+
+## Technical writing
+
+{% assign llms_posts = site.posts | sort: 'date' | reverse %}
+{% for post in llms_posts %}
+- [{{ post.title | strip_html | normalize_whitespace }}]({{ post.url | absolute_url }}): {{ post.description | default: post.excerpt | strip_html | normalize_whitespace }}
+{% endfor %}
