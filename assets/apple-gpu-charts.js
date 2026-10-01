@@ -9,6 +9,7 @@
     ink: "#344150",
     muted: "#607080",
     grid: "#dfe4ea",
+    blue: "#0072b2",
     green: "#009e73",
     paper: "#fbfaf7"
   };
@@ -39,9 +40,96 @@
     }
   };
 
-  Chart.register(speedupLabels);
+  var gpuValueLabels = {
+    id: "gpuValueLabels",
+    afterDatasetsDraw: function (chart) {
+      if (chart.canvas.id !== "apple-gpu-evolution-chart") {
+        return;
+      }
 
-  function createThroughputChart(id, legacy, nax, speedups, suggestedMax) {
+      var points = chart.getDatasetMeta(0).data;
+      var values = chart.data.datasets[0].data;
+      var context = chart.ctx;
+      context.save();
+      context.fillStyle = colors.ink;
+      context.font = '600 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      context.textAlign = "center";
+      context.textBaseline = "bottom";
+
+      points.forEach(function (point, index) {
+        if (chart.width < 600 && [0, 3, 6, values.length - 1].indexOf(index) === -1) {
+          return;
+        }
+        context.fillText(values[index].toLocaleString(), point.x, point.y - 8);
+      });
+
+      context.restore();
+    }
+  };
+
+  Chart.register(speedupLabels, gpuValueLabels);
+
+  function createGpuEvolutionChart() {
+    var canvas = document.getElementById("apple-gpu-evolution-chart");
+    if (!canvas) {
+      return;
+    }
+
+    var values = [5335, 8223, 13529, 15914, 19932, 22438, 27104, 32549, 45714, 63572];
+
+    new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: ["A11", "A12", "A13", "A14", "A15", "A16", "A17 Pro", "A18 Pro", "A19 Pro", "A20 Pro"],
+        datasets: [{
+          label: "Geekbench 6 Metal",
+          data: values,
+          borderColor: colors.blue,
+          backgroundColor: colors.blue,
+          pointBackgroundColor: values.map(function (_, index) {
+            return index === values.length - 1 ? colors.green : colors.blue;
+          }),
+          pointBorderColor: colors.paper,
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        normalized: true,
+        layout: { padding: { top: 24, right: 8 } },
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#273444",
+            padding: 10,
+            callbacks: {
+              label: function (context) {
+                return context.parsed.y.toLocaleString() + " points";
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            beginAtZero: true,
+            suggestedMax: 70000,
+            title: { display: true, text: "Metal score" },
+            grid: { color: colors.grid },
+            ticks: { maxTicksLimit: 6 }
+          }
+        }
+      }
+    });
+  }
+
+  function createThroughputChart(id, labels, legacy, nax, speedups, suggestedMax) {
     var canvas = document.getElementById(id);
     if (!canvas) {
       return;
@@ -50,7 +138,7 @@
     new Chart(canvas, {
       type: "bar",
       data: {
-        labels: ["F16", "Q8_0", "Q4_0"],
+        labels: labels,
         datasets: [
           {
             label: "Without NAX",
@@ -109,19 +197,23 @@
     });
   }
 
+  createGpuEvolutionChart();
+
   createThroughputChart(
     "nax-prefill-chart",
-    [1025.24, 1053.21, 988.82],
-    [3158.49, 3143.81, 3219.99],
-    ["3.08x", "2.98x", "3.26x"],
+    ["F16"],
+    [1025.24],
+    [3158.49],
+    ["3.08x"],
     3600
   );
 
   createThroughputChart(
     "nax-decode-chart",
-    [37.82, 64.86, 103.48],
-    [37.11, 72.42, 119.92],
-    ["0.98x", "1.12x", "1.16x"],
-    135
+    ["F16"],
+    [37.82],
+    [37.11],
+    ["0.98x"],
+    50
   );
 }());

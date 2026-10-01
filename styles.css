@@ -932,29 +932,6 @@ li::marker {
   font-weight: 760;
 }
 
-.tock-badge {
-  display: inline-block;
-  padding: 0.16rem 0.5rem;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 750;
-  line-height: 1.35;
-  white-space: nowrap;
-}
-
-.tock-badge--cpu {
-  border-color: #f3c79d;
-  background: #fff2e5;
-  color: #9a4b08;
-}
-
-.tock-badge--gpu {
-  border-color: #b9cff8;
-  background: #edf4ff;
-  color: #2457a7;
-}
-
 .gpu-family-label {
   white-space: nowrap;
 }

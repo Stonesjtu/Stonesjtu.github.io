@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "Apple GPU Evolution"
-description: "Apple GPU evolution from Dynamic Caching to Neural Accelerators, including Apple Silicon architecture, MLX Metal GEMM, and TensorOps."
+title: "Apple GPU Evolution for AI Compute"
+description: "Apple GPU evolution for AI compute, from Dynamic Caching and Neural Accelerators to TensorOps and MLX Metal GEMM."
 topic: "GPU architecture"
 date: 2026-09-09
-last_modified_at: 2026-09-10T17:14:00+08:00
-excerpt: "Apple GPU evolution from Dynamic Caching to Neural Accelerators, with an MLX Metal GEMM source walkthrough."
+last_modified_at: 2026-10-01T22:17:00+08:00
+excerpt: "Apple GPU evolution for AI compute, from Dynamic Caching and Neural Accelerators to the TensorOps and MLX software stack."
 ---
 
 ## SoC Evolution
@@ -17,28 +17,29 @@ Apple appears to follow a tick-tock cadence between the CPU + ANE subsystem[^ane
 | --- | --- | --- | --- | --- |
 | **M1 / A14** | New platform | 16 cores / 11 TOPS | New Apple7 platform | **New baseline** |
 | **M2 / A15–A16** | Minor update | 15.8 TOPS | Minor Apple8 update | **Overall refinement** |
-| **M3 / A17 Pro** | Medium update | Minor / medium update | **Major Apple9 update** | <span class="tock-badge tock-badge--gpu">GPU tock</span> |
-| **M4 / A18** | **Major CPU update** | **Major increase to 38 TOPS** | Apple9 refinement | <span class="tock-badge tock-badge--cpu">CPU/ANE tock</span> |
-| **M5 / A19** | Medium / major update | M5 Max: **25 FP16 TFLOPS / 50 INT8 TOPS (measured)**[^m5-max-ane-measured]; A19: refinement | **Major Apple10 update** | <span class="tock-badge tock-badge--gpu">GPU tock</span> |
-| **M6 / A20 (predicted)** | **CPU complex redesign / expansion** | **Dual 16-core ANE** | Apple10 refinement | <span class="tock-badge tock-badge--cpu">CPU/ANE tock</span> |
+| **M3 / A17 Pro** | Medium update | Minor / medium update | **Major Apple9 update** | GPU update |
+| **M4 / A18** | **Major CPU update** | **Major increase to 38 TOPS** | Apple9 refinement | CPU/ANE update |
+| **M5 / A19** | Medium / major update | M5 Max: **25 FP16 TFLOPS / 50 INT8 TOPS (measured)**[^m5-max-ane-measured]; A19: refinement | **Major Apple10 update** | GPU update |
+| **M6 / A20 Pro** | **12-core M6 CPU / 6-core A20 Pro CPU** | **Dual 16-core Neural Engine** | **12-core M6 GPU / 7-core A20 Pro GPU** | System-wide update[^m6-a20] |
 
 ## GPU Evolution
 
-> The A20 and M6 GPUs are predicted here to remain in the Apple10 family.
-
-<figure class="post-figure">
-  <img src="{{ '/assets/apple-gpu-evolution/a20-preview-gb6-compute.jpg' | relative_url }}" alt="Preview chart of A20 Geekbench 6 compute performance." />
-  <figcaption><strong>A20 preview.</strong> This forecast is supporting context for the predicted row, not a measured or official result.</figcaption>
+<figure class="post-figure post-chart">
+  <div class="chart-frame chart-frame--tall"><canvas id="apple-gpu-evolution-chart" role="img" aria-label="Line chart of measured Geekbench 6 Metal compute scores from A11 through A20 Pro. A20 Pro scores 63,572.">The measured values are summarized in the chart caption.</canvas></div>
+  <figcaption><strong>Measured Geekbench 6 Metal compute.</strong> A20 Pro reaches 63,572, replacing the earlier forecast. Geekbench scores are workload composites, not TFLOPS.</figcaption>
 </figure>
+
+The A20 Pro point uses a public Geekbench 6.7.2 result from September 21, 2026.[^gb6-a20]
 
 | GPU family | Representative SoCs | Peak SIMD-group FP16 TFLOPS (total / per core) | Peak NAX FP16 TFLOPS (total / per core) | Most important change |
 | --- | --- | --- | --- | --- |
 | <strong class="gpu-family-label">Apple7</strong> | A14 / M1 | A14: **0.65 / 0.16**<br>M1: **2.62 / 0.33** | — | TBDR + SIMD32 + UMA; starting point of the M-series GPU |
 | <strong class="gpu-family-label">Apple8</strong> | A15 / A16 / M2 | A15: **1.71 / 0.34**<br>A16: **~1.79 / ~0.36**<br>M2: **3.58 / 0.36** | — | Cache, bandwidth, and efficiency improvements; no fundamental shader-core redesign |
 | <strong class="gpu-family-label">Apple9</strong> | A17 / A18 / M3 / M4 | A17 Pro: **2.06 / 0.34**<br>A18 Pro: **2.26 / 0.38**<br>M3: **3.43 / 0.34**<br>M4: **4.04 / 0.40** | — | New shader core, **Dynamic Caching**, hardware ray tracing, and dynamic occupancy[^family9] |
-| <strong class="gpu-family-label">Apple10</strong> | A19 / A20 (predicted) / M5 / M6 (predicted) | A19 Pro: **4.98 / 0.82**<br>M5: **8.30 / 0.82**<br>A20 / M6: **TBD** | A19 Pro: **~9.96 / ~1.64**<br>M5: **~16.60 / ~1.64**<br>A20 / M6: **TBD** | A **Neural Accelerator** in every GPU core, 2× FP16 versus FP32 throughput, and Dynamic Caching Gen2[^m5-gpu] |
+| <strong class="gpu-family-label">Apple10</strong> | A19 / M5 / M6 | A19 Pro: **4.98 / 0.82**<br>M5: **8.30 / 0.82**<br>M6: **8.46 / 0.71 measured** | A19 Pro: **~9.96 / ~1.64**<br>M5: **~16.60 / ~1.64**<br>M6: **17–19.6 / 1.42–1.63 measured** | A **Neural Accelerator** in every GPU core, 2× FP16 versus FP32 throughput, and Dynamic Caching Gen2[^m5-gpu][^m6-measured] |
+| <strong class="gpu-family-label">Apple11 (reported)</strong> | A20 Pro / A20 | A20 Pro: **~5.6 / ~0.8**<br>A20: **—** | A20 Pro: **—**<br>A20: **—** | A20 Pro moves to 7 GPU cores and raises measured FP32 compute to about 2.8 TFLOPS; its SIMD FP16 value here applies the 2× FP16 rule.[^a20-pro-measured] |
 
-Each entry reads **total / per GPU core** for the highest-core base A- or M-series configuration. For Apple7–9, this table treats peak FP16 throughput as equal to FP32. For Apple10, SIMD-group FP16 is calculated as 2× FP32, while NAX FP16 is estimated as approximately 2× SIMD-group FP16. The NAX values are derived estimates, not measurements or Apple-published peaks. Except for Apple's published 2.6-TFLOPS M1 figure, the base values come from reported GPU width and clock rate and are rounded to two decimals. Pro, Max, and Ultra variants are not included.[^gpu-peak]
+Each entry reads **total / per GPU core** for the highest-core base A- or M-series configuration. For Apple7–9, this table treats peak FP16 throughput as equal to FP32. For Apple10 and the reported Apple11 result, SIMD-group FP16 is 2× FP32. Values marked **measured** come from sustained peak microbenchmarks; `~` values are estimates. A20 remains blank because no reliable public measurement is available. Except for Apple's published 2.6-TFLOPS M1 figure, earlier values come from reported GPU width and clock rate and are rounded to two decimals. Pro, Max, and Ultra variants are not included unless named.[^gpu-peak]
 
 ### Basic architecture
 
@@ -122,36 +123,31 @@ The cleanest complete comparison in the `llama.cpp` reports uses the same 40-cor
     <section class="chart-panel">
       <p class="chart-title">Prefill throughput</p>
       <p class="chart-subtitle">Prompt processing, batch size 512</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="nax-prefill-chart" role="img" aria-label="Grouped bar chart comparing M5 Max prefill throughput with legacy Metal and the NAX Tensor API for F16, Q8_0, and Q4_0. NAX is approximately three times faster for all three formats.">The exact throughput values are available in the table below.</canvas></div>
+      <div class="chart-frame chart-frame--compact"><canvas id="nax-prefill-chart" role="img" aria-label="Grouped bar chart comparing M5 Max F16 prefill throughput with legacy Metal and the NAX Tensor API. NAX is 3.08 times faster.">The exact throughput values are available in the table below.</canvas></div>
     </section>
     <section class="chart-panel">
       <p class="chart-title">Decode throughput</p>
       <p class="chart-subtitle">Token generation, batch size 1</p>
-      <div class="chart-frame chart-frame--compact"><canvas id="nax-decode-chart" role="img" aria-label="Grouped bar chart comparing M5 Max decode throughput with legacy Metal and the NAX Tensor API for F16, Q8_0, and Q4_0. Decode changes range from a slight regression to a 16 percent improvement.">The exact throughput values are available in the table below.</canvas></div>
+      <div class="chart-frame chart-frame--compact"><canvas id="nax-decode-chart" role="img" aria-label="Grouped bar chart comparing M5 Max F16 decode throughput with legacy Metal and the NAX Tensor API. Throughput is effectively unchanged.">The exact throughput values are available in the table below.</canvas></div>
     </section>
   </div>
-  <figcaption><strong>M5 Max llama.cpp throughput.</strong> NAX raises compute-bound prefill by about 3x across F16, Q8_0, and Q4_0, while memory-bound single-token decode remains close to the legacy path. Labels above the green bars show the with-NAX / without-NAX ratio.</figcaption>
+  <figcaption><strong>M5 Max llama.cpp F16 throughput.</strong> NAX raises compute-bound prefill by 3.08×, while memory-bound single-token decode is effectively unchanged. Labels above the green bars show the with-NAX / without-NAX ratio.</figcaption>
 </figure>
 
 | Phase | Format | Without NAX, legacy Metal (t/s) | With NAX, Tensor API (t/s) | Speedup |
 | --- | --- | ---: | ---: | ---: |
 | Prefill (`pp512`) | F16 | 1,025.24 | 3,158.49 | **3.08x** |
-| Prefill (`pp512`) | Q8_0 | 1,053.21 | 3,143.81 | **2.98x** |
-| Prefill (`pp512`) | Q4_0 | 988.82 | 3,219.99 | **3.26x** |
 | Decode (`tg128`) | F16 | 37.82 | 37.11 | **0.98x** |
-| Decode (`tg128`) | Q8_0 | 64.86 | 72.42 | **1.12x** |
-| Decode (`tg128`) | Q4_0 | 103.48 | 119.92 | **1.16x** |
 
-Prefill improves by roughly **3x**, while decode changes by **-2% to +16%**. This is the expected shape: prefill exposes large matrix multiplications to NAX, whereas single-token decode remains dominated by moving model weights through memory.
+NAX makes prefill **3.08× faster**. Decode is effectively unchanged because single-token generation remains dominated by moving model weights through memory.
 
-This is a strong field comparison, but not a controlled same-build toggle: `llama.cpp` also improved between the two commits. A same-device branch-versus-main test from the original Tensor API pull request provides a useful cross-check: Mistral 7B Q4_0 prefill rose from 252.82 to 608.05 t/s (**2.40x**), while decode stayed effectively flat at 27.55 versus 26.59 t/s (**0.97x**).[^llamacpp-nax-ab]
+## GPU AI Software Stack
 
-`Q8_0` and `Q4_0` are GGUF block-quantized formats, not pure INT8 and INT4 arithmetic benchmarks.
+### TensorOps
 
-#### HOWTO use NAX: TensorOps
 - MatMul + Conv
-- Same API across M1–M5
-- Uses NAX on M5 and A19 Pro
+- Same API across Apple GPU generations
+- Uses NAX on supported GPUs
 - Can be mixed with other programmable Metal shader code[^m5-gpu]
 
 <figure class="post-figure">
@@ -167,28 +163,6 @@ Important features:
 | **26.3** | **Cooperative tensors** as inputs, enabling a user-defined prologue for custom dequantization |
 | **26.4** | 4-bit / 8-bit integer support |
 | **27** | Micro-scaling MXFP4 / MXFP8 / FP8 / 2-bit integer support |
-
-#### Cooperative tensors
-
-Cooperative tensors keep a MatMul result in fast thread memory for in-place post-processing.[^m5-gpu]
-
-<div class="post-compare-grid">
-  <figure class="post-figure">
-    <img src="{{ '/assets/apple-gpu-evolution/cooperative-before.png' | relative_url }}" alt="Before cooperative tensors, a matrix result travels through device memory before custom processing." />
-    <figcaption><strong>Before.</strong> The MatMul output is written to and read back from slower device memory.</figcaption>
-  </figure>
-  <figure class="post-figure">
-    <img src="{{ '/assets/apple-gpu-evolution/cooperative-after.png' | relative_url }}" alt="With cooperative tensors, a matrix result remains in per-thread on-chip memory for custom processing." />
-    <figcaption><strong>After.</strong> The MatMul output stays in fast thread memory for in-place post-processing.</figcaption>
-  </figure>
-</div>
-
-How to:
-
-<figure class="post-figure">
-  <img src="{{ '/assets/apple-gpu-evolution/cooperative-howto.png' | relative_url }}" alt="Metal code showing how to create and consume a cooperative tensor." />
-  <figcaption><strong>Cooperative tensor API.</strong> The result is distributed across participating threads, modified in place, then stored once.</figcaption>
-</figure>
 
 ### MLX Metal GEMM: from dispatch to NAX
 
@@ -469,7 +443,10 @@ GPU trace replay isolates work for cost graphs, counters, register use, divergen
 [^family9]: Apple Developer, [Explore GPU advancements in M3 and A17 Pro](https://developer.apple.com/videos/play/tech-talks/111375/), Tech Talks: Apple family 9 shader cores, Dynamic Caching, flexible on-chip memory, dynamic occupancy, hardware ray tracing, and mesh shading.
 [^m5-gpu]: Apple Developer, [Accelerate your machine learning workloads with the M5 and A19 GPUs](https://developer.apple.com/videos/play/tech-talks/111432/), Tech Talks: per-shader-core Neural Accelerators, TensorOps, cooperative tensors, Metal System Trace, and Xcode Metal debugger.
 [^llamacpp-m5-max]: ggml-org, [`llama.cpp` Apple Silicon performance discussion](https://github.com/ggml-org/llama.cpp/discussions/4167): M5 Max 40-core legacy Metal reports by [Hassan-A-K](https://github.com/ggml-org/llama.cpp/discussions/4167#discussioncomment-16353087) and [CSendner](https://github.com/ggml-org/llama.cpp/discussions/4167#discussioncomment-16400323), plus the accepted [Tensor API result](https://github.com/ggml-org/llama.cpp/discussions/4167#discussioncomment-18152504). All use Llama 2 7B, `pp512`, `tg128`, and full GPU offload; the legacy pair is averaged in the table.
-[^llamacpp-nax-ab]: ggml-org, [`llama.cpp` PR #16634: initial Metal 4 Tensor API support](https://github.com/ggml-org/llama.cpp/pull/16634) and its [M5 branch-versus-main benchmark](https://github.com/ggml-org/llama.cpp/pull/16634#issuecomment-3445563655), October-November 2025. The pull request added Tensor API detection, an opt-out environment variable, and M5-or-later gating.
+[^m6-a20]: Apple, ["Apple introduces M6 and M5 Ultra"](https://www.apple.com/newsroom/2026/08/apple-introduces-m6-and-m5-ultra-for-a-big-leap-in-performance-and-ai-compute/) and ["Apple debuts iPhone 18 Pro and iPhone 18 Pro Max"](https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/), August-September 2026: M6 has a 12-core CPU, 12-core GPU, and Dual 16-core Neural Engine; A20 Pro has a 6-core CPU, 7-core GPU, and Dual 16-core Neural Engine.
+[^gb6-a20]: Primate Labs, [A20 Pro Geekbench 6.7.2 Metal result](https://browser.geekbench.com/v6/compute/6904398), September 21, 2026: 63,572 points on an iPhone19,3. The preceding points retain the measured values used in the original chart.
+[^m6-measured]: Mohamed Amine Bergach, ["Bandwidth, Not FLOPS: FFT Kernels, Matrix Units and SAR Imaging on Apple M6"](https://arxiv.org/abs/2609.32237), September 2026: a 12-core Apple10 GPU measured at 8.46 TFLOPS FP16 FMA; GPU matrix units reached 17-19.6 TFLOPS on 1024-2048 matrix products.
+[^a20-pro-measured]: Apple reports a 7-core A20 Pro GPU with up to 40% higher graphics performance in [its iPhone 18 Pro announcement](https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/). Geekerwan's A20 Pro testing, summarized by [Mobbang](https://www.mobbang.com/mb/309959.html), reports Apple family 11 and about 2.8 TFLOPS FP32; the table derives approximately 5.6 TFLOPS SIMD FP16 from the 2x FP16 rule.
 [^m5-max-ane-measured]: Kaiyu Shi, local M5 Max ANE throughput measurement, September 9, 2026: 25 TFLOPS at FP16 and 50 TOPS at INT8; measured results rather than Apple-published peak specifications.
 [^gpu-peak]: Apple, [Apple unleashes M1](https://www.apple.com/newsroom/2020/11/apple-unleashes-m1/), November 2020, reporting 2.6 TFLOPS for M1; Philip Turner, [Apple GPU microarchitecture benchmarks](https://github.com/philipturner/metal-benchmarks), FP32 FLOPS, core-count, and clock tables through Apple8; HubWeb, [A-series](https://hubweb.cn/apple-silicon/chip-a/) and [M-series](https://hubweb.cn/apple-silicon/chip-m/) comparison tables, used for later GPU width and clock inputs. Later values are derived estimates, not Apple-published peak specifications.
 [^mlx-linear]: MLX, [`Linear.__call__`](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/python/mlx/nn/layers/linear.py#L65-L70).
@@ -482,9 +459,8 @@ GPU trace replay isolates work for cost graphs, counters, register use, divergen
 [^mlx-nax-memory]: MLX, [`gemm_loop` device loads](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/gemm_nax.h#L25-L93) and [NAX output store](https://github.com/ml-explore/mlx/blob/3a6219917e4535575ce5bce2fc2ba27a483a709b/mlx/backend/metal/kernels/steel/gemm/kernels/steel_gemm_fused_nax.h#L178-L213).
 [^metal-memory]: Apple, ["Learn performance best practices for Metal shaders"](https://developer.apple.com/videos/play/tech-talks/111373/), address spaces and caching; [Metal Shading Language Specification](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf), address-space semantics.
 [^metal-tensors]: Apple, [Metal Shading Language Specification](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf), tensor operations; see also ["Optimize custom machine learning operations with Metal tensors"](https://developer.apple.com/videos/play/wwdc2026/330/). The linked specification is updated by Apple; MLX excerpts above are pinned to a commit.
-[^m-series]: HubWeb, [Apple M-series specification comparison](https://hubweb.cn/apple-silicon/chip-m/): secondary comparison source for M-series generation data.
 [^ane-execution]: Apple Neural Engine: A Complete Guide, [Execution model](https://ane-guide.readthedocs.io/en/latest/part-1-machine/02-execution-model.html): reverse-engineered ANE execution context; not an Apple specification.
 
 <script defer src="{{ '/assets/vendor/chart.umd.min.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/chart-theme.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/apple-gpu-charts.js' | relative_url }}?v=20260910a"></script>
+<script defer src="{{ '/assets/apple-gpu-charts.js' | relative_url }}?v=20261001"></script>
