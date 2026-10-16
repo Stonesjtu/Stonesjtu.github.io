@@ -1,0 +1,26 @@
+/* Scoped formatting for the annotated LLM watermark draft. */
+.watermark-status-table { max-width: 100%; overflow-x: auto; margin: 1.25rem 0; }
+.watermark-status-table table { min-width: 720px; width: 100%; table-layout: fixed; margin: 0; }
+.watermark-status-table th, .watermark-status-table td { vertical-align: top; white-space: normal; overflow-wrap: anywhere; }
+.watermark-status-table th:nth-child(1) { width: 13%; }
+.watermark-status-table th:nth-child(2) { width: 16%; }
+.watermark-status-table th:nth-child(3) { width: 16%; }
+.watermark-status-table th:nth-child(4) { width: 29%; }
+.watermark-status-table th:nth-child(5) { width: 26%; }
+.watermark-video video { display: block; width: 100%; height: auto; border-radius: 8px; }
+.watermark-overview picture, .watermark-overview img { display: block; width: 100%; }
+.watermark-red-green { max-width: 640px; margin-inline: auto; }
+.watermark-synthid-grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr); align-items: start; }
+.watermark-synthid-grid img { display: block; width: 100%; height: auto; }
+@media (max-width: 900px) {
+  .watermark-synthid-grid { grid-template-columns: 1fr; }
+  .watermark-synthid-grid figure:first-child { max-width: 600px; margin-inline: auto; }
+}
+/* Preserve legible paper labels within a contained mobile figure viewport. */
+.watermark-pan { display: block; max-width: 100%; overflow-x: auto; }
+@media (max-width: 640px) {
+  .watermark-red-green .watermark-pan img { width: 640px; min-width: 640px; max-width: none; }
+  .watermark-synthid-grid .watermark-pan img { width: 720px; min-width: 720px; max-width: none; }
+}
+
+.watermark-video video:focus-visible { outline: 3px solid #5687c4; outline-offset: 4px; }
