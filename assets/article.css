@@ -1,0 +1,172 @@
+/* Research article presentation, inspired by Apple Machine Learning Research.
+   Keep prose narrow, evidence spacious, and captions outside the chart surface. */
+.site-layout .post-content {
+  --reading-width: 680px;
+  max-width: none;
+  padding-top: 12px;
+  color: #1d1d1f;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.site-layout .post-content > :is(p, ul, ol, blockquote, h2, h3, h4, .footnotes) {
+  max-width: var(--reading-width);
+  margin-inline: auto;
+}
+
+.site-layout .post-hero {
+  max-width: 800px;
+  margin-inline: auto;
+  padding-bottom: 36px;
+}
+
+.site-layout .post-hero h1 {
+  font-size: clamp(2.1rem, 3.8vw, 3.35rem);
+  font-weight: 650;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+  overflow-wrap: normal;
+}
+
+.site-layout .post-excerpt {
+  max-width: 680px;
+  color: #6e6e73;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.site-layout .post-content h2 {
+  margin-top: 2.6em;
+  margin-bottom: .8em;
+  font-size: clamp(1.45rem, 2.5vw, 1.8rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.site-layout .post-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.site-layout .post-figure {
+  margin: 40px 0;
+}
+
+.site-layout .post-figure img {
+  border: 0;
+  border-radius: 8px;
+}
+
+.site-layout .post-figure figcaption {
+  max-width: var(--reading-width);
+  margin: 16px auto 0;
+  color: #6e6e73;
+  font-size: 13px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.site-layout .post-figure figcaption strong {
+  color: #424245;
+  font-weight: 600;
+}
+
+.site-layout .post-chart {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.site-layout .post-chart > :is(.chart-grid, .chart-frame) {
+  border-radius: 12px;
+  background: #f5f5f7;
+}
+
+.site-layout .post-chart > .chart-grid {
+  padding: 28px 24px;
+  gap: 32px;
+}
+
+.site-layout .chart-grid--two .chart-panel + .chart-panel {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.site-layout .post-content .chart-title {
+  margin-bottom: 6px;
+  color: #1d1d1f;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.site-layout .post-content .chart-subtitle {
+  color: #6e6e73;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.site-layout .post-content table {
+  margin-block: 28px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.site-layout .post-content :is(th, td) {
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid #dedee3;
+}
+
+.site-layout .post-content th {
+  background: transparent;
+  border-bottom-color: #86868b;
+}
+
+.site-layout .post-content pre,
+.site-layout .post-content .highlight {
+  border: 1px solid #dedee3;
+  border-radius: 8px;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  box-shadow: none;
+}
+
+.site-layout .post-content .highlight pre {
+  border: 0;
+  background: transparent;
+}
+
+.site-layout .post-content .highlight :is(.k, .kc, .kd, .kn, .kp, .kr, .kt) { color: #8c3f95; }
+.site-layout .post-content .highlight :is(.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .sr, .s1, .ss) { color: #28724b; }
+.site-layout .post-content .highlight :is(.na, .nb, .bp, .nc, .nf, .fm, .nn, .nt) { color: #0066cc; }
+.site-layout .post-content .highlight :is(.m, .mb, .mf, .mh, .mi, .il, .mo, .mx) { color: #875600; }
+
+.site-layout .post-content .key-insight {
+  border-left: 2px solid #86868b;
+  border-radius: 0;
+  background: #f5f5f7;
+  color: #424245;
+}
+
+.site-layout .key-insight strong { color: #424245; }
+
+@media (max-width: 760px) {
+  .site-layout .chart-grid--two { grid-template-columns: 1fr; }
+  .site-layout .chart-grid--two .chart-panel + .chart-panel {
+    padding-top: 24px;
+    border-top: 1px solid #dedee3;
+  }
+}
+
+@media (max-width: 540px) {
+  .site-layout .post-content { font-size: 16px; }
+  .site-layout .post-hero { padding-bottom: 24px; }
+  .site-layout .post-excerpt { font-size: 1rem; }
+  .site-layout .post-figure { margin-block: 28px; }
+  .site-layout .post-chart > .chart-grid { padding: 22px 12px; }
+  .site-layout .post-content :is(th, td) { padding: 12px; }
+  .site-layout .post-figure figcaption { font-size: 12px; }
+}

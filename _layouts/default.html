@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ '/styles.css' | relative_url }}?v=20260909-gpu-peak" />
     <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}?v=20260912-apple-about" />
     <link rel="stylesheet" href="{{ '/assets/liquid-glass.css' | relative_url }}?v=20260913" />
+    {% if page.layout == 'post' %}<link rel="stylesheet" href="{{ '/assets/article.css' | relative_url }}?v=20261019" />{% endif %}
   </head>
   <body class="site-layout">
     <div class="app-shell">
