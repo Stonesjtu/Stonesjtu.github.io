@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}?v=20260912-apple-about" />
     <link rel="stylesheet" href="{{ '/assets/liquid-glass.css' | relative_url }}?v=20260913" />
     {% if page.layout == 'post' %}<link rel="stylesheet" href="{{ '/assets/article.css' | relative_url }}?v=20261019" />{% endif %}
+    {% if page.url == '/about/' or page.url == '/cv/' %}<link rel="stylesheet" href="{{ '/assets/profile.css' | relative_url }}?v=20261019" />{% endif %}
   </head>
   <body class="site-layout">
     <div class="app-shell">
@@ -20,8 +21,9 @@
         <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
         <p class="site-tagline">AI Infrastructure Engineer</p>
         <nav class="site-nav" aria-label="Primary navigation">
-          <a href="{{ '/' | relative_url }}"{% if page.url != "/about/" %} data-active="true"{% endif %}>Writing</a>
+          <a href="{{ '/' | relative_url }}"{% if page.url != "/about/" and page.url != "/cv/" %} data-active="true"{% endif %}>Writing</a>
           <a href="{{ '/about/' | relative_url }}"{% if page.url == "/about/" %} aria-current="page"{% endif %}>About</a>
+          <a href="{{ '/cv/' | relative_url }}"{% if page.url == "/cv/" %} aria-current="page"{% endif %}>CV</a>
         </nav>
         <div class="sidebar-links" aria-label="Profile links">
           <a href="https://github.com/{{ site.github_username }}" target="_blank" rel="noreferrer">GitHub</a>

@@ -1,0 +1,105 @@
+---
+layout: default
+title: CV
+permalink: /cv/
+description: "Kaiyu Shi’s curriculum vitae: work experience, education, technical skills, publications, and patents in AI systems and compilers."
+---
+
+<main class="content-page cv-page" id="top">
+  <header class="page-hero cv-hero">
+    <p class="eyebrow">Curriculum vitae</p>
+    <h1>Kaiyu Shi <span lang="zh">石开宇</span></h1>
+    <p class="lead-copy">AI infrastructure engineer · Model serving, training systems, and compilers.</p>
+    <a class="profile-text-link" href="{{ '/about/' | relative_url }}">About me <span aria-hidden="true">↗</span></a>
+  </header>
+  <nav class="cv-nav" aria-label="CV sections">
+    <a href="#experience">Experience</a>
+    <a href="#background">Education &amp; skills</a>
+    <a href="#publications-title">Publications</a>
+    <a href="#patents-title">Patents</a>
+  </nav>
+
+  <section class="content-card" id="experience" aria-labelledby="experience-title">
+    <div class="section-heading">
+      <p class="eyebrow">Career</p>
+      <h2 id="experience-title">Experience</h2>
+    </div>
+    <div class="simple-timeline">
+      {% for item in site.data.experience %}
+      <article class="experience-card">
+        <div class="experience-meta">
+          <span>{{ item.scope }}</span>
+          <span>{{ item.tags }}</span>
+        </div>
+        <h3>{{ item.title }}</h3>
+        <ul>
+          {% for point in item.points %}
+          <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="content-card credentials about-background" id="background" aria-labelledby="background-title">
+    <div class="section-heading">
+      <p class="eyebrow">Background</p>
+      <h2 id="background-title">Education and Toolbox</h2>
+    </div>
+    <div class="about-columns">
+      <div>
+        <h3>Education</h3>
+        <div class="compact-list">
+          {% for item in site.data.education %}
+          <article>
+            <h4>{{ item.school }}</h4>
+            <p>{{ item.degree }}, {{ item.year }} - {{ item.field }}{% if item.extra %}. {{ item.extra }}{% endif %}</p>
+          </article>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <h3>Skills</h3>
+        <div class="skill-cloud">
+          {% for skill in site.data.skills %}
+          <span>{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-card credentials" aria-labelledby="publications-title">
+    <div class="section-heading">
+      <p class="eyebrow">Research</p>
+      <h2 id="publications-title">Publications</h2>
+    </div>
+    <div class="publications no-top-rule">
+      <ol>
+        {% for item in site.data.publications %}
+        {% if item.category == 'paper' %}
+        <li>{{ item.text }}</li>
+        {% endif %}
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
+  <section class="content-card credentials" aria-labelledby="patents-title">
+    <div class="section-heading">
+      <p class="eyebrow">Research</p>
+      <h2 id="patents-title">Patents</h2>
+    </div>
+    <div class="publications no-top-rule">
+      <ol>
+        {% for item in site.data.publications %}
+        {% if item.category == 'patent' %}
+        <li>{{ item.text }}</li>
+        {% endif %}
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
+</main>

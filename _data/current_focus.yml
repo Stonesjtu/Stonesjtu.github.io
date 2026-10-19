@@ -1,0 +1,6 @@
+# Writing index focus only. About has an author-maintained focus in about.html.
+title: Apple silicon
+summary: Exploring how Apple silicon architecture, compilers, and GPU kernels shape model execution.
+posts:
+  - /2026/09/09/apple-gpu-evolution/
+  - /2026/09/02/apple-silicon-ai-compute-gpu-vs-ane/

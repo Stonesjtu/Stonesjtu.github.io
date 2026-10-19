@@ -2,126 +2,31 @@
 layout: default
 title: About
 permalink: /about/
-description: "About Kaiyu Shi, an AI infrastructure engineer working on Doubao mobile assistant, model serving, training systems, and AI compilers."
+description: "Meet Kaiyu Shi, an AI infrastructure engineer at ByteDance working on practical, efficient, and accessible AI systems."
 ---
 
-<main class="content-page" id="top">
-  <section class="page-hero about-hero" aria-labelledby="about-title">
+<main class="content-page about-page" id="top">
+  <section class="page-hero about-intro" aria-labelledby="about-title">
+    <p class="eyebrow">About me</p>
+    <h1 id="about-title">Everyone Should Enjoy AI</h1>
+    <p class="about-intro-name">Kaiyu Shi <span lang="zh">石开宇</span></p>
+    <p class="lead-copy">I’m an AI infrastructure engineer on ByteDance’s Doubao mobile assistant team.
+      I work on the systems that turn models into practical products.</p>
+    <p>I believe everyone should enjoy AI—and strong, open infrastructure helps make that possible.</p>
+  </section>
+
+  <section class="content-card about-focus" aria-labelledby="focus-title">
+    <p class="eyebrow">Current focus</p>
+    <h2 id="focus-title">Training, inference &amp; product co-design</h2>
+    <p>I bring training, inference, and product design together to deliver the best possible user experience—optimizing latency and cost together.</p>
+  </section>
+
+  <section class="about-cv-link" aria-labelledby="cv-link-title">
     <div>
-      <p class="eyebrow">About</p>
-      <h1 id="about-title">Everyone Should Enjoy AI</h1>
-      <p>
-        I’m Kaiyu Shi, an AI infrastructure engineer on ByteDance’s Doubao mobile assistant team.
-        I believe everyone should enjoy AI—and strong, open infrastructure helps make that possible.
-      </p>
-    </div>
-    <aside class="profile-panel" aria-label="Profile summary">
-      <img src="{{ site.avatar_url }}" width="240" height="240" alt="GitHub avatar for {{ site.github_username }}" />
-      <div>
-        <p class="profile-name">石开宇 · Kaiyu Shi</p>
-        <a class="profile-link" href="mailto:{{ site.email }}">{{ site.email }}</a>
-        <a class="profile-link" href="https://github.com/{{ site.github_username }}" target="_blank" rel="noreferrer">GitHub @{{ site.github_username }}</a>
-      </div>
-    </aside>
-  </section>
-
-  <section class="content-card" aria-labelledby="work-title">
-    <div class="section-heading">
-      <p class="eyebrow">What I work on</p>
-      <h2 id="work-title">From Models to Production</h2>
-    </div>
-    <p class="lead-copy">
-      I work across model serving, training systems, and hardware optimization to make AI
-      practical, efficient, and accessible.
-    </p>
-    <ul class="about-list">
-      <li><strong>Model serving:</strong> Deploy and optimize LLMs, VLMs, and GUI agents for Doubao mobile assistant, focusing on latency, throughput, and cost.</li>
-      <li><strong>Training systems:</strong> Integrate distributed training stacks, including VeOmni and verl on Ascend 910B.</li>
-      <li><strong>Hardware optimization:</strong> Improve model execution through AI compilers, NPU operators, and GPU kernels.</li>
-    </ul>
-  </section>
-
-  <section class="content-card" id="experience" aria-label="Experience timeline">
-    <div class="section-heading">
-      <p class="eyebrow">Selected work</p>
-      <h2>Experience</h2>
-    </div>
-    <div class="simple-timeline">
-      {% for item in site.data.experience %}
-      <article class="experience-card">
-        <div class="experience-meta">
-          <span>{{ item.scope }}</span>
-          <span>{{ item.tags }}</span>
-        </div>
-        <h3>{{ item.title }}</h3>
-        <ul>
-          {% for point in item.points limit:2 %}
-          <li>{{ point }}</li>
-          {% endfor %}
-        </ul>
-      </article>
-      {% endfor %}
-    </div>
-  </section>
-
-  <section class="content-card credentials about-background" id="background" aria-labelledby="background-title">
-    <div class="section-heading">
       <p class="eyebrow">Background</p>
-      <h2 id="background-title">Education and Toolbox</h2>
+      <h2 id="cv-link-title">The full picture</h2>
+      <p>Work experience, education, publications, and patents.</p>
     </div>
-    <div class="about-columns">
-      <div>
-        <h3>Education</h3>
-        <div class="compact-list">
-          {% for item in site.data.education %}
-          <article>
-            <h4>{{ item.school }}</h4>
-            <p>{{ item.degree }}, {{ item.year }} - {{ item.field }}{% if item.extra %}. {{ item.extra }}{% endif %}</p>
-          </article>
-          {% endfor %}
-        </div>
-      </div>
-      <div>
-        <h3>Skills</h3>
-        <div class="skill-cloud">
-          {% for skill in site.data.skills %}
-          <span>{{ skill }}</span>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
+    <a class="profile-cv-button" href="{{ '/cv/' | relative_url }}">View CV <span aria-hidden="true">↗</span></a>
   </section>
-
-  <section class="content-card credentials" aria-labelledby="publications-title">
-    <div class="section-heading">
-      <p class="eyebrow">Research</p>
-      <h2 id="publications-title">Publications</h2>
-    </div>
-    <div class="publications no-top-rule">
-      <ol>
-        {% for item in site.data.publications %}
-        {% if item.category == 'paper' %}
-        <li>{{ item.text }}</li>
-        {% endif %}
-        {% endfor %}
-      </ol>
-    </div>
-  </section>
-
-  <section class="content-card credentials" aria-labelledby="patents-title">
-    <div class="section-heading">
-      <p class="eyebrow">Research</p>
-      <h2 id="patents-title">Patents</h2>
-    </div>
-    <div class="publications no-top-rule">
-      <ol>
-        {% for item in site.data.publications %}
-        {% if item.category == 'patent' %}
-        <li>{{ item.text }}</li>
-        {% endif %}
-        {% endfor %}
-      </ol>
-    </div>
-  </section>
-
 </main>

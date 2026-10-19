@@ -1,0 +1,21 @@
+{% assign focus = site.data.current_focus %}
+<section class="current-focus" aria-labelledby="current-focus-title">
+  <div class="current-focus-heading">
+    <p class="eyebrow">Current focus</p>
+    <h2 id="current-focus-title">{{ focus.title | escape }}</h2>
+    <p class="focus-summary">{{ focus.summary | escape }}</p>
+  </div>
+  <div class="focus-list">
+    {% for url in focus.posts %}
+    {% assign featured = site.posts | where: 'url', url | first %}
+    {% if featured %}
+    <a class="focus-item" href="{{ featured.url | relative_url }}">
+      <span>Featured post · {{ featured.date | date: '%b %Y' }}</span>
+      <strong>{{ featured.title | escape }}</strong>
+      <p>{{ featured.description | default: featured.excerpt | strip_html | escape }}</p>
+      <span class="focus-item-action">Read article →</span>
+    </a>
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>
