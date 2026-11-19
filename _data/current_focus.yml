@@ -2,5 +2,6 @@
 title: Apple silicon
 summary: Exploring how Apple silicon architecture, compilers, and GPU kernels shape model execution.
 posts:
+  - /2026/11/17/apple-gpu-kernel-issue/
   - /2026/09/09/apple-gpu-evolution/
   - /2026/09/02/apple-silicon-ai-compute-gpu-vs-ane/
